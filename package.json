@@ -1,0 +1,19 @@
+{
+  "name": "animora",
+  "version": "1.0.0",
+  "description": "Next-Gen Anime & Movie Streaming Platform powered by AniList GraphQL v2 and Mirror-Box API",
+  "author": "Rasel Khan (code9xrs-hub)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code9xrs-hub/animora.git"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "node start.js",
+    "server": "node server/src/index.js",
+    "client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client"
+  }
+}

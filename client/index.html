@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TD4S9HSEG5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-TD4S9HSEG5');
+    </script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F47521'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141519" />
+    <meta name="description" content="Stream thousands of trending anime series, simulcasts, and movies in HD with zero-wait direct downloads and multi-server playback powered by AniList & Mirror-Box on Animora." />
+    <meta name="keywords" content="anime, stream anime, watch anime online, animora, simulcasts, anime movies, free anime hd, english sub, english dub, 1080p anime, anilist, mirrorbox" />
+    <meta name="author" content="Animora" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Animora" />
+    <meta property="og:title" content="Animora — Stream Popular Anime & Movies Free" />
+    <meta property="og:description" content="Stream thousands of trending anime series, simulcasts, and movies in HD with zero-wait direct downloads and multi-server playback." />
+    <meta property="og:image" content="https://s4.anilist.co/file/anilistcdn/media/anime/banner/113415-jQBSkxWAAk83.jpg" />
+    <meta property="og:url" content="" id="og-url" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Animora — Stream Popular Anime & Movies Free" />
+    <meta name="twitter:description" content="Stream thousands of trending anime series, simulcasts, and movies in HD with zero-wait direct downloads and multi-server playback." />
+    <meta name="twitter:image" content="https://s4.anilist.co/file/anilistcdn/media/anime/banner/113415-jQBSkxWAAk83.jpg" />
+
+    <!-- Mobile App Capabilities -->
+    <meta name="application-name" content="Animora" />
+    <meta name="apple-mobile-web-app-title" content="Animora" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>Animora — Stream Popular Anime & Movies Free</title>
+
+    <!-- Dynamic Domain & Schema.org Structured Data -->
+    <script>
+      (function() {
+        try {
+          var origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+          var ogUrl = document.getElementById('og-url');
+          if (ogUrl) ogUrl.setAttribute('content', origin + '/');
+
+          var siteSchema = {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Animora",
+            "url": origin + "/",
+            "description": "Stream popular anime series, simulcasts, and movies in HD free with multi-server playback and direct downloads.",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": origin + "/browse?search={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          };
+          var script = document.createElement('script');
+          script.type = 'application/ld+json';
+          script.id = 'animora-site-jsonld';
+          script.textContent = JSON.stringify(siteSchema);
+          document.head.appendChild(script);
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#141519] text-white selection:bg-[#F47521] selection:text-black">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
