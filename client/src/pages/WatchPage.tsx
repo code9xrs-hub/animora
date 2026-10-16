@@ -172,6 +172,8 @@ export const WatchPage: React.FC = () => {
       <MirrorBoxPlayer
         animeTitle={title}
         activeEpisode={activeEpisode}
+        anilistId={media.id}
+        malId={media.idMal}
         hasPrevEpisode={hasPrevEpisode}
         hasNextEpisode={hasNextEpisode}
         onSelectPrev={handleSelectPrev}

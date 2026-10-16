@@ -25,11 +25,692 @@
   ],
   "history": [
     {
+      "anilistId": 21519,
+      "episodeNumber": 1,
+      "progressSeconds": 120,
+      "totalSeconds": 1440,
+      "watchedAt": "2026-10-16T19:03:57.978Z",
+      "media": {
+        "id": 21519,
+        "idMal": 32281,
+        "title": {
+          "romaji": "Kimi no Na wa.",
+          "english": "Your Name.",
+          "native": "君の名は。"
+        },
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "description": "Mitsuha Miyamizu, a high school girl, yearns to live the life of a boy in the bustling city of Tokyo—a dream that stands in stark contrast to her present life in the countryside. Meanwhile in the city, Taki Tachibana lives a busy life as a high school student while juggling his part-time job and hopes for a future in architecture.<br>\n<br>\nOne day, Mitsuha awakens in a room that is not her own and suddenly finds herself living the dream life in Tokyo—but in Taki's body! Elsewhere, Taki finds himself living Mitsuha's life in the humble countryside. In pursuit of an answer to this strange phenomenon, they begin to search for one another.<br>\n<br>\n<i>Kimi no Na wa.</i> revolves around Mitsuha and Taki's actions, which begin to have a dramatic impact on each other's lives, weaving them into a fabric held together by fate and circumstance.<br>\n<br>\n(Source: MAL Rewrite)",
+        "startDate": {
+          "year": 2016,
+          "month": 8,
+          "day": 26
+        },
+        "endDate": {
+          "year": 2016,
+          "month": 8,
+          "day": 26
+        },
+        "season": "SUMMER",
+        "seasonYear": 2016,
+        "episodes": 1,
+        "duration": 107,
+        "countryOfOrigin": "JP",
+        "source": "ORIGINAL",
+        "genres": [
+          "Drama",
+          "Romance",
+          "Supernatural"
+        ],
+        "averageScore": 85,
+        "popularity": 722291,
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21519-1ayMXgNlmByb.jpg",
+        "coverImage": {
+          "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21519-SUo3ZQuCbYhJ.png",
+          "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21519-SUo3ZQuCbYhJ.png",
+          "color": "#0da1e4"
+        },
+        "trailer": {
+          "id": "k4xGqY5IDBE",
+          "site": "youtube",
+          "thumbnail": "https://i.ytimg.com/vi/k4xGqY5IDBE/hqdefault.jpg"
+        },
+        "nextAiringEpisode": null,
+        "airingSchedule": {
+          "nodes": [
+            {
+              "id": 60170,
+              "episode": 1,
+              "airingAt": 1472137200,
+              "timeUntilAiring": -320040235
+            }
+          ]
+        },
+        "studios": {
+          "nodes": [
+            {
+              "id": 291,
+              "name": "CoMix Wave"
+            }
+          ]
+        },
+        "streamingEpisodes": [
+          {
+            "title": "Your Name.",
+            "thumbnail": "https://img1.ak.crunchyroll.com/i/spire3-tmb/0fffaee7712406fb5dcebb4d6e1805fc1660866426_full.jpg",
+            "url": "http://www.crunchyroll.com/watch/G4VUQJ94D/your-name",
+            "site": "Crunchyroll"
+          },
+          {
+            "title": "Episode 1 - your name.",
+            "thumbnail": "https://img1.ak.crunchyroll.com/i/spire2-tmb/ce4001b091149df6a34f565657c61f561765651420_full.jpg",
+            "url": "https://www.crunchyroll.com/watch/GEVUWZM1G/your-name",
+            "site": "Crunchyroll"
+          }
+        ],
+        "relations": {
+          "edges": [
+            {
+              "relationType": "CHARACTER",
+              "node": {
+                "id": 97962,
+                "idMal": 33902,
+                "type": "ANIME",
+                "format": "SPECIAL",
+                "status": "FINISHED",
+                "episodes": 3,
+                "season": "SUMMER",
+                "seasonYear": 2016,
+                "startDate": {
+                  "year": 2016,
+                  "month": 8,
+                  "day": 9
+                },
+                "title": {
+                  "romaji": "Suntory Minami Alps no Tennen Mizu",
+                  "english": null
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/97962-3rBcawJt63sG.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "ADAPTATION",
+              "node": {
+                "id": 97337,
+                "idMal": 99314,
+                "type": "MANGA",
+                "format": "MANGA",
+                "status": "FINISHED",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2016,
+                  "month": 5,
+                  "day": 27
+                },
+                "title": {
+                  "romaji": "Kimi no Na wa.",
+                  "english": "your name."
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx97337-aotf0vw3Ta1F.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "SIDE_STORY",
+              "node": {
+                "id": 97789,
+                "idMal": 100051,
+                "type": "MANGA",
+                "format": "NOVEL",
+                "status": "FINISHED",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2016,
+                  "month": 7,
+                  "day": 30
+                },
+                "title": {
+                  "romaji": "Kimi no Na wa. Another Side: Earthbound",
+                  "english": "your name. Another Side: Earthbound"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx97789-AIkhgBrelomp.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "CHARACTER",
+              "node": {
+                "id": 106286,
+                "idMal": 38826,
+                "type": "ANIME",
+                "format": "MOVIE",
+                "status": "FINISHED",
+                "episodes": 1,
+                "season": "SUMMER",
+                "seasonYear": 2019,
+                "startDate": {
+                  "year": 2019,
+                  "month": 7,
+                  "day": 19
+                },
+                "title": {
+                  "romaji": "Tenki no Ko",
+                  "english": "Weathering With You"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx106286-5COcpd0J9VbL.png"
+                }
+              }
+            },
+            {
+              "relationType": "CHARACTER",
+              "node": {
+                "id": 16782,
+                "idMal": 16782,
+                "type": "ANIME",
+                "format": "MOVIE",
+                "status": "FINISHED",
+                "episodes": 1,
+                "season": "SPRING",
+                "seasonYear": 2013,
+                "startDate": {
+                  "year": 2013,
+                  "month": 5,
+                  "day": 31
+                },
+                "title": {
+                  "romaji": "Kotonoha no Niwa",
+                  "english": "The Garden of Words"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16782-qpFGk18UqaHn.jpg"
+                }
+              }
+            }
+          ]
+        },
+        "characters": {
+          "edges": [
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 121514,
+                "name": {
+                  "full": "Mitsuha Miyamizu"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b121514-MGI7JRluscpz.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 121515,
+                  "name": {
+                    "full": "Mone Kamishiraishi"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n121515-RA4atoxdBxD1.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 121516,
+                "name": {
+                  "full": "Taki Tachibana"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b121516-kuPVJLNsH5uE.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95947,
+                  "name": {
+                    "full": "Ryuunosuke Kamiki"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95947-tFFSGE4ErP8B.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 121517,
+                "name": {
+                  "full": "Tsukasa Fujii"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/121517-JHgyJZkaxYiW.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 105989,
+                  "name": {
+                    "full": "Nobunaga Shimazaki"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n105989-96etzH1dLNug.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 121518,
+                "name": {
+                  "full": "Yotsuha Miyamizu"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/121518-wB61TbuDbqOc.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 121519,
+                  "name": {
+                    "full": "Kanon Tani"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/121519-8qcIFTMqHNB6.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 121520,
+                "name": {
+                  "full": "Hitoha Miyamizu"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/121520-UQ3c0qMgX6OJ.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 107070,
+                  "name": {
+                    "full": "Etsuko Ichihara"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/12070.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 121521,
+                "name": {
+                  "full": "Sayaka Natori"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/121521-Kicx28xd5UGp.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 101686,
+                  "name": {
+                    "full": "Aoi Yuuki"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n101686-PTd0lQZMsmcv.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 121522,
+                "name": {
+                  "full": "Miki Okudera"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b121522-TeGSD6ESVtc0.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 101329,
+                  "name": {
+                    "full": "Masami Nagasawa"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n101329-pgUq3x00yTou.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 121523,
+                "name": {
+                  "full": "Shinta Takagi"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/121523-uKlu97PM0bg0.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 115156,
+                  "name": {
+                    "full": "Kaito Ishikawa"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n115156-ngYfqBazlxYQ.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 121524,
+                "name": {
+                  "full": "Katsuhiko Teshigawara"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/121524-aSUbujPYjFRX.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 121525,
+                  "name": {
+                    "full": "Ryou Narita"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/121525-m6Mj1tEKmeJk.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "BACKGROUND",
+              "node": {
+                "id": 79463,
+                "name": {
+                  "full": "Takao Akizuki"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/79463.jpg"
+                }
+              },
+              "voiceActors": []
+            },
+            {
+              "role": "BACKGROUND",
+              "node": {
+                "id": 79465,
+                "name": {
+                  "full": "Yukari Yukino"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/n79465-9RmwiUdbYlo9.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95185,
+                  "name": {
+                    "full": "Kana Hanazawa"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95185-x8ZYvtN7SegC.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "BACKGROUND",
+              "node": {
+                "id": 150755,
+                "name": {
+                  "full": "Toshiki Miyamizu"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b150755-SZ54GLi3idnL.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95563,
+                  "name": {
+                    "full": "Masaki Terasoma"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95563-tMN0xtsy1qyh.png"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "recommendations": {
+          "nodes": [
+            {
+              "mediaRecommendation": {
+                "id": 20954,
+                "title": {
+                  "romaji": "Koe no Katachi",
+                  "english": "A Silent Voice"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 88,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20954-sYRfE5jQRtSB.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20954-sYRfE5jQRtSB.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 106286,
+                "title": {
+                  "romaji": "Tenki no Ko",
+                  "english": "Weathering With You"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 81,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx106286-5COcpd0J9VbL.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx106286-5COcpd0J9VbL.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 99750,
+                "title": {
+                  "romaji": "Kimi no Suizou wo Tabetai",
+                  "english": "I Want to Eat Your Pancreas"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 84,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99750-pNyly9d3MEgV.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99750-pNyly9d3MEgV.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 1689,
+                "title": {
+                  "romaji": "Byousoku 5 Centimeter",
+                  "english": "5 Centimeters per Second"
+                },
+                "format": "MOVIE",
+                "episodes": 3,
+                "averageScore": 71,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1689-rJKhjLEjQHSy.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1689-rJKhjLEjQHSy.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 16782,
+                "title": {
+                  "romaji": "Kotonoha no Niwa",
+                  "english": "The Garden of Words"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 75,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx16782-qpFGk18UqaHn.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16782-qpFGk18UqaHn.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 142770,
+                "title": {
+                  "romaji": "Suzume no Tojimari",
+                  "english": "Suzume"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 81,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx142770-dDaDIRnsv5jN.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx142770-dDaDIRnsv5jN.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 104157,
+                "title": {
+                  "romaji": "Seishun Buta Yarou wa Yumemiru Shoujo no Yume wo Minai",
+                  "english": "Rascal Does Not Dream of a Dreaming Girl"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 84,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx104157-rk99XI56PaIC.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx104157-rk99XI56PaIC.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 114963,
+                "title": {
+                  "romaji": "Nakitai Watashi wa Neko wo Kaburu",
+                  "english": "A Whisker Away"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 73,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx114963-QWMbi5ttovSK.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx114963-QWMbi5ttovSK.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 21827,
+                "title": {
+                  "romaji": "Violet Evergarden",
+                  "english": "Violet Evergarden"
+                },
+                "format": "TV",
+                "episodes": 13,
+                "averageScore": 85,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21827-ubzq619ZA2E9.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21827-ubzq619ZA2E9.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 2236,
+                "title": {
+                  "romaji": "Toki wo Kakeru Shoujo",
+                  "english": "The Girl Who Leapt Through Time"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 78,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx2236-tH5fWFkHyVGg.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx2236-tH5fWFkHyVGg.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 142455,
+                "title": {
+                  "romaji": "Bubble",
+                  "english": "Bubble"
+                },
+                "format": "ONA",
+                "episodes": 1,
+                "averageScore": 71,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx142455-5cBnV4rz5ISf.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx142455-5cBnV4rz5ISf.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 99457,
+                "title": {
+                  "romaji": "Sayonara no Asa ni Yakusoku no Hana wo Kazarou",
+                  "english": "Maquia: When the Promised Flower Blooms"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 82,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99457-OD0xtM8NlHNQ.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99457-OD0xtM8NlHNQ.png"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
       "anilistId": 170942,
       "episodeNumber": 1,
       "progressSeconds": 120,
       "totalSeconds": 1440,
-      "watchedAt": "2026-10-16T18:16:45.353Z",
+      "watchedAt": "2026-10-16T19:00:21.724Z",
       "media": {
         "id": 170942,
         "idMal": 57181,
@@ -82,151 +763,151 @@
               "id": 390428,
               "episode": 1,
               "airingAt": 1727967360,
-              "timeUntilAiring": -64207242
+              "timeUntilAiring": -64209853
             },
             {
               "id": 390429,
               "episode": 2,
               "airingAt": 1727967360,
-              "timeUntilAiring": -64207242
+              "timeUntilAiring": -64209853
             },
             {
               "id": 390430,
               "episode": 3,
               "airingAt": 1728572160,
-              "timeUntilAiring": -63602442
+              "timeUntilAiring": -63605053
             },
             {
               "id": 390431,
               "episode": 4,
               "airingAt": 1729176960,
-              "timeUntilAiring": -62997642
+              "timeUntilAiring": -63000253
             },
             {
               "id": 390432,
               "episode": 5,
               "airingAt": 1729781760,
-              "timeUntilAiring": -62392842
+              "timeUntilAiring": -62395453
             },
             {
               "id": 390433,
               "episode": 6,
               "airingAt": 1730386560,
-              "timeUntilAiring": -61788042
+              "timeUntilAiring": -61790653
             },
             {
               "id": 390434,
               "episode": 7,
               "airingAt": 1730991360,
-              "timeUntilAiring": -61183242
+              "timeUntilAiring": -61185853
             },
             {
               "id": 390435,
               "episode": 8,
               "airingAt": 1731596160,
-              "timeUntilAiring": -60578442
+              "timeUntilAiring": -60581053
             },
             {
               "id": 390436,
               "episode": 9,
               "airingAt": 1732200960,
-              "timeUntilAiring": -59973642
+              "timeUntilAiring": -59976253
             },
             {
               "id": 390437,
               "episode": 10,
               "airingAt": 1732805760,
-              "timeUntilAiring": -59368842
+              "timeUntilAiring": -59371453
             },
             {
               "id": 390438,
               "episode": 11,
               "airingAt": 1733410560,
-              "timeUntilAiring": -58764042
+              "timeUntilAiring": -58766653
             },
             {
               "id": 390439,
               "episode": 12,
               "airingAt": 1734015360,
-              "timeUntilAiring": -58159242
+              "timeUntilAiring": -58161853
             },
             {
               "id": 390440,
               "episode": 13,
               "airingAt": 1735224960,
-              "timeUntilAiring": -56949642
+              "timeUntilAiring": -56952253
             },
             {
               "id": 390441,
               "episode": 14,
               "airingAt": 1735829760,
-              "timeUntilAiring": -56344842
+              "timeUntilAiring": -56347453
             },
             {
               "id": 390442,
               "episode": 15,
               "airingAt": 1736434560,
-              "timeUntilAiring": -55740042
+              "timeUntilAiring": -55742653
             },
             {
               "id": 390443,
               "episode": 16,
               "airingAt": 1737039360,
-              "timeUntilAiring": -55135242
+              "timeUntilAiring": -55137853
             },
             {
               "id": 390444,
               "episode": 17,
               "airingAt": 1737644160,
-              "timeUntilAiring": -54530442
+              "timeUntilAiring": -54533053
             },
             {
               "id": 390445,
               "episode": 18,
               "airingAt": 1738248960,
-              "timeUntilAiring": -53925642
+              "timeUntilAiring": -53928253
             },
             {
               "id": 390446,
               "episode": 19,
               "airingAt": 1738853760,
-              "timeUntilAiring": -53320842
+              "timeUntilAiring": -53323453
             },
             {
               "id": 390447,
               "episode": 20,
               "airingAt": 1739458560,
-              "timeUntilAiring": -52716042
+              "timeUntilAiring": -52718653
             },
             {
               "id": 390448,
               "episode": 21,
               "airingAt": 1740063360,
-              "timeUntilAiring": -52111242
+              "timeUntilAiring": -52113853
             },
             {
               "id": 390449,
               "episode": 22,
               "airingAt": 1740668160,
-              "timeUntilAiring": -51506442
+              "timeUntilAiring": -51509053
             },
             {
               "id": 390450,
               "episode": 23,
               "airingAt": 1741272960,
-              "timeUntilAiring": -50901642
+              "timeUntilAiring": -50904253
             },
             {
               "id": 390451,
               "episode": 24,
               "airingAt": 1741877760,
-              "timeUntilAiring": -50296842
+              "timeUntilAiring": -50299453
             },
             {
               "id": 390452,
               "episode": 25,
               "airingAt": 1742482560,
-              "timeUntilAiring": -49692042
+              "timeUntilAiring": -49694653
             }
           ]
         },

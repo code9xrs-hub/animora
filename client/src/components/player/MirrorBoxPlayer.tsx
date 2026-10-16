@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { Download, ChevronLeft, ChevronRight, Moon, Sun, Maximize2, Minimize2, Server } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, ChevronLeft, ChevronRight, Moon, Sun, Maximize2, Minimize2, Server, Volume2, Captions } from 'lucide-react';
 import { EpisodeItemDTO } from '../../types/anime';
+
+export type VideoServer = 'mirrorbox' | 'sub' | 'dub';
 
 interface MirrorBoxPlayerProps {
   animeTitle: string;
   activeEpisode: EpisodeItemDTO;
+  anilistId?: number | string;
+  malId?: number | null;
   hasPrevEpisode: boolean;
   hasNextEpisode: boolean;
   onSelectPrev: () => void;
@@ -14,6 +18,8 @@ interface MirrorBoxPlayerProps {
 export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
   animeTitle,
   activeEpisode,
+  anilistId,
+  malId,
   hasPrevEpisode,
   hasNextEpisode,
   onSelectPrev,
@@ -22,11 +28,30 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
   const [lightsOff, setLightsOff] = useState(false);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [activeServer, setActiveServer] = useState<VideoServer>('mirrorbox');
 
   const stream = activeEpisode.mirrorBoxStream;
-  const embedUrl = stream?.embedUrl || `https://mirrorboxapi.web.app/tv/${activeEpisode.episodeNumber}`;
-  const downloadUrl = stream?.downloadUrl || `https://mirrorboxapi.web.app/download/tv/${activeEpisode.episodeNumber}`;
   const isMovie = stream?.mediaType === 'movie';
+  const epNum = isMovie ? 1 : (activeEpisode.episodeNumber || 1);
+
+  // Compute active embed URL based on chosen server
+  let embedUrl = stream?.embedUrl || `https://mirrorboxapi.web.app/tv/${activeEpisode.episodeNumber}`;
+  if (activeServer === 'sub') {
+    embedUrl = anilistId
+      ? `https://megaplay.buzz/stream/ani/${anilistId}/${epNum}/sub`
+      : (malId ? `https://megaplay.buzz/stream/mal/${malId}/${epNum}/sub` : embedUrl);
+  } else if (activeServer === 'dub') {
+    embedUrl = anilistId
+      ? `https://megaplay.buzz/stream/ani/${anilistId}/${epNum}/dub`
+      : (malId ? `https://megaplay.buzz/stream/mal/${malId}/${epNum}/dub` : embedUrl);
+  }
+
+  const downloadUrl = stream?.downloadUrl || `https://mirrorboxapi.web.app/download/tv/${activeEpisode.episodeNumber}`;
+
+  // Reset loading state on episode or server change
+  useEffect(() => {
+    setIframeLoaded(false);
+  }, [activeServer, activeEpisode.episodeNumber, activeEpisode.mirrorBoxStream?.embedUrl]);
 
   return (
     <section className="relative w-full bg-black py-4">
@@ -47,14 +72,23 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
         {/* 16:9 Responsive Iframe Container */}
         <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#141519] shadow-2xl ring-1 ring-white/10">
           {!iframeLoaded && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#141519] text-white z-10">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#141519] text-white z-10 px-4 text-center">
               <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#F47521] border-t-transparent" />
               <p className="text-sm font-medium text-[#A0A0A0]">
-                Connecting to Mirror-Box CDN stream for {animeTitle}{' '}
-                {!isMovie && `(Episode ${activeEpisode.episodeNumber})`}...
+                Connecting to{' '}
+                {activeServer === 'mirrorbox'
+                  ? 'Mirror-Box Multi-Server CDN'
+                  : activeServer === 'sub'
+                  ? 'Megaplay SUB Server'
+                  : 'Megaplay DUB Server'}{' '}
+                for {animeTitle} {!isMovie && `(Episode ${activeEpisode.episodeNumber})`}...
               </p>
               <span className="text-xs text-[#4A4E58]">
-                Multi-server adaptive streams: Abyss, FileMoon, Vidmoly, Streamwish
+                {activeServer === 'mirrorbox'
+                  ? 'Adaptive Multi-Server Stream: Abyss, FileMoon, Vidmoly, Streamwish'
+                  : activeServer === 'sub'
+                  ? 'Secondary Server: High-Speed Subtitled Stream (Megaplay)'
+                  : 'Secondary Server: High-Speed English Dubbed Stream (Megaplay)'}
               </span>
             </div>
           )}
@@ -62,7 +96,7 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
           <iframe
             key={embedUrl}
             src={embedUrl}
-            title={`${animeTitle} - ${activeEpisode.title}`}
+            title={`${animeTitle} - ${activeEpisode.title} (${activeServer})`}
             width="100%"
             height="100%"
             frameBorder="0"
@@ -82,7 +116,7 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
         </div>
 
         {/* Crunchyroll-Style Player Action Bar */}
-        <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3 rounded-lg bg-[#23252B] px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white border border-[#4A4E58]/30">
+        <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 rounded-lg bg-[#23252B] px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white border border-[#4A4E58]/30">
           {/* Left Controls: Lights & Theater Mode */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
@@ -102,10 +136,54 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
             </button>
           </div>
 
-          {/* Center Info: Server Guidance Notice */}
-          <div className="hidden lg:flex items-center gap-2 text-xs text-[#A0A0A0] bg-[#141519]/70 px-3 py-1 rounded-full border border-white/5">
-            <Server className="w-3.5 h-3.5 text-[#2ABDBB]" />
-            <span>Multiple Servers: Switch between Abyss, FileMoon, Vidmoly & Streamwish in-player</span>
+          {/* Center: Server Selector (Mirror-Box, SUB, DUB) */}
+          <div className="flex items-center gap-1 bg-[#141519] p-1 rounded-lg border border-[#4A4E58]/40">
+            <span className="text-[10px] sm:text-[11px] font-bold text-[#A0A0A0] uppercase px-1.5 sm:px-2 flex items-center gap-1">
+              <Server className="w-3 h-3 text-[#F47521]" />
+              <span className="hidden xs:inline">Server:</span>
+            </span>
+
+            {/* Server 1: Mirror-Box Multi-Server */}
+            <button
+              onClick={() => setActiveServer('mirrorbox')}
+              className={`px-2.5 sm:px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1 ${
+                activeServer === 'mirrorbox'
+                  ? 'bg-[#F47521] text-black shadow font-black'
+                  : 'text-[#A0A0A0] hover:text-white hover:bg-white/5'
+              }`}
+              title="Primary HD Multi-Server (Abyss, FileMoon, Vidmoly, Streamwish)"
+            >
+              <span>HD-1</span>
+              <span className="hidden sm:inline text-[10px] opacity-80">(Multi)</span>
+            </button>
+
+            {/* Server 2: Megaplay SUB */}
+            <button
+              onClick={() => setActiveServer('sub')}
+              className={`px-2.5 sm:px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 ${
+                activeServer === 'sub'
+                  ? 'bg-[#2ABDBB] text-black shadow font-black'
+                  : 'text-[#A0A0A0] hover:text-white hover:bg-white/5'
+              }`}
+              title="Secondary Server SUB (Megaplay Softsub/Hardsub)"
+            >
+              <Captions className="w-3.5 h-3.5" />
+              <span>SUB</span>
+            </button>
+
+            {/* Server 3: Megaplay DUB */}
+            <button
+              onClick={() => setActiveServer('dub')}
+              className={`px-2.5 sm:px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 ${
+                activeServer === 'dub'
+                  ? 'bg-[#FAB818] text-black shadow font-black'
+                  : 'text-[#A0A0A0] hover:text-white hover:bg-white/5'
+              }`}
+              title="Secondary Server DUB (Megaplay English Dubbed)"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+              <span>DUB</span>
+            </button>
           </div>
 
           {/* Right Controls: Prev/Next & Download */}
