@@ -86,7 +86,11 @@ export const SeriesDetailPage: React.FC = () => {
   const isMovie = media.format === 'MOVIE';
   const title = media.title.english || media.title.romaji || 'Untitled';
   const startWatchingUrl = isMovie ? `/watch/${media.id}` : `/watch/${media.id}/ep/1`;
-  const firstDownloadUrl = episodes[0]?.mirrorBoxStream?.downloadUrl || `https://mirrorboxapi.web.app/download/movie/${media.id}`;
+  const firstStream = episodes[0]?.mirrorBoxStream;
+  const externalId = firstStream?.externalId || media.id;
+  const firstDownloadUrl = firstStream?.downloadUrl || (isMovie
+    ? `https://mirrorboxapi.web.app/download/movie/${externalId}`
+    : `https://mirrorboxapi.web.app/download/tv/${externalId}/1/1`);
 
   const handleBookmarkToggle = async () => {
     const added = await toggleWatchlist(media);

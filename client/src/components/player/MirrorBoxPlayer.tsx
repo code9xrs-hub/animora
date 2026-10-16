@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, ChevronLeft, ChevronRight, Moon, Sun, Maximize2, Minimize2, Server, Volume2, Captions } from 'lucide-react';
 import { EpisodeItemDTO } from '../../types/anime';
+import { resolveCrosswalkStream } from '../../api/crosswalkResolver';
 
 export type VideoServer = 'mirrorbox' | 'sub' | 'dub';
 
@@ -29,13 +30,42 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [activeServer, setActiveServer] = useState<VideoServer>('mirrorbox');
+  const [liveStream, setLiveStream] = useState(activeEpisode.mirrorBoxStream);
 
-  const stream = activeEpisode.mirrorBoxStream;
-  const isMovie = stream?.mediaType === 'movie';
+  const initialStream = activeEpisode.mirrorBoxStream;
+  const isMovie = initialStream?.mediaType === 'movie';
+
+  // Real-time conversion safeguard: if active stream is unmapped, resolve on the fly
+  useEffect(() => {
+    let isMounted = true;
+    if (activeEpisode.mirrorBoxStream?.isMapped) {
+      setLiveStream(activeEpisode.mirrorBoxStream);
+    } else if (anilistId) {
+      resolveCrosswalkStream(
+        Number(anilistId),
+        activeEpisode.episodeNumber || 1,
+        isMovie ? 'MOVIE' : 'TV',
+        malId
+      ).then((res) => {
+        if (isMounted && res) {
+          setLiveStream(res);
+        }
+      }).catch((e) => console.warn('Realtime player stream resolution notice:', e));
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [activeEpisode.episodeNumber, anilistId, malId, activeEpisode.mirrorBoxStream, isMovie]);
+
+  const stream = liveStream || activeEpisode.mirrorBoxStream;
   const epNum = isMovie ? 1 : (activeEpisode.episodeNumber || 1);
+  const externalId = stream?.externalId || (anilistId ? String(anilistId) : String(epNum));
 
   // Compute active embed URL based on chosen server
-  let embedUrl = stream?.embedUrl || `https://mirrorboxapi.web.app/tv/${activeEpisode.episodeNumber}`;
+  let embedUrl = stream?.embedUrl || (isMovie
+    ? `https://mirrorboxapi.web.app/movie/${externalId}`
+    : `https://mirrorboxapi.web.app/tv/${externalId}/1/${epNum}`);
+
   if (activeServer === 'sub') {
     embedUrl = anilistId
       ? `https://megaplay.buzz/stream/ani/${anilistId}/${epNum}/sub`
@@ -46,12 +76,14 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
       : (malId ? `https://megaplay.buzz/stream/mal/${malId}/${epNum}/dub` : embedUrl);
   }
 
-  const downloadUrl = stream?.downloadUrl || `https://mirrorboxapi.web.app/download/tv/${activeEpisode.episodeNumber}`;
+  const downloadUrl = stream?.downloadUrl || (isMovie
+    ? `https://mirrorboxapi.web.app/download/movie/${externalId}`
+    : `https://mirrorboxapi.web.app/download/tv/${externalId}/1/${epNum}`);
 
   // Reset loading state on episode or server change
   useEffect(() => {
     setIframeLoaded(false);
-  }, [activeServer, activeEpisode.episodeNumber, activeEpisode.mirrorBoxStream?.embedUrl]);
+  }, [activeServer, activeEpisode.episodeNumber, embedUrl]);
 
   return (
     <section className="relative w-full bg-black py-4">

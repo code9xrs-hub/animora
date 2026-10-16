@@ -22,7 +22,8 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({
 }) => {
   const effectiveSeason = episode.seasonNumber || seasonNumber || 1;
   const watchUrl = `/watch/${anilistId}/ep/${episode.episodeNumber}`;
-  const downloadUrl = episode.mirrorBoxStream?.downloadUrl || `https://mirrorboxapi.web.app/download/tv/${anilistId}/${effectiveSeason}/${episode.episodeNumber}`;
+  const targetId = episode.mirrorBoxStream?.externalId || anilistId;
+  const downloadUrl = episode.mirrorBoxStream?.downloadUrl || `https://mirrorboxapi.web.app/download/tv/${targetId}/${effectiveSeason}/${episode.episodeNumber}`;
 
   return (
     <div

@@ -1,11 +1,14 @@
 import { MirrorBoxStream } from '../types/anime';
 
-// Cache structure: anilist_id -> [tmdbId, tmdbSeason, episodeOffset, imdbId]
-type CrosswalkEntry = [number | string | null, number, number, string | null];
+interface CrosswalkResult {
+  tmdbId: string | number | null;
+  imdbId: string | null;
+  season: number;
+  offset: number;
+}
 
-const memoryIndex = new Map<number, CrosswalkEntry>();
-let isLoaded = false;
-let loadPromise: Promise<void> | null = null;
+// In-memory runtime session cache: anilist_id -> CrosswalkResult
+const realtimeCache = new Map<number, CrosswalkResult>();
 
 const AVAILABLE_SERVERS = [
   'Abyss',
@@ -18,31 +21,87 @@ const AVAILABLE_SERVERS = [
 ];
 
 /**
- * Loads the local 8,339-title pre-indexed crosswalk mapping
+ * Real-time conversion: AniList ID -> TMDb ID / IMDb ID
+ * Queries live real-time conversion endpoints on demand with zero static mapping files.
  */
-export async function loadMappings(): Promise<void> {
-  if (isLoaded) return;
-  if (!loadPromise) {
-    loadPromise = (async () => {
-      try {
-        const res = await fetch('/mappings.json');
-        if (res.ok) {
-          const json = await res.json();
-          for (const [key, val] of Object.entries(json)) {
-            memoryIndex.set(Number(key), val as CrosswalkEntry);
-          }
-          isLoaded = true;
-        }
-      } catch (err) {
-        console.warn('[Crosswalk] Failed to load local /mappings.json:', err);
-      }
-    })();
+export async function convertAniListToTMDbRealtime(
+  anilistId: number,
+  malId?: number | null
+): Promise<CrosswalkResult | null> {
+  const numericId = Number(anilistId);
+  if (!numericId) return null;
+
+  if (realtimeCache.has(numericId)) {
+    return realtimeCache.get(numericId)!;
   }
-  await loadPromise;
+
+  // 1. Primary: Real-time query via ani.zip API
+  try {
+    const res = await fetch(`https://api.ani.zip/mappings?anilist_id=${numericId}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.mappings && (data.mappings.themoviedb_id || data.mappings.imdb_id)) {
+        const result: CrosswalkResult = {
+          tmdbId: data.mappings.themoviedb_id || null,
+          imdbId: data.mappings.imdb_id || null,
+          season: 1,
+          offset: 0
+        };
+        realtimeCache.set(numericId, result);
+        return result;
+      }
+    }
+  } catch (err) {
+    console.warn('[Realtime Crosswalk] ani.zip query notice:', err);
+  }
+
+  // 2. Secondary: Real-time query via ARM API (Anime Relations Mapping)
+  try {
+    const res = await fetch(`https://arm.haglund.dev/api/v2/ids?source=anilist&id=${numericId}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && (data.themoviedb || data.imdb)) {
+        const result: CrosswalkResult = {
+          tmdbId: data.themoviedb ? Number(data.themoviedb) : null,
+          imdbId: data.imdb || null,
+          season: data['themoviedb-season'] ? Number(data['themoviedb-season']) : 1,
+          offset: data['themoviedb-episode'] ? Number(data['themoviedb-episode']) : 0
+        };
+        realtimeCache.set(numericId, result);
+        return result;
+      }
+    }
+  } catch (err) {
+    console.warn('[Realtime Crosswalk] ARM query notice:', err);
+  }
+
+  // 3. Tertiary: Try via MyAnimeList ID on ARM if available
+  if (malId) {
+    try {
+      const res = await fetch(`https://arm.haglund.dev/api/v2/ids?source=myanimelist&id=${malId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && (data.themoviedb || data.imdb)) {
+          const result: CrosswalkResult = {
+            tmdbId: data.themoviedb ? Number(data.themoviedb) : null,
+            imdbId: data.imdb || null,
+            season: data['themoviedb-season'] ? Number(data['themoviedb-season']) : 1,
+            offset: data['themoviedb-episode'] ? Number(data['themoviedb-episode']) : 0
+          };
+          realtimeCache.set(numericId, result);
+          return result;
+        }
+      }
+    } catch (err) {
+      console.warn('[Realtime Crosswalk] MAL ARM fallback notice:', err);
+    }
+  }
+
+  return null;
 }
 
 /**
- * Resolves an AniList media ID to TMDb / IMDb ID with season & episode offsets for Mirror-Box
+ * Resolves Mirror-Box stream with real-time converted TMDb / IMDb ID
  */
 export async function resolveCrosswalkStream(
   anilistId: number,
@@ -51,40 +110,14 @@ export async function resolveCrosswalkStream(
   malId?: number | null
 ): Promise<MirrorBoxStream> {
   const isMovie = format === 'MOVIE';
+  const mapping = await convertAniListToTMDbRealtime(anilistId, malId);
 
-  // 1. Ensure local index is loaded
-  await loadMappings();
+  const tmdbId = mapping?.tmdbId || null;
+  const imdbId = mapping?.imdbId || null;
+  const season = mapping?.season || 1;
+  const offset = mapping?.offset || 0;
 
-  let entry = memoryIndex.get(Number(anilistId));
-
-  // 2. Fallback to live ARM API if not present in pre-indexed dictionary
-  if (!entry) {
-    try {
-      const armRes = await fetch(`https://arm.haglund.dev/api/v2/ids?source=anilist&id=${anilistId}`);
-      if (armRes.ok) {
-        const arm = await armRes.json();
-        if (arm) {
-          const tmdb = arm.themoviedb ? Number(arm.themoviedb) : null;
-          const season = arm['themoviedb-season'] ? Number(arm['themoviedb-season']) : 1;
-          const offset = arm['themoviedb-episode'] ? Number(arm['themoviedb-episode']) : 0;
-          const imdb = arm.imdb || null;
-          if (tmdb || imdb) {
-            entry = [tmdb, season, offset, imdb];
-            memoryIndex.set(Number(anilistId), entry);
-          }
-        }
-      }
-    } catch (e) {
-      console.warn('[Crosswalk] Live ARM lookup error:', e);
-    }
-  }
-
-  const tmdbId = entry ? entry[0] : null;
-  const season = entry ? (Number(entry[1]) || 1) : 1;
-  const offset = entry ? (Number(entry[2]) || 0) : 0;
-  const imdbId = entry ? entry[3] : null;
-
-  // Prioritize TMDb ID, then IMDb ID, fallback to AniList ID
+  // Prioritize TMDb ID, then IMDb ID, fallback to AniList ID if unconverted
   const externalId = String(tmdbId || imdbId || anilistId);
   const resolvedEpisode = Math.max(1, (Number(episodeNumber) || 1) + offset);
 

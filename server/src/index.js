@@ -100,8 +100,9 @@ app.get('/api/v1/anime/calendar', async (req, res) => {
 });
 
 // Helper to construct normalized episode list strictly aligned with AniList
-function buildEpisodeList(media, franchiseSeasons = []) {
+async function buildEpisodeList(media, franchiseSeasons = []) {
   const isMovie = media.format === 'MOVIE';
+  const mapping = await fribbService.getMapping(media.id, media.idMal);
 
   // Find franchise season info if available
   const currentSeasonItem = (franchiseSeasons || []).find(s => s.anilistId === media.id);
@@ -110,7 +111,7 @@ function buildEpisodeList(media, franchiseSeasons = []) {
 
   if (isMovie) {
     const movieTitle = media.title?.english || media.title?.romaji || 'Full Movie';
-    const stream = fribbService.resolve(media.id, 1, 'MOVIE', media.idMal);
+    const stream = fribbService.buildStream(media.id, 1, 'MOVIE', mapping);
     return [{
       episodeNumber: 1,
       seasonNumber: 1,
@@ -240,7 +241,7 @@ function buildEpisodeList(media, franchiseSeasons = []) {
       isAired = false;
     }
 
-    const stream = fribbService.resolve(media.id, i, media.format, media.idMal);
+    const stream = fribbService.buildStream(media.id, i, media.format, mapping);
 
     episodes.push({
       episodeNumber: i,
@@ -374,7 +375,7 @@ app.get('/api/v1/anime/:id', async (req, res) => {
     }
 
     const franchiseSeasons = await buildFranchiseSeasons(media);
-    const episodes = buildEpisodeList(media, franchiseSeasons);
+    const episodes = await buildEpisodeList(media, franchiseSeasons);
 
     res.json({
       media,
@@ -388,13 +389,13 @@ app.get('/api/v1/anime/:id', async (req, res) => {
 });
 
 // 5. Dedicated Stream Resolution Endpoint (as per PRD Section 6.2 & Acceptance Criteria)
-app.get('/api/v1/stream/resolve/:anilistId', (req, res) => {
+app.get('/api/v1/stream/resolve/:anilistId', async (req, res) => {
   const anilistId = req.params.anilistId;
   const episode = parseInt(req.query.episode || '1', 10);
   const format = req.query.format || 'TV';
   const malId = req.query.malId ? parseInt(req.query.malId, 10) : null;
 
-  const result = fribbService.resolve(anilistId, episode, format, malId);
+  const result = await fribbService.resolve(anilistId, episode, format, malId);
   res.json(result);
 });
 
