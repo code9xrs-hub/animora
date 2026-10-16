@@ -75,6 +75,10 @@ export const WatchPage: React.FC = () => {
 
   // Find active episode item
   const activeEpisodeIndex = episodes.findIndex((ep) => ep.episodeNumber === currentEpNum);
+  const fallbackStream = episodes[0]?.mirrorBoxStream;
+  const fallbackExternalId = fallbackStream?.externalId || String(media.id);
+  const fallbackSeason = fallbackStream?.resolvedSeason || 1;
+
   const activeEpisode: EpisodeItemDTO = activeEpisodeIndex >= 0
     ? episodes[activeEpisodeIndex]
     : episodes[0] || {
@@ -87,16 +91,16 @@ export const WatchPage: React.FC = () => {
         mirrorBoxStream: {
           provider: 'mirrorbox',
           mediaType: isMovie ? 'movie' : 'tv',
-          externalId: String(media.id),
-          resolvedSeason: 1,
-          resolvedEpisode: currentEpNum,
+          externalId: fallbackExternalId,
+          resolvedSeason: fallbackSeason,
+          resolvedEpisode: isMovie ? 1 : currentEpNum,
           embedUrl: isMovie
-            ? `https://mirrorboxapi.web.app/movie/${media.id}`
-            : `https://mirrorboxapi.web.app/tv/${media.id}/1/${currentEpNum}`,
+            ? `https://mirrorboxapi.web.app/movie/${fallbackExternalId}`
+            : `https://mirrorboxapi.web.app/tv/${fallbackExternalId}/${fallbackSeason}/${currentEpNum}`,
           downloadUrl: isMovie
-            ? `https://mirrorboxapi.web.app/download/movie/${media.id}`
-            : `https://mirrorboxapi.web.app/download/tv/${media.id}/1/${currentEpNum}`,
-          availableServers: ['Abyss', 'FileMoon', 'Vidmoly', 'Streamwish']
+            ? `https://mirrorboxapi.web.app/download/movie/${fallbackExternalId}`
+            : `https://mirrorboxapi.web.app/download/tv/${fallbackExternalId}/${fallbackSeason}/${currentEpNum}`,
+          availableServers: fallbackStream?.availableServers || ['Abyss', 'FileMoon', 'Vidmoly', 'Streamwish']
         }
       };
 

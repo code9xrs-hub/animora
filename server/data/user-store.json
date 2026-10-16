@@ -29,7 +29,7 @@
       "episodeNumber": 1,
       "progressSeconds": 120,
       "totalSeconds": 1440,
-      "watchedAt": "2026-10-16T17:14:58.660Z",
+      "watchedAt": "2026-10-16T18:16:45.353Z",
       "media": {
         "id": 170942,
         "idMal": 57181,
@@ -82,151 +82,151 @@
               "id": 390428,
               "episode": 1,
               "airingAt": 1727967360,
-              "timeUntilAiring": -64203529
+              "timeUntilAiring": -64207242
             },
             {
               "id": 390429,
               "episode": 2,
               "airingAt": 1727967360,
-              "timeUntilAiring": -64203529
+              "timeUntilAiring": -64207242
             },
             {
               "id": 390430,
               "episode": 3,
               "airingAt": 1728572160,
-              "timeUntilAiring": -63598729
+              "timeUntilAiring": -63602442
             },
             {
               "id": 390431,
               "episode": 4,
               "airingAt": 1729176960,
-              "timeUntilAiring": -62993929
+              "timeUntilAiring": -62997642
             },
             {
               "id": 390432,
               "episode": 5,
               "airingAt": 1729781760,
-              "timeUntilAiring": -62389129
+              "timeUntilAiring": -62392842
             },
             {
               "id": 390433,
               "episode": 6,
               "airingAt": 1730386560,
-              "timeUntilAiring": -61784329
+              "timeUntilAiring": -61788042
             },
             {
               "id": 390434,
               "episode": 7,
               "airingAt": 1730991360,
-              "timeUntilAiring": -61179529
+              "timeUntilAiring": -61183242
             },
             {
               "id": 390435,
               "episode": 8,
               "airingAt": 1731596160,
-              "timeUntilAiring": -60574729
+              "timeUntilAiring": -60578442
             },
             {
               "id": 390436,
               "episode": 9,
               "airingAt": 1732200960,
-              "timeUntilAiring": -59969929
+              "timeUntilAiring": -59973642
             },
             {
               "id": 390437,
               "episode": 10,
               "airingAt": 1732805760,
-              "timeUntilAiring": -59365129
+              "timeUntilAiring": -59368842
             },
             {
               "id": 390438,
               "episode": 11,
               "airingAt": 1733410560,
-              "timeUntilAiring": -58760329
+              "timeUntilAiring": -58764042
             },
             {
               "id": 390439,
               "episode": 12,
               "airingAt": 1734015360,
-              "timeUntilAiring": -58155529
+              "timeUntilAiring": -58159242
             },
             {
               "id": 390440,
               "episode": 13,
               "airingAt": 1735224960,
-              "timeUntilAiring": -56945929
+              "timeUntilAiring": -56949642
             },
             {
               "id": 390441,
               "episode": 14,
               "airingAt": 1735829760,
-              "timeUntilAiring": -56341129
+              "timeUntilAiring": -56344842
             },
             {
               "id": 390442,
               "episode": 15,
               "airingAt": 1736434560,
-              "timeUntilAiring": -55736329
+              "timeUntilAiring": -55740042
             },
             {
               "id": 390443,
               "episode": 16,
               "airingAt": 1737039360,
-              "timeUntilAiring": -55131529
+              "timeUntilAiring": -55135242
             },
             {
               "id": 390444,
               "episode": 17,
               "airingAt": 1737644160,
-              "timeUntilAiring": -54526729
+              "timeUntilAiring": -54530442
             },
             {
               "id": 390445,
               "episode": 18,
               "airingAt": 1738248960,
-              "timeUntilAiring": -53921929
+              "timeUntilAiring": -53925642
             },
             {
               "id": 390446,
               "episode": 19,
               "airingAt": 1738853760,
-              "timeUntilAiring": -53317129
+              "timeUntilAiring": -53320842
             },
             {
               "id": 390447,
               "episode": 20,
               "airingAt": 1739458560,
-              "timeUntilAiring": -52712329
+              "timeUntilAiring": -52716042
             },
             {
               "id": 390448,
               "episode": 21,
               "airingAt": 1740063360,
-              "timeUntilAiring": -52107529
+              "timeUntilAiring": -52111242
             },
             {
               "id": 390449,
               "episode": 22,
               "airingAt": 1740668160,
-              "timeUntilAiring": -51502729
+              "timeUntilAiring": -51506442
             },
             {
               "id": 390450,
               "episode": 23,
               "airingAt": 1741272960,
-              "timeUntilAiring": -50897929
+              "timeUntilAiring": -50901642
             },
             {
               "id": 390451,
               "episode": 24,
               "airingAt": 1741877760,
-              "timeUntilAiring": -50293129
+              "timeUntilAiring": -50296842
             },
             {
               "id": 390452,
               "episode": 25,
               "airingAt": 1742482560,
-              "timeUntilAiring": -49688329
+              "timeUntilAiring": -49692042
             }
           ]
         },
@@ -801,7 +801,7 @@
       "episodeNumber": 1,
       "progressSeconds": 120,
       "totalSeconds": 1440,
-      "watchedAt": "2026-10-16T17:04:15.149Z",
+      "watchedAt": "2026-10-16T18:16:19.395Z",
       "media": {
         "id": 99750,
         "idMal": 36098,
@@ -854,7 +854,7 @@
               "id": 244384,
               "episode": 1,
               "airingAt": 1535727600,
-              "timeUntilAiring": -256442650
+              "timeUntilAiring": -256446976
             }
           ]
         },

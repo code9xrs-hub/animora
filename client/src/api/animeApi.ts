@@ -13,6 +13,7 @@ import {
   clientFetchAnimeDetail,
   clientFetchCalendar
 } from './clientAniList';
+import { resolveCrosswalkStream } from './crosswalkResolver';
 
 const API_BASE = '/api/v1';
 
@@ -111,21 +112,7 @@ export async function resolveStream(
 
     return await fetchSafeJson(`${API_BASE}/stream/resolve/${anilistId}?${query.toString()}`);
   } catch (err) {
-    const isMovie = format === 'MOVIE';
-    return {
-      provider: 'mirrorbox',
-      mediaType: isMovie ? 'movie' : 'tv',
-      externalId: String(anilistId),
-      resolvedSeason: 1,
-      resolvedEpisode: episode,
-      embedUrl: isMovie
-        ? `https://mirrorboxapi.web.app/movie/${anilistId}`
-        : `https://mirrorboxapi.web.app/tv/${anilistId}/1/${episode}`,
-      downloadUrl: isMovie
-        ? `https://mirrorboxapi.web.app/download/movie/${anilistId}`
-        : `https://mirrorboxapi.web.app/download/tv/${anilistId}/1/${episode}`,
-      availableServers: ['Abyss', 'FileMoon', 'Vidmoly', 'Streamwish']
-    };
+    return await resolveCrosswalkStream(anilistId, episode, format, malId);
   }
 }
 

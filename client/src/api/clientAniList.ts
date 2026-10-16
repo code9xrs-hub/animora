@@ -6,6 +6,7 @@ import {
   AiringScheduleItem
 } from '../types/anime';
 import { AnimeDetailResponse } from './animeApi';
+import { resolveCrosswalkStream } from './crosswalkResolver';
 
 const ANILIST_GRAPHQL_ENDPOINT = 'https://graphql.anilist.co';
 
@@ -328,6 +329,9 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
 
   const isMovie = media.format === 'MOVIE';
 
+  // Resolve true crosswalk stream (TMDb / IMDb ID with season & offset)
+  const defaultStream = await resolveCrosswalkStream(media.id, 1, media.format, media.idMal);
+
   // Generate episode items & streams
   let episodes: EpisodeItemDTO[] = [];
   if (isMovie) {
@@ -338,16 +342,7 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
       durationMinutes: media.duration || 105,
       isAired: true,
       airingAtUnix: null,
-      mirrorBoxStream: {
-        provider: 'mirrorbox',
-        mediaType: 'movie',
-        externalId: String(media.id),
-        resolvedSeason: 1,
-        resolvedEpisode: 1,
-        embedUrl: `https://mirrorboxapi.web.app/movie/${media.id}`,
-        downloadUrl: `https://mirrorboxapi.web.app/download/movie/${media.id}`,
-        availableServers: ['Abyss', 'FileMoon', 'Vidmoly', 'Streamwish']
-      }
+      mirrorBoxStream: defaultStream
     }];
   } else {
     let totalEpisodes = media.episodes;
@@ -383,14 +378,19 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
       }
     }
 
+    const externalId = defaultStream.externalId;
+    const season = defaultStream.resolvedSeason || 1;
+    const offset = Math.max(0, (defaultStream.resolvedEpisode || 1) - 1);
+
     for (let i = 1; i <= count; i++) {
       const airing = airingMap.get(i);
       const isAired = !airing;
       const streaming = streamMap.get(i);
+      const targetEp = i + offset;
 
       episodes.push({
         episodeNumber: i,
-        seasonNumber: 1,
+        seasonNumber: season,
         displayTitle: `Episode ${i}`,
         title: streaming?.cleanTitle || `Episode ${i}`,
         thumbnailUrl: streaming?.thumbnail || media.bannerImage || media.coverImage?.extraLarge || '',
@@ -400,12 +400,13 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
         mirrorBoxStream: {
           provider: 'mirrorbox',
           mediaType: 'tv',
-          externalId: String(media.id),
-          resolvedSeason: 1,
-          resolvedEpisode: i,
-          embedUrl: `https://mirrorboxapi.web.app/tv/${media.id}/1/${i}`,
-          downloadUrl: `https://mirrorboxapi.web.app/download/tv/${media.id}/1/${i}`,
-          availableServers: ['Abyss', 'FileMoon', 'Vidmoly', 'Streamwish']
+          externalId,
+          resolvedSeason: season,
+          resolvedEpisode: targetEp,
+          embedUrl: `https://mirrorboxapi.web.app/tv/${externalId}/${season}/${targetEp}`,
+          downloadUrl: `https://mirrorboxapi.web.app/download/tv/${externalId}/${season}/${targetEp}`,
+          availableServers: defaultStream.availableServers,
+          isMapped: defaultStream.isMapped
         }
       });
     }
