@@ -13,7 +13,7 @@
 
 **Animora** is a state-of-the-art, open-source anime streaming platform engineered with a cinema-grade dark UI/UX inspired by Crunchyroll. It pairs the extensive metadata catalog of **AniList GraphQL v2** with high-speed multi-server streaming (**Mirror-Box API** + **Megaplay SUB/DUB**), powered by a **100% Real-Time AniList-to-TMDb Crosswalk Engine** with zero static mapping file overhead.
 
-🌐 **Live Demo:** [https://animora-b3477.web.app](https://animora-b3477.web.app)  
+🌐 **Live Demo:** [https://animora.web.app](https://animora.web.app/)  
 📦 **GitHub Repository:** [code9xrs-hub/animora](https://github.com/code9xrs-hub/animora)  
 👤 **Author & Creator:** [Rasel Khan](https://github.com/code9xrs-hub) (`code9xrs-hub`)
 
@@ -48,37 +48,52 @@
 - **Sub-Millisecond Runtime Caching:** Intelligent in-memory session caching (`Map`) delivers `<0.01ms` repeated lookups without redundant network calls.
 - **Dual Client & Server Support:** Works both serverless in modern browsers (Firebase Hosting, Vercel, Netlify) and within the Node.js Express backend.
 
-### 2. 🎭 Multi-Server Theater Player (HD-1, SUB, DUB)
+### 2. 🎭 Multi-Server Theater Player with Full Screen & Rotation
 - **Server 1 — `HD-1 (Multi)` (Mirror-Box API):** Multi-source adaptive player supporting high-definition mirrors (**Abyss**, **FileMoon**, **Vidmoly**, **Streamwish**) powered by real-time TMDb ID, Season, and Episode translation.
 - **Server 2 — `SUB` (Megaplay Softsub/Hardsub):** Dedicated original audio Japanese streaming with multilingual subtitles using direct AniList ID routing (`/stream/ani/{id}/{ep}/sub`).
 - **Server 3 — `DUB` (Megaplay English Dub):** Direct English voiceover streaming server using direct AniList ID routing (`/stream/ani/{id}/{ep}/dub`).
 - **Instant Server Switching:** Toggle seamlessly between servers inside the player with zero page refreshes.
+- **Full Screen & Landscape Player Rotation:** One-click Full Screen control with automatic landscape orientation lock (`screen.orientation.lock('landscape')`) and a universal fallback 90° landscape mode with floating exit controls.
+- **Complete Feature Policy:** Enhanced iframe permissions (`fullscreen`, `screen-wake-lock`, `orientation-lock`, `accelerometer`, `gyroscope`, `picture-in-picture`) for smooth mobile video playback.
 - **Direct CDN Downloads:** High-speed, one-click direct episode and movie downloads with resolved external CDN endpoints.
 - **Theater Experience:** Dedicated "Lights Off" cinema mode, wide viewport theater layout, and auto-scrolling to player view.
 - **Binge Navigation:** Fluid Previous and Next episode triggers with instant stream swapping.
 
-### 3. 📅 Live Simulcast Airing Calendar
+### 3. 🔄 Intelligent "Continue Watching" & Season-Aware Auto-Resume
+- **Season & Episode Tracking:** Local and cloud watch history maintains both season numbers and episode numbers.
+- **Franchise Auto-Resume:** Opening `/watch/:id` automatically finds and resumes the user's exact last played episode and season across multi-season franchises.
+- **Dynamic CTA Buttons:** Series Detail banners, Hero carousels, and Anime Poster cards dynamically update to `CONTINUE S<season> E<ep>` (or `Resume Ep <ep>`).
+- **Visual Progress Badges:** Visual "Last Played" indicator badges and watch progress bars in episode list and grid views.
+
+### 4. ✨ Universal Content-Aware Shimmer Skeleton System
+- **No More Spinners:** Replaced generic loading spinners with animated, content-aware skeleton placeholders across all routes (Hero Banner, Media Swimlanes, Episode Lists, Browse Grids, and Cinema Player).
+
+### 5. 📍 Intelligent Page Scroll Position Restoration
+- **Reload Continuity:** Refreshing or reloading any page (F5 / browser refresh) reliably restores the user's exact vertical scroll coordinate, even as asynchronous AniList catalogs and swimlanes expand the DOM via `ResizeObserver` tracking.
+- **Natural Route Navigation:** Clicking links to new pages starts cleanly at the top (`0, 0`).
+
+### 6. 📅 Live Simulcast Airing Calendar
 - **Real-Time Countdown with Seconds:** Dynamic ticking countdown displaying exact hours, minutes, and seconds until upcoming episodes broadcast live in Japan.
 - **Weekly Schedule:** Day-by-day airing timeline synchronized with AniList and converted to the user's local browser timezone.
 
-### 4. 📚 True Season & Episode Hierarchy
+### 7. 📚 True Season & Episode Hierarchy
 - **Strict AniList Alignment:** TV Series and multi-cour franchises display accurate season counts and episode numbers according to official AniList production records.
 - **Movie Differentiation:** Anime movies feature clean presentation without redundant season or episode dropdowns.
 
-### 5. 🌊 Ultra-Smooth Inertia Physics with Lenis
+### 8. 🌊 Ultra-Smooth Inertia Physics with Lenis
 - **Lenis Smooth Scroll:** Global hardware-accelerated inertia scrolling enabled across all desktop and mobile devices via [@studio-freight/lenis](https://lenis.darkroom.engineering/).
 
-### 6. 🔍 Faceted Search & Advanced Exploration
+### 9. 🔍 Faceted Search & Advanced Exploration
 - **Real-Time Dynamic Filters:** Explore tens of thousands of anime titles by genre, season (Winter, Spring, Summer, Fall), release year, format (TV, Movie, OVA, ONA), broadcasting status, and sorting order.
 - **Instant Search Modal:** Header quick-search with debounced AniList queries, instant cover thumbnails, and keyboard accessibility.
 
-### 7. 📱 Responsive Mobile First UI
-- Optimized typography, touch-friendly tap targets, swipeable horizontal rail carousels, and responsive layouts crafted for modern iOS Safari, Android Chrome, tablets, and 4K displays.
+### 10. 📱 Responsive Mobile First UI
+- Optimized typography, touch-friendly tap targets, swipeable horizontal rail carousels, bottom navigation bar on mobile, and responsive layouts crafted for modern iOS Safari, Android Chrome, tablets, and 4K displays.
 
-### 8. 🔖 Local & Cloud Watchlist & History
+### 11. 🔖 Local & Cloud Watchlist & History
 - Persistent storage for Saved Watchlist and Watch History with local fallback (`localStorage`), allowing full offline guest support and instant multi-device syncing.
 
-### 9. 🎯 Production-Grade SEO & Structured Data
+### 12. 🎯 Production-Grade SEO & Structured Data
 - **Dynamic Meta Tags:** Automated page titles, descriptions, canonical URLs, and OpenGraph/Twitter card images.
 - **Schema.org Rich Snippets:** Injected JSON-LD structured data for `WebSite` (with deep `SearchAction`), `TVSeries`, `Movie`, and `TVEpisode`.
 - **Domain Auto-Resolution:** Automatically adapts metadata and OpenGraph URLs to any custom domain or hosting host without hardcoded domains.
@@ -293,11 +308,13 @@ The project includes pre-configured [`.firebaserc`](file:///.firebaserc) and [`f
 
 4. **Deploy to Firebase Hosting:**
    ```bash
-   firebase deploy --only hosting --project animora-b3477
+   firebase deploy --only hosting:animora
+   # or
+   firebase deploy --only hosting
    ```
 
 Your live site will be ready at:  
-👉 **`https://animora-b3477.web.app`**
+👉 **`https://animora.web.app/`**
 
 ---
 
