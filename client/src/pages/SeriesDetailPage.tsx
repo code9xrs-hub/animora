@@ -16,7 +16,7 @@ import {
   List,
   X
 } from 'lucide-react';
-import { fetchAnimeDetail, AnimeDetailResponse, toggleWatchlist } from '../api/animeApi';
+import { fetchAnimeDetail, AnimeDetailResponse, toggleWatchlist, getContinuePlayUrl } from '../api/animeApi';
 import { EpisodeCard } from '../components/cards/EpisodeCard';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
@@ -81,7 +81,13 @@ export const SeriesDetailPage: React.FC = () => {
   const { media, episodes, franchiseSeasons } = data;
   const isMovie = media.format === 'MOVIE';
   const title = media.title.english || media.title.romaji || 'Untitled';
-  const startWatchingUrl = isMovie ? `/watch/${media.id}` : `/watch/${media.id}/ep/1`;
+
+  const franchiseIds = (franchiseSeasons || []).map((s) => s.anilistId);
+  const continuePlayInfo = getContinuePlayUrl(media, franchiseIds);
+  const startWatchingUrl = continuePlayInfo.url;
+  const continuePlayLabel = continuePlayInfo.label;
+  const lastWatchedItem = continuePlayInfo.lastWatched;
+
   const firstStream = episodes[0]?.mirrorBoxStream;
   const externalId = firstStream?.externalId || media.id;
   const firstDownloadUrl = firstStream?.downloadUrl || (isMovie
@@ -216,7 +222,7 @@ export const SeriesDetailPage: React.FC = () => {
                 className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#F47521]/20 active:scale-95 transition-all"
               >
                 <Play className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current" />
-                <span>{isMovie ? 'WATCH MOVIE' : 'WATCH S1 E1'}</span>
+                <span>{continuePlayLabel}</span>
               </button>
 
               <button
@@ -393,12 +399,19 @@ export const SeriesDetailPage: React.FC = () => {
                           <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                         </Link>
                         <div>
-                          <Link
-                            to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
-                            className="text-xs sm:text-sm font-semibold text-white/90 hover:text-[#F47521] transition line-clamp-1"
-                          >
-                            {ep.displayTitle || (ep.title?.toLowerCase().startsWith('episode') ? ep.title : `Episode ${ep.episodeNumber}: ${ep.title}`)}
-                          </Link>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
+                              className="text-xs sm:text-sm font-semibold text-white/90 hover:text-[#F47521] transition line-clamp-1"
+                            >
+                              {ep.displayTitle || (ep.title?.toLowerCase().startsWith('episode') ? ep.title : `Episode ${ep.episodeNumber}: ${ep.title}`)}
+                            </Link>
+                            {lastWatchedItem?.anilistId === media.id && lastWatchedItem?.episodeNumber === ep.episodeNumber && (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F47521]/20 text-[#F47521] border border-[#F47521]/30">
+                                Last Played
+                              </span>
+                            )}
+                          </div>
                           <span className="text-[11px] text-[#8E93A0]">
                             {ep.durationMinutes || 24} mins
                           </span>
@@ -424,6 +437,9 @@ export const SeriesDetailPage: React.FC = () => {
                       anilistId={media.id}
                       episode={ep}
                       seasonNumber={ep.seasonNumber || activeSeasonNumber}
+                      isActive={lastWatchedItem?.anilistId === media.id && lastWatchedItem?.episodeNumber === ep.episodeNumber}
+                      isWatched={lastWatchedItem?.anilistId === media.id ? ep.episodeNumber <= lastWatchedItem.episodeNumber : false}
+                      progressPercent={lastWatchedItem?.anilistId === media.id && ep.episodeNumber === lastWatchedItem.episodeNumber ? 75 : 0}
                     />
                   ))}
                 </div>

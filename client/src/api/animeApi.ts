@@ -174,6 +174,7 @@ export async function toggleWatchlist(media: AnimeMedia): Promise<boolean> {
 export interface WatchHistoryItem {
   anilistId: number;
   episodeNumber: number;
+  seasonNumber?: number;
   progressSeconds: number;
   totalSeconds: number;
   watchedAt: string;
@@ -194,12 +195,57 @@ export async function getWatchHistory(): Promise<WatchHistoryItem[]> {
   return local ? JSON.parse(local) : [];
 }
 
+export function getLastWatched(anilistId: number, franchiseIds?: number[]): WatchHistoryItem | null {
+  try {
+    const local = localStorage.getItem(HISTORY_KEY) || localStorage.getItem(LEGACY_HISTORY_KEY);
+    if (!local) return null;
+    const history: WatchHistoryItem[] = JSON.parse(local);
+    if (!Array.isArray(history) || history.length === 0) return null;
+
+    if (franchiseIds && franchiseIds.length > 0) {
+      const franchiseMatch = history.find((h) => franchiseIds.includes(h.anilistId));
+      if (franchiseMatch) return franchiseMatch;
+    }
+
+    return history.find((h) => h.anilistId === anilistId) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function getContinuePlayUrl(
+  media: AnimeMedia,
+  franchiseIds?: number[]
+): { url: string; label: string; lastWatched: WatchHistoryItem | null } {
+  const isMovie = media.format === 'MOVIE';
+  if (isMovie) {
+    return { url: `/watch/${media.id}`, label: 'WATCH MOVIE', lastWatched: null };
+  }
+
+  const lastWatched = getLastWatched(media.id, franchiseIds);
+  if (lastWatched) {
+    const seasonStr = lastWatched.seasonNumber && lastWatched.seasonNumber > 1 ? `S${lastWatched.seasonNumber} ` : '';
+    return {
+      url: `/watch/${lastWatched.anilistId}/ep/${lastWatched.episodeNumber}`,
+      label: `CONTINUE ${seasonStr}E${lastWatched.episodeNumber}`,
+      lastWatched
+    };
+  }
+
+  return {
+    url: `/watch/${media.id}/ep/1`,
+    label: 'WATCH S1 E1',
+    lastWatched: null
+  };
+}
+
 export async function recordHistory(
   anilistId: number,
   episodeNumber: number,
   progressSeconds: number = 0,
   totalSeconds: number = 1440,
-  media?: AnimeMedia
+  media?: AnimeMedia,
+  seasonNumber: number = 1
 ): Promise<void> {
   try {
     await fetch(`${API_BASE}/user/history`, {
@@ -208,6 +254,7 @@ export async function recordHistory(
       body: JSON.stringify({
         anilistId,
         episodeNumber,
+        seasonNumber,
         progressSeconds,
         totalSeconds,
         media
@@ -219,10 +266,11 @@ export async function recordHistory(
 
   const local = localStorage.getItem(HISTORY_KEY) || localStorage.getItem(LEGACY_HISTORY_KEY);
   let history: WatchHistoryItem[] = local ? JSON.parse(local) : [];
-  const idx = history.findIndex(h => h.anilistId === anilistId);
+  const idx = history.findIndex((h) => h.anilistId === anilistId);
   const item: WatchHistoryItem = {
     anilistId,
     episodeNumber,
+    seasonNumber,
     progressSeconds,
     totalSeconds,
     watchedAt: new Date().toISOString(),

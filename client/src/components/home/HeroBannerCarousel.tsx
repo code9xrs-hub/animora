@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Play, Bookmark, Check, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { AnimeMedia } from '../../types/anime';
-import { toggleWatchlist } from '../../api/animeApi';
+import { toggleWatchlist, getContinuePlayUrl } from '../../api/animeApi';
 
 interface HeroBannerCarouselProps {
   items: AnimeMedia[];
@@ -64,7 +64,9 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
 
   const title = activeItem.title.english || activeItem.title.romaji || 'Featured Anime';
   const isMovie = activeItem.format === 'MOVIE';
-  const playUrl = isMovie ? `/watch/${activeItem.id}` : `/watch/${activeItem.id}/ep/1`;
+  const continueInfo = getContinuePlayUrl(activeItem);
+  const playUrl = continueInfo.url;
+  const playLabel = continueInfo.label;
   const detailUrl = isMovie ? `/movie/${activeItem.id}` : `/series/${activeItem.id}`;
   const banner = activeItem.bannerImage || activeItem.coverImage?.extraLarge || activeItem.coverImage?.large;
 
@@ -145,7 +147,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
               className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#F47521]/20 active:scale-95 transition-all"
             >
               <Play className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current" />
-              <span>{isMovie ? 'WATCH MOVIE' : 'WATCH S1 E1'}</span>
+              <span>{playLabel}</span>
             </button>
 
             <button

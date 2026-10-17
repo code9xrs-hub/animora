@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Play, Bookmark, Check } from 'lucide-react';
 import { AnimeMedia } from '../../types/anime';
-import { toggleWatchlist } from '../../api/animeApi';
+import { toggleWatchlist, getContinuePlayUrl } from '../../api/animeApi';
 
 interface AnimePosterCardProps {
   anime: AnimeMedia;
@@ -16,7 +16,8 @@ export const AnimePosterCard: React.FC<AnimePosterCardProps> = ({ anime }) => {
   const title = anime.title.english || anime.title.romaji || 'Untitled';
   const isMovie = anime.format === 'MOVIE';
   const detailUrl = isMovie ? `/movie/${anime.id}` : `/series/${anime.id}`;
-  const playUrl = isMovie ? `/watch/${anime.id}` : `/watch/${anime.id}/ep/1`;
+  const continueInfo = getContinuePlayUrl(anime);
+  const playUrl = continueInfo.url;
 
   useEffect(() => {
     try {
@@ -118,7 +119,7 @@ export const AnimePosterCard: React.FC<AnimePosterCardProps> = ({ anime }) => {
               className="flex-1 bg-[#F47521] hover:bg-[#FF8533] text-black font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
-              <span>{isMovie ? 'Play' : 'S1 E1'}</span>
+              <span>{isMovie ? 'Play' : continueInfo.lastWatched ? `Resume E${continueInfo.lastWatched.episodeNumber}` : 'S1 E1'}</span>
             </button>
 
             <button

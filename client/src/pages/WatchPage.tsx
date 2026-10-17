@@ -4,7 +4,8 @@ import {
   fetchAnimeDetail,
   AnimeDetailResponse,
   recordHistory,
-  toggleWatchlist
+  toggleWatchlist,
+  getLastWatched
 } from '../api/animeApi';
 import { EpisodeItemDTO } from '../types/anime';
 import { MirrorBoxPlayer } from '../components/player/MirrorBoxPlayer';
@@ -29,10 +30,26 @@ export const WatchPage: React.FC = () => {
       try {
         setLoading(true);
         const res = await fetchAnimeDetail(id!);
+        const isMovie = res.media.format === 'MOVIE';
+
+        // Auto-resume: if user accessed /watch/:id without specifying episode, play last played season & episode
+        if (!episodeNumber && !isMovie) {
+          const franchiseIds = (res.franchiseSeasons || []).map((s: any) => s.anilistId);
+          const last = getLastWatched(res.media.id, franchiseIds);
+          if (last) {
+            navigate(`/watch/${last.anilistId}/ep/${last.episodeNumber}`, { replace: true });
+            return;
+          }
+        }
+
         setData(res);
 
-        // Record watch history
-        recordHistory(res.media.id, currentEpNum, 120, 1440, res.media);
+        // Record watch history with effective season
+        const effectiveSeason =
+          res.episodes?.find((ep: any) => ep.episodeNumber === currentEpNum)?.seasonNumber ||
+          res.episodes?.[0]?.mirrorBoxStream?.resolvedSeason ||
+          1;
+        recordHistory(res.media.id, currentEpNum, 120, 1440, res.media, effectiveSeason);
 
         // Check watchlist
         const stored = localStorage.getItem('animora_watchlist') || localStorage.getItem('crunchyroll_watchlist');
@@ -48,7 +65,7 @@ export const WatchPage: React.FC = () => {
       }
     }
     loadDetail();
-  }, [id, currentEpNum]);
+  }, [id, currentEpNum, episodeNumber, navigate]);
 
   if (loading) {
     return <WatchPageSkeleton />;
