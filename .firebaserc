@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "animora-b3477"
+    "default": "animora-b3477",
+    "animora": "animora-b3477"
   }
 }

@@ -187,15 +187,15 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
                 : 'rounded-xl'
           }`}
         >
-          {/* Exit Rotate Floating Badge */}
+          {/* Exit Full Screen Floating Badge */}
           {isRotatedLandscape && (
             <button
               onClick={() => setIsRotatedLandscape(false)}
               className="absolute top-4 right-4 z-50 bg-black/80 hover:bg-[#F47521] text-white hover:text-black px-3 py-1.5 rounded-full shadow-lg transition-all flex items-center gap-1.5 text-xs font-bold border border-white/20"
-              title="Exit Landscape Rotation"
+              title="Exit Full Screen"
             >
-              <RotateCw className="w-3.5 h-3.5" />
-              <span>Exit Rotation</span>
+              <Minimize2 className="w-3.5 h-3.5" />
+              <span>Exit Full Screen</span>
             </button>
           )}
 
@@ -267,10 +267,14 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
             <button
               onClick={handleToggleRotate}
               className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-medium text-[#8E93A0] transition-colors hover:bg-white/10 hover:text-white text-xs"
-              title="Rotate player to landscape or enter fullscreen"
+              title={isFullscreen || isRotatedLandscape ? 'Exit Full Screen' : 'Full Screen'}
             >
-              <RotateCw className="w-3.5 h-3.5 text-[#2ABDBB]" />
-              <span>Rotate</span>
+              {isFullscreen || isRotatedLandscape ? (
+                <Minimize2 className="w-3.5 h-3.5 text-[#2ABDBB]" />
+              ) : (
+                <Maximize className="w-3.5 h-3.5 text-[#2ABDBB]" />
+              )}
+              <span>{isFullscreen || isRotatedLandscape ? 'Exit Full Screen' : 'Full Screen'}</span>
             </button>
           </div>
 
