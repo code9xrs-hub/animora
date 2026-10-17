@@ -5,6 +5,7 @@ import { HeroBannerCarousel } from '../components/home/HeroBannerCarousel';
 import { MediaSwimlane } from '../components/home/MediaSwimlane';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
+import { HomePageSkeleton } from '../components/common/Shimmer';
 
 export const HomePage: React.FC = () => {
   const [data, setData] = useState<HomeCatalogResponse | null>(null);
@@ -33,14 +34,7 @@ export const HomePage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="w-full min-h-[80vh] flex flex-col items-center justify-center gap-4 text-white">
-        <div className="w-12 h-12 rounded-full border-4 border-[#F47521] border-t-transparent animate-spin" />
-        <p className="text-sm font-semibold tracking-wide text-[#A0A0A0]">
-          Loading Animora Anime Catalog...
-        </p>
-      </div>
-    );
+    return <HomePageSkeleton />;
   }
 
   if (error || !data) {
@@ -63,7 +57,7 @@ export const HomePage: React.FC = () => {
     .map((h) => h.media!);
 
   return (
-    <div className="w-full pb-16">
+    <div className="w-full pb-2 md:pb-8">
       <SEO
         title="Watch Trending Anime & Simulcasts Online Free"
         description="Stream thousands of trending anime series, simulcasts, and movies in HD with zero-wait direct downloads and multi-server playback on Animora."
@@ -80,7 +74,6 @@ export const HomePage: React.FC = () => {
           subtitle="Pick up where you left off"
           items={continueWatchingMedia}
           viewAllLink="/watchlist?tab=history"
-          badge="In Progress"
         />
       )}
 
@@ -99,7 +92,6 @@ export const HomePage: React.FC = () => {
         subtitle="Fresh episodes straight from Japan with English subtitles"
         items={data.simulcast}
         viewAllLink={`/browse?season=${data.season}&seasonYear=${data.year}&status=RELEASING`}
-        badge="Simulcast"
       />
 
       {/* 5. Top Rated Anime Movies */}
@@ -108,7 +100,6 @@ export const HomePage: React.FC = () => {
         subtitle="Feature films with direct high-speed downloads"
         items={data.popularMovies}
         viewAllLink="/movies"
-        badge="HD 1080p/4K"
       />
 
       {/* 6. Most Popular All-Time */}

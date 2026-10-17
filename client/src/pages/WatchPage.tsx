@@ -10,6 +10,7 @@ import { EpisodeItemDTO } from '../types/anime';
 import { MirrorBoxPlayer } from '../components/player/MirrorBoxPlayer';
 import { Play, Bookmark, Check, Download, ArrowLeft, Tv, Star, Film, Sparkles } from 'lucide-react';
 import { SEO } from '../components/common/SEO';
+import { WatchPageSkeleton } from '../components/common/Shimmer';
 
 export const WatchPage: React.FC = () => {
   const { id, episodeNumber } = useParams<{ id: string; episodeNumber?: string }>();
@@ -50,12 +51,7 @@ export const WatchPage: React.FC = () => {
   }, [id, currentEpNum]);
 
   if (loading) {
-    return (
-      <div className="w-full min-h-[70vh] flex flex-col items-center justify-center gap-3 text-white">
-        <div className="w-12 h-12 rounded-full border-4 border-[#F47521] border-t-transparent animate-spin" />
-        <p className="text-sm font-semibold text-[#A0A0A0]">Preparing Mirror-Box Player & Stream...</p>
-      </div>
-    );
+    return <WatchPageSkeleton />;
   }
 
   if (error || !data) {
@@ -184,17 +180,17 @@ export const WatchPage: React.FC = () => {
       <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
         {/* Left Column (8 cols): Episode Info & Franchise Context */}
         <div className="lg:col-span-8 space-y-4 sm:space-y-6">
-          <div className="bg-[#23252B] border border-[#4A4E58]/40 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#4A4E58]/30 pb-3 sm:pb-4">
+          <div className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-3 sm:pb-4">
               <div>
                 <Link
                   to={isMovie ? `/movie/${media.id}` : `/series/${media.id}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#F47521] hover:underline mb-1"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F47521] hover:text-[#FF8533] transition-colors mb-1.5"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>{title} (Series Details)</span>
                 </Link>
-                <h1 className="font-display font-black text-lg sm:text-2xl text-white">
+                <h1 className="font-display font-extrabold text-lg sm:text-2xl text-white tracking-tight">
                   {isMovie
                     ? title
                     : (activeEpisode.displayTitle
@@ -203,13 +199,13 @@ export const WatchPage: React.FC = () => {
                 </h1>
               </div>
 
-              <div className="flex items-center gap-2 self-start sm:self-auto">
+              <div className="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
                 <button
                   onClick={handleBookmarkToggle}
-                  className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border transition ${
+                  className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition-all ${
                     isBookmarked
-                      ? 'border-[#F47521] bg-[#F47521]/20 text-[#F47521]'
-                      : 'border-[#4A4E58] bg-[#141519] text-white hover:bg-white/10'
+                      ? 'border-[#F47521] bg-[#F47521]/15 text-[#F47521]'
+                      : 'border-white/15 bg-white/5 text-white/90 hover:bg-white/10'
                   }`}
                 >
                   {isBookmarked ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
@@ -220,7 +216,7 @@ export const WatchPage: React.FC = () => {
                   href={activeEpisode.mirrorBoxStream?.downloadUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-[#2ABDBB] text-black hover:bg-[#2ABDBB]/80 transition"
+                  className="px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 bg-[#2ABDBB] text-black hover:bg-[#2ABDBB]/90 transition-all shadow-sm"
                   title="Direct CDN Download"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -230,20 +226,20 @@ export const WatchPage: React.FC = () => {
             </div>
 
             {/* Quick Metadata */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-[#A0A0A0]">
-              <span className="text-white font-semibold">{media.format}</span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[#8E93A0]">
+              <span className="text-white/90 font-medium">{media.format}</span>
               <span>•</span>
-              <span className="text-[#FAB818] font-bold">
+              <span className="text-[#FAB818] font-semibold">
                 ★ {media.averageScore ? (media.averageScore / 10).toFixed(1) : '8.5'}
               </span>
               <span>•</span>
               <span>{activeEpisode.durationMinutes || 24} minutes</span>
               <span>•</span>
-              <span>Subtitled & English Dubbed</span>
+              <span className="text-[#2ABDBB]">Subtitled & English Dubbed</span>
             </div>
 
             {/* Synopsis */}
-            <p className="text-sm text-[#D0D0D0] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#D0D0D0] leading-relaxed">
               {media.description
                 ? media.description.replace(/<[^>]*>?/gm, '').trim()
                 : 'Enjoy high-speed multi-server streaming with full HD resolution and instant download support.'}
@@ -256,7 +252,7 @@ export const WatchPage: React.FC = () => {
                   <Link
                     key={g}
                     to={`/browse?genre=${encodeURIComponent(g)}`}
-                    className="text-xs bg-[#141519] text-[#A0A0A0] hover:text-white px-2.5 py-1 rounded"
+                    className="text-xs bg-[#121318] text-[#8E93A0] hover:text-white border border-white/5 px-2.5 py-1 rounded-full transition-colors"
                   >
                     {g}
                   </Link>
@@ -267,21 +263,21 @@ export const WatchPage: React.FC = () => {
 
           {/* Cast strip */}
           {media.characters && media.characters.edges && media.characters.edges.length > 0 && (
-            <div className="bg-[#23252B] border border-[#4A4E58]/40 rounded-xl p-5 space-y-3">
-              <h3 className="font-bold text-sm text-white uppercase tracking-wider">
+            <div className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-4 sm:p-5 space-y-3 shadow-sm">
+              <h3 className="font-semibold text-xs text-[#8E93A0] uppercase tracking-wider">
                 Featured Characters & Cast
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {media.characters.edges.slice(0, 4).map((c, i) => (
-                  <div key={i} className="flex items-center gap-2 p-1.5 rounded bg-[#141519]">
+                  <div key={i} className="flex items-center gap-2.5 p-2 rounded-xl bg-[#121318] border border-white/5">
                     <img
                       src={c.node.image?.medium}
                       alt={c.node.name.full}
-                      className="w-8 h-10 object-cover rounded"
+                      className="w-8 h-10 object-cover rounded-lg shadow-sm border border-white/5"
                     />
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate">{c.node.name.full}</p>
-                      <p className="text-[10px] text-[#A0A0A0]">{c.role}</p>
+                      <p className="text-xs font-semibold text-white/90 truncate">{c.node.name.full}</p>
+                      <p className="text-[10px] text-[#8E93A0]">{c.role}</p>
                     </div>
                   </div>
                 ))}
@@ -293,10 +289,10 @@ export const WatchPage: React.FC = () => {
         {/* Right Column (4 cols): Up Next / Season Queue Sidebar (Series) OR Movie Details & Download (Movie) */}
         <div className="lg:col-span-4 space-y-4">
           {isMovie ? (
-            <div className="bg-[#23252B] border border-[#4A4E58]/40 rounded-xl p-5 shadow-xl space-y-4">
-              <div className="flex items-center gap-2 border-b border-[#4A4E58]/30 pb-3">
+            <div className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-5 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-white/[0.06] pb-3">
                 <Film className="w-4 h-4 text-[#F47521]" />
-                <h3 className="font-bold text-sm text-white uppercase tracking-wider">
+                <h3 className="font-semibold text-xs text-white/90 uppercase tracking-wider">
                   Movie Features & Download
                 </h3>
               </div>
@@ -307,31 +303,31 @@ export const WatchPage: React.FC = () => {
                   href={activeEpisode.mirrorBoxStream.downloadUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 px-4 rounded-lg bg-[#2ABDBB] hover:bg-[#239B99] text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#2ABDBB] hover:bg-[#239B99] text-black font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
                 >
                   <Download className="w-4 h-4" />
                   <span>DOWNLOAD FULL MOVIE</span>
                 </a>
               )}
 
-              <div className="space-y-2.5 text-xs pt-1">
-                <div className="flex justify-between py-1 border-b border-white/5">
-                  <span className="text-[#A0A0A0]">Format</span>
-                  <span className="text-white font-semibold">Movie Feature Film</span>
+              <div className="space-y-2 text-xs pt-1">
+                <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                  <span className="text-[#8E93A0]">Format</span>
+                  <span className="text-white/90 font-medium">Movie Feature Film</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-white/5">
-                  <span className="text-[#A0A0A0]">Duration</span>
-                  <span className="text-white font-semibold">{media.duration || 90} mins</span>
+                <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                  <span className="text-[#8E93A0]">Duration</span>
+                  <span className="text-white/90 font-medium">{media.duration || 90} mins</span>
                 </div>
                 {media.studios?.nodes?.[0]?.name && (
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-[#A0A0A0]">Animation Studio</span>
-                    <span className="text-white font-semibold">{media.studios.nodes[0].name}</span>
+                  <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                    <span className="text-[#8E93A0]">Animation Studio</span>
+                    <span className="text-white/90 font-medium">{media.studios.nodes[0].name}</span>
                   </div>
                 )}
                 {media.averageScore && (
-                  <div className="flex justify-between py-1 border-b border-white/5">
-                    <span className="text-[#A0A0A0]">AniList Rating</span>
+                  <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                    <span className="text-[#8E93A0]">AniList Rating</span>
                     <span className="text-[#FAB818] font-bold">★ {(media.averageScore / 10).toFixed(1)} / 10</span>
                   </div>
                 )}
@@ -339,10 +335,10 @@ export const WatchPage: React.FC = () => {
 
               {/* Related/Recommendations for Movie */}
               {media.recommendations && media.recommendations.nodes && media.recommendations.nodes.length > 0 && (
-                <div className="pt-3 border-t border-[#4A4E58]/30 space-y-3">
-                  <h4 className="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                <div className="pt-3 border-t border-white/[0.06] space-y-3">
+                  <h4 className="font-semibold text-xs text-[#8E93A0] uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-[#F47521]" />
-                    <span>Recommended Films & Shows</span>
+                    <span>Recommended Films</span>
                   </h4>
                   <div className="space-y-2">
                     {media.recommendations.nodes.slice(0, 4).map((rec, idx) => {
@@ -352,18 +348,18 @@ export const WatchPage: React.FC = () => {
                         <Link
                           key={idx}
                           to={m.format === 'MOVIE' ? `/movie/${m.id}` : `/series/${m.id}`}
-                          className="flex items-center gap-3 p-2 rounded-lg bg-[#141519] hover:bg-[#2B2E36] border border-white/5 transition group"
+                          className="flex items-center gap-3 p-2 rounded-xl bg-[#121318] hover:bg-[#20222B] border border-white/5 transition-all group"
                         >
                           <img
                             src={m.coverImage?.large || m.coverImage?.extraLarge}
                             alt={m.title.english || m.title.romaji}
-                            className="w-10 h-14 object-cover rounded shadow"
+                            className="w-10 h-14 object-cover rounded-lg shadow-sm border border-white/5"
                           />
                           <div className="flex-1 min-w-0">
-                            <h5 className="text-xs font-bold text-white group-hover:text-[#F47521] transition line-clamp-1">
+                            <h5 className="text-xs font-semibold text-white/90 group-hover:text-[#F47521] transition line-clamp-1">
                               {m.title.english || m.title.romaji}
                             </h5>
-                            <p className="text-[10px] text-[#A0A0A0] mt-0.5">
+                            <p className="text-[10px] text-[#8E93A0] mt-0.5">
                               {m.format} {m.averageScore ? `• ★ ${(m.averageScore / 10).toFixed(1)}` : ''}
                             </p>
                           </div>
@@ -375,11 +371,11 @@ export const WatchPage: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="bg-[#23252B] border border-[#4A4E58]/40 rounded-xl p-4 shadow-xl">
-              <div className="flex items-center justify-between border-b border-[#4A4E58]/30 pb-3 mb-3">
+            <div className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 mb-3">
                 <div className="flex items-center gap-2">
                   <Tv className="w-4 h-4 text-[#F47521]" />
-                  <h3 className="font-bold text-sm text-white uppercase tracking-wider">
+                  <h3 className="font-semibold text-xs text-white/90 uppercase tracking-wider">
                     Season {activeEpisode.seasonNumber || 1} Queue ({episodes.length} Episodes)
                   </h3>
                 </div>
@@ -387,29 +383,29 @@ export const WatchPage: React.FC = () => {
 
               {/* Next Episode Featured Card (if available) */}
               {nextEpisode && (
-                <div className="mb-4 p-3 rounded-lg bg-[#141519] border border-[#F47521]/40 space-y-2">
-                  <span className="text-[10px] font-black uppercase text-[#F47521] tracking-wider block">
+                <div className="mb-3.5 p-3 rounded-xl bg-[#14151B] border border-[#F47521]/30 space-y-2">
+                  <span className="text-[10px] font-bold uppercase text-[#F47521] tracking-wider block">
                     UP NEXT
                   </span>
                   <Link
                     to={`/watch/${media.id}/ep/${nextEpisode.episodeNumber}`}
                     className="flex items-center gap-3 group"
                   >
-                    <div className="relative w-20 aspect-video rounded overflow-hidden flex-shrink-0 bg-black">
+                    <div className="relative w-20 aspect-video rounded-lg overflow-hidden flex-shrink-0 bg-black">
                       <img
                         src={nextEpisode.thumbnailUrl}
                         alt={nextEpisode.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                         <Play className="w-4 h-4 text-white fill-current" />
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h5 className="text-xs font-bold text-white group-hover:text-[#F47521] transition line-clamp-1">
+                      <h5 className="text-xs font-semibold text-white/90 group-hover:text-[#F47521] transition line-clamp-1">
                         {nextEpisode.displayTitle || (nextEpisode.title?.toLowerCase().startsWith('episode') ? nextEpisode.title : `Episode ${nextEpisode.episodeNumber}: ${nextEpisode.title}`)}
                       </h5>
-                      <span className="text-[10px] text-[#A0A0A0]">
+                      <span className="text-[10px] text-[#8E93A0]">
                         {nextEpisode.durationMinutes || 24} mins
                       </span>
                     </div>
@@ -425,29 +421,29 @@ export const WatchPage: React.FC = () => {
                     <Link
                       key={ep.episodeNumber}
                       to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
-                      className={`flex items-center gap-3 p-2 rounded-lg border transition ${
+                      className={`flex items-center gap-3 p-2 rounded-xl border transition-all ${
                         isCurrent
-                          ? 'bg-[#F47521]/15 border-[#F47521] ring-1 ring-[#F47521]'
-                          : 'bg-[#141519] border-white/5 hover:bg-[#2B2E36]'
+                          ? 'bg-[#F47521]/15 border-[#F47521]/60'
+                          : 'bg-[#121318] border-white/5 hover:bg-[#20222B]'
                       }`}
                     >
-                      <div className="relative w-20 aspect-video rounded overflow-hidden flex-shrink-0 bg-black">
+                      <div className="relative w-20 aspect-video rounded-lg overflow-hidden flex-shrink-0 bg-black">
                         <img
                           src={ep.thumbnailUrl}
                           alt={ep.title}
                           className="w-full h-full object-cover"
                         />
                         {isCurrent && (
-                          <div className="absolute inset-0 bg-[#F47521]/80 flex items-center justify-center text-black font-black text-xs">
+                          <div className="absolute inset-0 bg-[#F47521]/80 flex items-center justify-center text-black font-bold text-[10px]">
                             PLAYING
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-bold line-clamp-1 ${isCurrent ? 'text-[#F47521]' : 'text-white'}`}>
+                        <p className={`text-xs font-medium line-clamp-1 ${isCurrent ? 'text-[#F47521] font-semibold' : 'text-white/90'}`}>
                           {ep.displayTitle || (ep.title?.toLowerCase().startsWith('episode') ? ep.title : `Episode ${ep.episodeNumber}: ${ep.title}`)}
                         </p>
-                        <p className="text-[10px] text-[#A0A0A0]">
+                        <p className="text-[10px] text-[#8E93A0]">
                           {ep.durationMinutes || 24}m
                         </p>
                       </div>

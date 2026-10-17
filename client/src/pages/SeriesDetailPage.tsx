@@ -20,6 +20,7 @@ import { fetchAnimeDetail, AnimeDetailResponse, toggleWatchlist } from '../api/a
 import { EpisodeCard } from '../components/cards/EpisodeCard';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
+import { SeriesDetailPageSkeleton } from '../components/common/Shimmer';
 
 export const SeriesDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,12 +64,7 @@ export const SeriesDetailPage: React.FC = () => {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="w-full min-h-[70vh] flex flex-col items-center justify-center gap-3 text-white">
-        <div className="w-12 h-12 rounded-full border-4 border-[#F47521] border-t-transparent animate-spin" />
-        <p className="text-sm text-[#A0A0A0]">Loading Anime Details & Episodes...</p>
-      </div>
-    );
+    return <SeriesDetailPageSkeleton />;
   }
 
   if (error || !data) {
@@ -173,7 +169,7 @@ export const SeriesDetailPage: React.FC = () => {
         {/* Foreground Content */}
         <div className="relative z-10 max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-10 flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-end">
           {/* 2:3 Crisp Poster */}
-          <div className="w-36 sm:w-52 md:w-64 flex-shrink-0 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 bg-[#23252B]">
+          <div className="w-36 sm:w-52 md:w-60 flex-shrink-0 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 bg-[#181A22]">
             <img
               src={media.coverImage?.extraLarge || media.coverImage?.large}
               alt={title}
@@ -183,55 +179,55 @@ export const SeriesDetailPage: React.FC = () => {
 
           {/* Title & Metadata Info */}
           <div className="flex-1 space-y-3 sm:space-y-4 text-center md:text-left">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold">
-              <span className="bg-[#F47521] text-black px-2 sm:px-2.5 py-0.5 rounded uppercase tracking-wider">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold">
+              <span className="bg-[#F47521] text-black px-2.5 py-0.5 rounded-md uppercase tracking-wider font-bold">
                 {media.format}
               </span>
               {media.averageScore && (
-                <span className="bg-[#FAB818] text-black px-2 py-0.5 rounded font-black flex items-center gap-1">
+                <span className="bg-[#FAB818] text-black px-2 py-0.5 rounded-md font-bold flex items-center gap-1">
                   <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
-                  {(media.averageScore / 10).toFixed(1)} / 10 ({media.averageScore}%)
+                  {(media.averageScore / 10).toFixed(1)} / 10
                 </span>
               )}
-              <span className="bg-[#2B2E36] text-[#A0A0A0] px-2 sm:px-2.5 py-0.5 rounded">
+              <span className="bg-[#1A1C24]/90 backdrop-blur-md border border-white/10 text-white/90 px-2.5 py-0.5 rounded-md">
                 {media.status}
               </span>
               {media.seasonYear && (
-                <span className="bg-[#2B2E36] text-white px-2 sm:px-2.5 py-0.5 rounded">
+                <span className="bg-[#1A1C24]/90 backdrop-blur-md border border-white/10 text-white/90 px-2.5 py-0.5 rounded-md">
                   {media.season} {media.seasonYear}
                 </span>
               )}
             </div>
 
-            <h1 className="font-display font-black text-xl sm:text-3xl lg:text-5xl text-white tracking-tight leading-tight">
+            <h1 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-5xl text-white tracking-tight leading-tight">
               {title}
             </h1>
 
             {media.title.native && (
-              <p className="text-xs sm:text-sm text-[#A0A0A0] font-medium">
+              <p className="text-xs sm:text-sm text-[#8E93A0] font-normal">
                 {media.title.native} • {media.title.romaji}
               </p>
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 pt-1 sm:pt-2">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-1 sm:pt-2">
               <button
                 onClick={() => navigate(startWatchingUrl)}
-                className="bg-[#F47521] hover:bg-[#FF8533] text-black font-extrabold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-[#F47521]/20 hover:scale-105 active:scale-95 transition-all"
+                className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#F47521]/20 active:scale-95 transition-all"
               >
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+                <Play className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current" />
                 <span>{isMovie ? 'WATCH MOVIE' : 'WATCH S1 E1'}</span>
               </button>
 
               <button
                 onClick={handleBookmarkToggle}
-                className={`px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border transition ${
+                className={`px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 border transition-all ${
                   isBookmarked
-                    ? 'border-[#F47521] bg-[#F47521]/20 text-[#F47521]'
-                    : 'border-white/30 bg-black/40 text-white hover:bg-white/10'
+                    ? 'border-[#F47521] bg-[#F47521]/15 text-[#F47521]'
+                    : 'border-white/20 bg-black/40 backdrop-blur-sm text-white hover:bg-white/10'
                 }`}
               >
-                {isBookmarked ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                {isBookmarked ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                 <span>{isBookmarked ? 'IN WATCHLIST' : 'WATCHLIST'}</span>
               </button>
 
@@ -240,9 +236,9 @@ export const SeriesDetailPage: React.FC = () => {
                   href={firstDownloadUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border border-[#2ABDBB] bg-[#2ABDBB]/15 text-[#2ABDBB] hover:bg-[#2ABDBB] hover:text-black transition"
+                  className="px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 border border-[#2ABDBB]/40 bg-[#2ABDBB]/15 text-[#2ABDBB] hover:bg-[#2ABDBB] hover:text-black transition-all"
                 >
-                  <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <Download className="w-4 h-4" />
                   <span>DOWNLOAD</span>
                 </a>
               )}
@@ -250,21 +246,21 @@ export const SeriesDetailPage: React.FC = () => {
               {media.trailer && media.trailer.id && (
                 <button
                   onClick={() => setIsTrailerOpen(true)}
-                  className="px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border border-white/20 bg-black/40 text-white hover:bg-white/10 transition"
+                  className="px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 border border-white/20 bg-black/40 backdrop-blur-sm text-white hover:bg-white/10 transition-all"
                 >
-                  <Film className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FAB818]" />
+                  <Film className="w-4 h-4 text-[#FAB818]" />
                   <span>TRAILER</span>
                 </button>
               )}
 
               <button
                 onClick={handleShare}
-                className="p-2.5 sm:p-3 rounded-lg border border-white/20 bg-black/40 text-[#A0A0A0] hover:text-white hover:bg-white/10 transition relative"
+                className="p-2.5 sm:p-3 rounded-xl border border-white/20 bg-black/40 backdrop-blur-sm text-[#8E93A0] hover:text-white hover:bg-white/10 transition-all relative"
                 title="Share link"
               >
                 <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 {isCopied && (
-                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-2 py-1 rounded shadow whitespace-nowrap border border-white/20">
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] px-2 py-1 rounded-md shadow whitespace-nowrap border border-white/20">
                     Copied!
                   </span>
                 )}
@@ -279,8 +275,8 @@ export const SeriesDetailPage: React.FC = () => {
         {/* Left Column (8 cols): Synopsis, Season Selector & Episode Grid */}
         <div className="lg:col-span-8 space-y-6 sm:space-y-8">
           {/* Synopsis & Tags */}
-          <div className="bg-[#23252B]/60 border border-[#4A4E58]/30 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4">
-            <h3 className="font-bold text-white uppercase tracking-wider text-[11px] sm:text-xs text-[#A0A0A0]">
+          <div className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-5 sm:p-6 space-y-3 sm:space-y-4 shadow-sm">
+            <h3 className="font-semibold text-white uppercase tracking-wider text-xs text-[#8E93A0]">
               Synopsis
             </h3>
             <p className="text-xs sm:text-sm leading-relaxed text-[#D0D0D0]">
@@ -288,13 +284,13 @@ export const SeriesDetailPage: React.FC = () => {
             </p>
 
             {/* Clickable Genre Pills */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-2 border-t border-[#4A4E58]/30">
-              <span className="text-[11px] sm:text-xs text-[#A0A0A0] font-semibold mr-1">Genres:</span>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-3 border-t border-white/[0.06]">
+              <span className="text-xs text-[#8E93A0] font-medium mr-1">Genres:</span>
               {media.genres.map((genre) => (
                 <Link
                   key={genre}
                   to={`/browse?genre=${encodeURIComponent(genre)}`}
-                  className="text-[11px] sm:text-xs bg-[#141519] text-[#A0A0A0] hover:text-white hover:bg-[#F47521]/20 hover:border-[#F47521] border border-[#4A4E58]/50 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition"
+                  className="text-xs bg-[#121318] text-[#8E93A0] hover:text-white hover:border-[#F47521]/60 border border-white/10 px-3 py-1 rounded-full transition-all"
                 >
                   {genre}
                 </Link>
@@ -306,10 +302,10 @@ export const SeriesDetailPage: React.FC = () => {
           {!isMovie && (
             <div className="space-y-4">
               {/* Season Selector Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#4A4E58]/40 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <Tv className="w-4 h-4 sm:w-5 sm:h-5 text-[#F47521]" />
-                  <h3 className="font-display font-black text-base sm:text-xl text-white">
+                  <h3 className="font-display font-bold text-base sm:text-xl text-white">
                     Episodes & Seasons
                   </h3>
 
@@ -323,7 +319,7 @@ export const SeriesDetailPage: React.FC = () => {
                           navigate(media.format === 'MOVIE' ? `/movie/${selId}` : `/series/${selId}`);
                         }
                       }}
-                      className="bg-[#23252B] border border-[#F47521] text-white text-[11px] sm:text-xs font-bold rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 focus:outline-none cursor-pointer hover:border-[#FF8533] shadow"
+                      className="bg-[#181A22] border border-[#F47521]/80 text-white text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer hover:border-[#F47521] shadow-sm transition-colors"
                     >
                       {franchiseSeasons.map((s) => (
                         <option key={s.anilistId} value={s.anilistId}>
@@ -332,113 +328,113 @@ export const SeriesDetailPage: React.FC = () => {
                       ))}
                     </select>
                   ) : (
-                    <span className="text-xs bg-[#23252B] border border-white/10 text-[#A0A0A0] font-semibold px-2.5 py-1 rounded-lg">
+                    <span className="text-xs bg-[#181A22] border border-white/10 text-[#8E93A0] font-medium px-3 py-1.5 rounded-xl">
                       {currentSeasonNode?.seasonNumberLabel || `Season ${activeSeasonNumber}`} • {episodes.length} Episodes
                     </span>
                   )}
                 </div>
 
-              {/* Episode Filter & Sort Toolbar */}
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                {/* Search in episodes */}
-                <div className="relative flex-1 sm:flex-initial">
-                  <input
-                    type="text"
-                    placeholder="Find episode..."
-                    value={searchEp}
-                    onChange={(e) => setSearchEp(e.target.value)}
-                    className="w-full sm:w-40 md:w-48 bg-[#23252B] text-xs text-white pl-7 pr-3 py-1.5 rounded-lg border border-[#4A4E58]/50 focus:border-[#F47521] focus:outline-none"
-                  />
-                  <Search className="w-3.5 h-3.5 text-[#A0A0A0] absolute left-2 top-2 pointer-events-none" />
-                </div>
+                {/* Episode Filter & Sort Toolbar */}
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  {/* Search in episodes */}
+                  <div className="relative flex-1 sm:flex-initial">
+                    <input
+                      type="text"
+                      placeholder="Find episode..."
+                      value={searchEp}
+                      onChange={(e) => setSearchEp(e.target.value)}
+                      className="w-full sm:w-44 md:w-52 bg-[#181A22] text-xs text-white pl-8 pr-3 py-2 rounded-xl border border-white/10 focus:border-[#F47521] focus:outline-none transition-colors"
+                    />
+                    <Search className="w-3.5 h-3.5 text-[#8E93A0] absolute left-2.5 top-2.5 pointer-events-none" />
+                  </div>
 
-                {/* Asc / Desc Sort */}
-                <button
-                  onClick={() => setIsDescOrder(!isDescOrder)}
-                  className={`p-1.5 sm:p-2 rounded-lg border text-xs font-semibold flex items-center gap-1 transition flex-shrink-0 ${
-                    isDescOrder
-                      ? 'border-[#F47521] text-[#F47521] bg-[#F47521]/10'
-                      : 'border-[#4A4E58] text-[#A0A0A0] hover:text-white'
-                  }`}
-                  title={isDescOrder ? 'Descending (Newest first)' : 'Ascending (1 → N)'}
-                >
-                  <ArrowUpDown className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{isDescOrder ? 'Desc' : 'Asc'}</span>
-                </button>
-
-                {/* Grid / List View Toggle */}
-                <button
-                  onClick={() => setIsListView(!isListView)}
-                  className="p-1.5 sm:p-2 rounded-lg border border-[#4A4E58] text-[#A0A0A0] hover:text-white transition flex-shrink-0"
-                  title={isListView ? 'Switch to Grid View' : 'Switch to List View'}
-                >
-                  {isListView ? <LayoutGrid className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Episode Grid / List */}
-            {filteredEpisodes.length === 0 ? (
-              <div className="p-8 text-center bg-[#23252B]/40 rounded-xl border border-[#4A4E58]/30 text-[#A0A0A0]">
-                No episodes matched your filter.
-              </div>
-            ) : isListView ? (
-              <div className="space-y-2">
-                {filteredEpisodes.map((ep) => (
-                  <div
-                    key={ep.episodeNumber}
-                    className="flex items-center justify-between p-3 rounded-lg bg-[#23252B] hover:bg-[#2B2E36] border border-[#4A4E58]/30 transition"
+                  {/* Asc / Desc Sort */}
+                  <button
+                    onClick={() => setIsDescOrder(!isDescOrder)}
+                    className={`p-2 rounded-xl border text-xs font-medium flex items-center gap-1 transition-all flex-shrink-0 ${
+                      isDescOrder
+                        ? 'border-[#F47521] text-[#F47521] bg-[#F47521]/10'
+                        : 'border-white/10 text-[#8E93A0] hover:text-white bg-[#181A22]'
+                    }`}
+                    title={isDescOrder ? 'Descending (Newest first)' : 'Ascending (1 → N)'}
                   >
-                    <div className="flex items-center gap-3">
-                      <Link
-                        to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
-                        className="w-8 h-8 rounded-full bg-[#141519] flex items-center justify-center text-[#F47521] hover:bg-[#F47521] hover:text-black transition"
-                      >
-                        <Play className="w-4 h-4 fill-current ml-0.5" />
-                      </Link>
-                      <div>
+                    <ArrowUpDown className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">{isDescOrder ? 'Desc' : 'Asc'}</span>
+                  </button>
+
+                  {/* Grid / List View Toggle */}
+                  <button
+                    onClick={() => setIsListView(!isListView)}
+                    className="p-2 rounded-xl border border-white/10 bg-[#181A22] text-[#8E93A0] hover:text-white transition-all flex-shrink-0"
+                    title={isListView ? 'Switch to Grid View' : 'Switch to List View'}
+                  >
+                    {isListView ? <LayoutGrid className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Episode Grid / List */}
+              {filteredEpisodes.length === 0 ? (
+                <div className="p-8 text-center bg-[#181A20] rounded-2xl border border-white/[0.08] text-[#8E93A0] text-xs">
+                  No episodes matched your filter.
+                </div>
+              ) : isListView ? (
+                <div className="space-y-2">
+                  {filteredEpisodes.map((ep) => (
+                    <div
+                      key={ep.episodeNumber}
+                      className="flex items-center justify-between p-3 rounded-xl bg-[#181A20] hover:bg-[#20222B] border border-white/[0.08] transition-all"
+                    >
+                      <div className="flex items-center gap-3">
                         <Link
                           to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
-                          className="text-sm font-bold text-white hover:text-[#F47521] transition line-clamp-1"
+                          className="w-8 h-8 rounded-full bg-[#121318] flex items-center justify-center text-[#F47521] hover:bg-[#F47521] hover:text-black transition-all"
                         >
-                          {ep.displayTitle || (ep.title?.toLowerCase().startsWith('episode') ? ep.title : `Episode ${ep.episodeNumber}: ${ep.title}`)}
+                          <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                         </Link>
-                        <span className="text-xs text-[#A0A0A0]">
-                          {ep.durationMinutes || 24} mins
-                        </span>
+                        <div>
+                          <Link
+                            to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
+                            className="text-xs sm:text-sm font-semibold text-white/90 hover:text-[#F47521] transition line-clamp-1"
+                          >
+                            {ep.displayTitle || (ep.title?.toLowerCase().startsWith('episode') ? ep.title : `Episode ${ep.episodeNumber}: ${ep.title}`)}
+                          </Link>
+                          <span className="text-[11px] text-[#8E93A0]">
+                            {ep.durationMinutes || 24} mins
+                          </span>
+                        </div>
                       </div>
+                      <a
+                        href={ep.mirrorBoxStream?.downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 rounded-lg bg-[#2ABDBB]/10 text-[#2ABDBB] text-xs font-medium hover:bg-[#2ABDBB] hover:text-black transition-all flex items-center gap-1"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download</span>
+                      </a>
                     </div>
-                    <a
-                      href={ep.mirrorBoxStream?.downloadUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-2.5 py-1 rounded bg-[#2ABDBB]/15 text-[#2ABDBB] text-xs font-semibold hover:bg-[#2ABDBB] hover:text-black transition flex items-center gap-1"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Download</span>
-                    </a>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredEpisodes.map((ep) => (
-                  <EpisodeCard
-                    key={ep.episodeNumber}
-                    anilistId={media.id}
-                    episode={ep}
-                    seasonNumber={ep.seasonNumber || activeSeasonNumber}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+                  {filteredEpisodes.map((ep) => (
+                    <EpisodeCard
+                      key={ep.episodeNumber}
+                      anilistId={media.id}
+                      episode={ep}
+                      seasonNumber={ep.seasonNumber || activeSeasonNumber}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
-        {/* Character & Voice Actor Strip */}
+          {/* Character & Voice Actor Strip */}
           {media.characters && media.characters.edges && media.characters.edges.length > 0 && (
-            <div className="space-y-4 pt-6 border-t border-[#4A4E58]/30">
-              <h3 className="font-display font-black text-xl text-white">
+            <div className="space-y-4 pt-6 border-t border-white/[0.08]">
+              <h3 className="font-display font-bold text-lg sm:text-xl text-white">
                 Characters & Voice Actors
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -448,18 +444,18 @@ export const SeriesDetailPage: React.FC = () => {
                   return (
                     <div
                       key={idx}
-                      className="flex items-center gap-2.5 p-2 rounded-lg bg-[#23252B] border border-[#4A4E58]/30"
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#181A20] border border-white/[0.08]"
                     >
                       <img
                         src={edge.node.image?.medium}
                         alt={charName}
-                        className="w-10 h-12 object-cover rounded shadow"
+                        className="w-10 h-12 object-cover rounded-lg shadow-sm border border-white/5"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-white truncate">{charName}</p>
-                        <p className="text-[10px] text-[#A0A0A0] uppercase font-semibold">{edge.role}</p>
+                        <p className="text-xs font-semibold text-white/90 truncate">{charName}</p>
+                        <p className="text-[10px] text-[#8E93A0] uppercase font-medium">{edge.role}</p>
                         {va && (
-                          <p className="text-[10px] text-[#2ABDBB] truncate">VA: {va.name.full}</p>
+                          <p className="text-[10px] text-[#2ABDBB] truncate font-medium">VA: {va.name.full}</p>
                         )}
                       </div>
                     </div>
@@ -472,58 +468,58 @@ export const SeriesDetailPage: React.FC = () => {
 
         {/* Right Column (4 cols): Metadata Details Card */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#23252B] border border-[#4A4E58]/40 rounded-xl p-6 space-y-4 shadow-xl">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-[#A0A0A0] border-b border-[#4A4E58]/30 pb-2">
+          <div className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+            <h3 className="font-semibold text-xs uppercase tracking-wider text-[#8E93A0] border-b border-white/[0.06] pb-2.5">
               Anime Details
             </h3>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-[#A0A0A0]">Studio:</span>
-                <span className="text-white font-semibold">
+            <div className="space-y-2.5 text-xs">
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-[#8E93A0]">Studio:</span>
+                <span className="text-white/90 font-medium">
                   {media.studios?.nodes?.[0]?.name || 'Unknown'}
                 </span>
               </div>
 
-              <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-[#A0A0A0]">Format:</span>
-                <span className="text-white font-semibold">{media.format}</span>
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-[#8E93A0]">Format:</span>
+                <span className="text-white/90 font-medium">{media.format}</span>
               </div>
 
-              <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-[#A0A0A0]">Status:</span>
-                <span className="text-white font-semibold">{media.status}</span>
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-[#8E93A0]">Status:</span>
+                <span className="text-white/90 font-medium">{media.status}</span>
               </div>
 
               {!isMovie && (
-                <div className="flex justify-between py-1 border-b border-white/5">
-                  <span className="text-[#A0A0A0]">Episodes:</span>
-                  <span className="text-white font-semibold">{media.episodes || 'Ongoing'}</span>
+                <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                  <span className="text-[#8E93A0]">Episodes:</span>
+                  <span className="text-white/90 font-medium">{media.episodes || 'Ongoing'}</span>
                 </div>
               )}
 
-              <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-[#A0A0A0]">{isMovie ? 'Duration:' : 'Episode Duration:'}</span>
-                <span className="text-white font-semibold">{media.duration || (isMovie ? 90 : 24)} mins</span>
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-[#8E93A0]">{isMovie ? 'Duration:' : 'Episode Duration:'}</span>
+                <span className="text-white/90 font-medium">{media.duration || (isMovie ? 90 : 24)} mins</span>
               </div>
 
               {!isMovie && (
-                <div className="flex justify-between py-1 border-b border-white/5">
-                  <span className="text-[#A0A0A0]">Season:</span>
-                  <span className="text-white font-semibold">
+                <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                  <span className="text-[#8E93A0]">Season:</span>
+                  <span className="text-white/90 font-medium">
                     {media.season || 'N/A'} {media.seasonYear || ''}
                   </span>
                 </div>
               )}
 
-              <div className="flex justify-between py-1 border-b border-white/5">
-                <span className="text-[#A0A0A0]">Source:</span>
-                <span className="text-white font-semibold">{media.source || 'Original'}</span>
+              <div className="flex justify-between py-1 border-b border-white/[0.04]">
+                <span className="text-[#8E93A0]">Source:</span>
+                <span className="text-white/90 font-medium">{media.source || 'Original'}</span>
               </div>
 
               <div className="flex justify-between py-1">
-                <span className="text-[#A0A0A0]">AniList Score:</span>
-                <span className="text-[#FAB818] font-black">
+                <span className="text-[#8E93A0]">AniList Score:</span>
+                <span className="text-[#FAB818] font-bold">
                   ★ {media.averageScore ? `${(media.averageScore / 10).toFixed(1)} / 10` : 'N/A'}
                 </span>
               </div>
@@ -533,7 +529,7 @@ export const SeriesDetailPage: React.FC = () => {
           {/* Recommendations Rail */}
           {media.recommendations && media.recommendations.nodes && media.recommendations.nodes.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-bold text-sm text-white uppercase tracking-wider">
+              <h4 className="font-semibold text-xs text-[#8E93A0] uppercase tracking-wider">
                 You May Also Like
               </h4>
               <div className="space-y-2">
@@ -544,22 +540,22 @@ export const SeriesDetailPage: React.FC = () => {
                     <Link
                       key={idx}
                       to={m.format === 'MOVIE' ? `/movie/${m.id}` : `/series/${m.id}`}
-                      className="flex items-center gap-3 p-2 rounded-lg bg-[#23252B] hover:bg-[#2B2E36] border border-[#4A4E58]/30 transition group"
+                      className="flex items-center gap-3 p-2.5 rounded-xl bg-[#181A20] hover:bg-[#20222B] border border-white/[0.08] transition-all group"
                     >
                       <img
                         src={m.coverImage?.large || m.coverImage?.extraLarge}
                         alt={m.title.english || m.title.romaji}
-                        className="w-12 h-16 object-cover rounded shadow"
+                        className="w-12 h-16 object-cover rounded-lg shadow-sm border border-white/5"
                       />
                       <div className="flex-1 min-w-0">
-                        <h5 className="text-xs font-bold text-white group-hover:text-[#F47521] transition line-clamp-1">
+                        <h5 className="text-xs font-semibold text-white/90 group-hover:text-[#F47521] transition line-clamp-1">
                           {m.title.english || m.title.romaji}
                         </h5>
-                        <p className="text-[10px] text-[#A0A0A0] mt-0.5">
+                        <p className="text-[11px] text-[#8E93A0] mt-0.5">
                           {m.format} • {m.episodes ? `${m.episodes} Eps` : 'Movie'}
                         </p>
                         {m.averageScore && (
-                          <span className="text-[10px] text-[#FAB818] font-bold">
+                          <span className="text-[10px] text-[#FAB818] font-semibold">
                             ★ {(m.averageScore / 10).toFixed(1)}
                           </span>
                         )}

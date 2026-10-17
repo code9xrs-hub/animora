@@ -5,6 +5,7 @@ import { fetchBrowse, BrowseParams } from '../api/animeApi';
 import { AnimeMedia, BrowseResponse } from '../types/anime';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
+import { GridSkeleton } from '../components/common/Shimmer';
 
 const GENRES = [
   'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy',
@@ -145,23 +146,23 @@ export const BrowsePage: React.FC = () => {
             placeholder="Search anime title..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full bg-[#23252B] border border-[#4A4E58]/60 focus:border-[#F47521] text-white pl-9 pr-4 py-2 rounded-lg text-xs sm:text-sm focus:outline-none"
+            className="w-full bg-[#181A22] border border-white/10 focus:border-[#F47521] focus:ring-1 focus:ring-[#F47521] text-white pl-9 pr-4 py-2.5 rounded-xl text-xs sm:text-sm placeholder:text-[#636875] focus:outline-none transition-all shadow-sm"
           />
-          <Search className="w-4 h-4 text-[#A0A0A0] absolute left-3 top-2.5 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#8E93A0] absolute left-3 top-3 pointer-events-none" />
         </form>
       </div>
 
       {/* Filter Control Bar */}
-      <div className="bg-[#23252B] border border-[#4A4E58]/40 rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 shadow-lg">
-        <div className="flex items-center justify-between gap-2 border-b border-[#4A4E58]/30 pb-3 mb-3">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white">
+      <div className="bg-[#181A22] border border-white/[0.08] rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8 shadow-sm">
+        <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] pb-3 mb-3.5">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/90">
             <Filter className="w-4 h-4 text-[#F47521]" />
             <span>Filter Catalog</span>
           </div>
 
           <button
             onClick={handleResetFilters}
-            className="flex items-center gap-1 text-xs text-[#A0A0A0] hover:text-[#F47521] transition"
+            className="flex items-center gap-1.5 text-xs text-[#8E93A0] hover:text-[#F47521] transition-colors font-medium"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Filters</span>
@@ -169,14 +170,14 @@ export const BrowsePage: React.FC = () => {
         </div>
 
         {/* Filters Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
           {/* Genre */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#A0A0A0] mb-1">Genre</label>
+            <label className="block text-[11px] font-medium text-[#8E93A0] uppercase tracking-wider mb-1.5">Genre</label>
             <select
               value={genre}
               onChange={(e) => updateParam('genre', e.target.value)}
-              className="w-full bg-[#141519] text-xs text-white border border-[#4A4E58]/50 rounded-lg p-2 focus:border-[#F47521] focus:outline-none"
+              className="w-full bg-[#121318] text-xs text-white/90 border border-white/10 rounded-xl px-3 py-2.5 focus:border-[#F47521] focus:ring-1 focus:ring-[#F47521] focus:outline-none transition-all cursor-pointer"
             >
               <option value="">All Genres</option>
               {GENRES.map((g) => (
@@ -187,11 +188,11 @@ export const BrowsePage: React.FC = () => {
 
           {/* Format */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#A0A0A0] mb-1">Format</label>
+            <label className="block text-[11px] font-medium text-[#8E93A0] uppercase tracking-wider mb-1.5">Format</label>
             <select
               value={format}
               onChange={(e) => updateParam('format', e.target.value)}
-              className="w-full bg-[#141519] text-xs text-white border border-[#4A4E58]/50 rounded-lg p-2 focus:border-[#F47521] focus:outline-none"
+              className="w-full bg-[#121318] text-xs text-white/90 border border-white/10 rounded-xl px-3 py-2.5 focus:border-[#F47521] focus:ring-1 focus:ring-[#F47521] focus:outline-none transition-all cursor-pointer"
             >
               {FORMATS.map((f) => (
                 <option key={f.value} value={f.value}>{f.label}</option>
@@ -201,11 +202,11 @@ export const BrowsePage: React.FC = () => {
 
           {/* Season */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#A0A0A0] mb-1">Season</label>
+            <label className="block text-[11px] font-medium text-[#8E93A0] uppercase tracking-wider mb-1.5">Season</label>
             <select
               value={season}
               onChange={(e) => updateParam('season', e.target.value)}
-              className="w-full bg-[#141519] text-xs text-white border border-[#4A4E58]/50 rounded-lg p-2 focus:border-[#F47521] focus:outline-none"
+              className="w-full bg-[#121318] text-xs text-white/90 border border-white/10 rounded-xl px-3 py-2.5 focus:border-[#F47521] focus:ring-1 focus:ring-[#F47521] focus:outline-none transition-all cursor-pointer"
             >
               {SEASONS.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -215,11 +216,11 @@ export const BrowsePage: React.FC = () => {
 
           {/* Sort */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#A0A0A0] mb-1">Sort By</label>
+            <label className="block text-[11px] font-medium text-[#8E93A0] uppercase tracking-wider mb-1.5">Sort By</label>
             <select
               value={sort}
               onChange={(e) => updateParam('sort', e.target.value)}
-              className="w-full bg-[#141519] text-xs text-white border border-[#4A4E58]/50 rounded-lg p-2 focus:border-[#F47521] focus:outline-none"
+              className="w-full bg-[#121318] text-xs text-white/90 border border-white/10 rounded-xl px-3 py-2.5 focus:border-[#F47521] focus:ring-1 focus:ring-[#F47521] focus:outline-none transition-all cursor-pointer"
             >
               {SORTS.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -229,11 +230,11 @@ export const BrowsePage: React.FC = () => {
 
           {/* Year */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#A0A0A0] mb-1">Year</label>
+            <label className="block text-[11px] font-medium text-[#8E93A0] uppercase tracking-wider mb-1.5">Year</label>
             <select
               value={seasonYear}
               onChange={(e) => updateParam('seasonYear', e.target.value)}
-              className="w-full bg-[#141519] text-xs text-white border border-[#4A4E58]/50 rounded-lg p-2 focus:border-[#F47521] focus:outline-none"
+              className="w-full bg-[#121318] text-xs text-white/90 border border-white/10 rounded-xl px-3 py-2.5 focus:border-[#F47521] focus:ring-1 focus:ring-[#F47521] focus:outline-none transition-all cursor-pointer"
             >
               <option value="">Any Year</option>
               {[2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2015, 2010, 2005, 2000].map((y) => (
@@ -246,21 +247,18 @@ export const BrowsePage: React.FC = () => {
 
       {/* Results Content */}
       {loading ? (
-        <div className="w-full min-h-[50vh] flex flex-col items-center justify-center gap-3 text-white">
-          <div className="w-10 h-10 rounded-full border-4 border-[#F47521] border-t-transparent animate-spin" />
-          <p className="text-xs text-[#A0A0A0]">Updating filtered anime catalog...</p>
-        </div>
+        <GridSkeleton count={24} />
       ) : error || !data ? (
-        <div className="w-full py-16 text-center text-red-400">
+        <div className="w-full py-16 text-center text-red-400 font-medium">
           {error || 'Error loading results'}
         </div>
       ) : data.media.length === 0 ? (
-        <div className="w-full py-20 text-center bg-[#23252B]/40 rounded-2xl border border-white/5 space-y-3">
-          <p className="text-base text-white font-bold">No anime matched your active filters</p>
-          <p className="text-xs text-[#A0A0A0]">Try adjusting your search query, genre, or format settings.</p>
+        <div className="w-full py-20 text-center bg-[#181A22] rounded-2xl border border-white/[0.08] space-y-3 p-6">
+          <p className="text-base text-white font-semibold">No anime matched your active filters</p>
+          <p className="text-xs text-[#8E93A0] max-w-sm mx-auto">Try adjusting your search query, genre, or format settings.</p>
           <button
             onClick={handleResetFilters}
-            className="bg-[#F47521] text-black font-bold px-4 py-2 rounded text-xs"
+            className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-4 py-2 rounded-xl text-xs transition-colors"
           >
             Reset Filters
           </button>
@@ -268,33 +266,33 @@ export const BrowsePage: React.FC = () => {
       ) : (
         <>
           {/* Anime Grid (2 cols mobile, 3 tablet, 5-6 desktop) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-5">
             {data.media.map((anime) => (
               <AnimePosterCard key={anime.id} anime={anime} />
             ))}
           </div>
 
           {/* Pagination Bar */}
-          <div className="mt-12 flex items-center justify-center gap-4">
+          <div className="mt-12 flex items-center justify-center gap-3">
             <button
               disabled={page <= 1}
               onClick={() => handlePageChange(page - 1)}
-              className="flex items-center gap-1 px-4 py-2 rounded-lg bg-[#23252B] hover:bg-[#F47521] hover:text-black text-white text-xs font-bold transition disabled:opacity-30 disabled:cursor-not-allowed border border-[#4A4E58]/40"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181A22] hover:bg-[#F47521] hover:text-black text-white/90 text-xs font-semibold transition disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 shadow-sm"
             >
               <ChevronLeft className="w-4 h-4" />
-              <span>Previous Page</span>
+              <span>Previous</span>
             </button>
 
-            <span className="text-xs font-semibold text-[#A0A0A0] px-3">
+            <span className="text-xs font-medium text-[#8E93A0] px-3">
               Page {page} {data.pageInfo.lastPage ? `of ${data.pageInfo.lastPage}` : ''}
             </span>
 
             <button
               disabled={!data.pageInfo.hasNextPage}
               onClick={() => handlePageChange(page + 1)}
-              className="flex items-center gap-1 px-4 py-2 rounded-lg bg-[#23252B] hover:bg-[#F47521] hover:text-black text-white text-xs font-bold transition disabled:opacity-30 disabled:cursor-not-allowed border border-[#4A4E58]/40"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181A22] hover:bg-[#F47521] hover:text-black text-white/90 text-xs font-semibold transition disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 shadow-sm"
             >
-              <span>Next Page</span>
+              <span>Next</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

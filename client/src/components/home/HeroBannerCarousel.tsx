@@ -78,87 +78,91 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
     : 'Stream the full season in crisp HD with multi-server playback and direct download options.';
 
   return (
-    <div className="relative w-full h-[480px] sm:h-[550px] md:h-[620px] bg-[#000000] overflow-hidden select-none">
-      {/* Background Banner with Crunchyroll Vignette */}
+    <div className="relative w-full h-[390px] xs:h-[430px] sm:h-[500px] md:h-[580px] lg:h-[620px] bg-[#000000] overflow-hidden select-none">
+      {/* Background Banner with Crystal-Clear Art */}
       <div className="absolute inset-0">
         <img
           src={banner}
           alt={title}
-          className="w-full h-full object-cover object-top opacity-55 transition-opacity duration-700 filter brightness-90"
+          className="w-full h-full object-cover object-[center_top] sm:object-center md:object-[right_center] opacity-90 transition-all duration-700 filter brightness-105 contrast-[1.02]"
         />
-        {/* Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#141519] via-[#141519]/85 via-50% to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#141519] via-transparent to-black/40" />
+        {/* Mobile Gradient: Natural bottom fade so the artwork at the top is completely unblocked & vibrant */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#141519] via-[#141519]/75 via-50% to-transparent md:hidden" />
+        {/* Desktop Gradients: Left-to-right fade leaving the right artwork pristine */}
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[#141519]/95 via-[#141519]/60 via-40% to-transparent" />
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-[#141519] via-[#141519]/25 via-20% to-transparent" />
+        {/* Top Vignette for Navbar legibility */}
+        <div className="absolute top-0 left-0 right-0 h-16 sm:h-20 bg-gradient-to-b from-black/60 to-transparent" />
       </div>
 
       {/* Main Content Container */}
-      <div className="relative z-10 max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-12 sm:pb-16">
-        <div className="max-w-2xl space-y-4">
+      <div className="relative z-10 max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-7 sm:pb-12 md:pb-16">
+        <div className="max-w-2xl space-y-3 sm:space-y-4">
           {/* Metadata Badges */}
-          <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
-            <span className="bg-[#F47521] text-black px-2.5 py-0.5 rounded uppercase tracking-wider">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold">
+            <span className="bg-[#F47521] text-black px-2 sm:px-2.5 py-0.5 rounded-md uppercase tracking-wider font-bold">
               {isMovie ? 'FEATURE FILM' : 'SERIES'}
             </span>
             {activeItem.averageScore && (
-              <span className="bg-[#FAB818] text-black px-2 py-0.5 rounded font-black flex items-center gap-1">
-                ★ {(activeItem.averageScore / 10).toFixed(1)} ({activeItem.averageScore}% Match)
+              <span className="bg-[#FAB818] text-black px-2 py-0.5 rounded-md font-bold flex items-center gap-1">
+                ★ {(activeItem.averageScore / 10).toFixed(1)}
               </span>
             )}
-            <span className="bg-[#2B2E36] text-white px-2 py-0.5 rounded">
+            <span className="bg-[#1A1C24]/90 backdrop-blur-md border border-white/10 text-white/90 px-2 py-0.5 rounded-md">
               {isMovie ? 'Movie' : `${activeItem.episodes || 12} Episodes`}
             </span>
-            <span className="text-[#2ABDBB] font-semibold">
+            <span className="text-[#2ABDBB] font-medium">
               Sub | Dub Available
             </span>
           </div>
 
           {/* Heading */}
-          <h1 className="font-display font-black text-xl sm:text-3xl md:text-5xl text-white tracking-tight leading-tight drop-shadow-md">
+          <h1 className="font-display font-extrabold text-xl sm:text-3xl md:text-5xl text-white tracking-tight leading-tight drop-shadow-md">
             {title}
           </h1>
 
           {/* Genres */}
           {activeItem.genres && activeItem.genres.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#A0A0A0]">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-[#9AA0A6]">
               {activeItem.genres.slice(0, 3).map((genre, idx) => (
                 <React.Fragment key={genre}>
-                  <span className="text-white/80">{genre}</span>
-                  {idx < Math.min(2, activeItem.genres.length - 1) && <span>•</span>}
+                  <span className="text-white/80 font-medium">{genre}</span>
+                  {idx < Math.min(2, activeItem.genres.length - 1) && <span className="text-white/30">•</span>}
                 </React.Fragment>
               ))}
             </div>
           )}
 
           {/* Clamped Synopsis */}
-          <p className="text-xs sm:text-base text-[#D0D0D0] line-clamp-2 sm:line-clamp-3 leading-relaxed max-w-xl drop-shadow">
+          <p className="hidden xs:line-clamp-2 sm:line-clamp-3 text-xs sm:text-sm md:text-base text-[#D0D0D0] leading-relaxed max-w-xl drop-shadow">
             {cleanDescription}
           </p>
 
           {/* CTA Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-1 sm:pt-2">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1 sm:pt-2">
             <button
               onClick={() => navigate(playUrl)}
-              className="bg-[#F47521] hover:bg-[#FF8533] text-black font-extrabold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-[#F47521]/25 hover:scale-105 active:scale-95 transition-all"
+              className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#F47521]/20 active:scale-95 transition-all"
             >
-              <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+              <Play className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current" />
               <span>{isMovie ? 'WATCH MOVIE' : 'WATCH S1 E1'}</span>
             </button>
 
             <button
               onClick={handleBookmarkToggle}
-              className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 border transition ${
+              className={`px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 border transition-all ${
                 isBookmarked
-                  ? 'border-[#F47521] bg-[#F47521]/20 text-[#F47521]'
-                  : 'border-white/30 bg-black/40 text-white hover:bg-white/10'
+                  ? 'border-[#F47521] bg-[#F47521]/15 text-[#F47521]'
+                  : 'border-white/20 bg-black/40 backdrop-blur-sm text-white hover:bg-white/10'
               }`}
             >
-              {isBookmarked ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+              {isBookmarked ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
               <span className="hidden xs:inline">{isBookmarked ? 'IN WATCHLIST' : 'WATCHLIST'}</span>
             </button>
 
             <Link
               to={detailUrl}
-              className="p-2.5 sm:p-3 rounded-lg border border-white/20 bg-black/30 text-[#A0A0A0] hover:text-white hover:bg-white/10 transition"
+              className="p-2.5 sm:p-3 rounded-xl border border-white/20 bg-black/40 backdrop-blur-sm text-[#9AA0A6] hover:text-white hover:bg-white/10 transition-all"
               title="Series Details"
             >
               <Info className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -171,15 +175,15 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
           {/* Arrow Buttons (Hidden on tiny screens to avoid text overlay) */}
           <button
             onClick={() => setCurrentIndex((prev) => (prev - 1 + items.length) % items.length)}
-            className="hidden sm:flex w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/50 border border-white/20 text-white items-center justify-center hover:bg-[#F47521] hover:text-black hover:border-[#F47521] transition"
+            className="hidden sm:flex w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 text-white/90 items-center justify-center hover:bg-[#F47521] hover:text-black hover:border-[#F47521] transition-all"
           >
-            <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentIndex((prev) => (prev + 1) % items.length)}
-            className="hidden sm:flex w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/50 border border-white/20 text-white items-center justify-center hover:bg-[#F47521] hover:text-black hover:border-[#F47521] transition"
+            className="hidden sm:flex w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 text-white/90 items-center justify-center hover:bg-[#F47521] hover:text-black hover:border-[#F47521] transition-all"
           >
-            <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <ChevronRight className="w-4 h-4" />
           </button>
 
           {/* Interactive Progress Pills */}

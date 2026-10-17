@@ -35,47 +35,48 @@ export const MediaSwimlane: React.FC<MediaSwimlaneProps> = ({
   };
 
   return (
-    <section className="relative w-full py-6 select-none">
+    <section className="relative w-full py-3.5 sm:py-5 select-none">
       {/* Swimlane Header */}
-      <div className="flex items-end justify-between mb-4 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <h2 className="font-display font-black text-base sm:text-2xl text-white tracking-tight">
+      <div className="flex items-end justify-between mb-3.5 sm:mb-4 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto">
+        <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+          <h2 className="font-display font-bold text-lg sm:text-xl md:text-2xl text-white tracking-tight">
             {title}
           </h2>
           {badge && (
-            <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded bg-[#F47521]/20 text-[#F47521] border border-[#F47521]/30 uppercase tracking-wider">
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#F47521]/15 text-[#F47521] border border-[#F47521]/25 uppercase tracking-wider">
               {badge}
             </span>
           )}
           {subtitle && (
-            <span className="hidden md:inline-block text-xs text-[#A0A0A0]">
+            <span className="hidden md:inline-block text-xs text-[#8E93A0] font-normal">
               {subtitle}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
           {viewAllLink && (
             <Link
               to={viewAllLink}
-              className="text-[11px] sm:text-xs font-bold text-[#F47521] hover:text-[#FF8533] transition"
+              className="text-xs font-semibold text-[#F47521] hover:text-[#FF8533] transition-colors inline-flex items-center gap-1 group"
             >
-              VIEW ALL →
+              <span>View All</span>
+              <span className="group-hover:translate-x-0.5 transition-transform">→</span>
             </Link>
           )}
 
           {/* Scroll Arrows */}
-          <div className="hidden sm:flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1.5">
             <button
               onClick={() => scroll('left')}
-              className="p-1.5 rounded-full bg-[#23252B] hover:bg-[#F47521] hover:text-black text-white transition border border-[#4A4E58]/40"
+              className="p-1.5 sm:p-2 rounded-full bg-[#181A20] hover:bg-[#F47521] hover:text-black text-white/80 transition-all border border-white/[0.08] shadow-sm"
               title="Scroll Left"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="p-1.5 rounded-full bg-[#23252B] hover:bg-[#F47521] hover:text-black text-white transition border border-[#4A4E58]/40"
+              className="p-1.5 sm:p-2 rounded-full bg-[#181A20] hover:bg-[#F47521] hover:text-black text-white/80 transition-all border border-white/[0.08] shadow-sm"
               title="Scroll Right"
             >
               <ChevronRight className="w-4 h-4" />

@@ -4,6 +4,7 @@ import { fetchBrowse } from '../api/animeApi';
 import { AnimeMedia } from '../types/anime';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
+import { GridSkeleton } from '../components/common/Shimmer';
 
 export const MoviesPage: React.FC = () => {
   const [movies, setMovies] = useState<AnimeMedia[]>([]);
@@ -39,56 +40,56 @@ export const MoviesPage: React.FC = () => {
         type="video.movie"
       />
       {/* Hero Header */}
-      <div className="bg-gradient-to-r from-[#23252B] via-[#141519] to-black border border-[#4A4E58]/40 rounded-2xl p-4 sm:p-8 md:p-10 mb-6 sm:mb-8 shadow-xl">
+      <div className="bg-gradient-to-r from-[#181A22] via-[#14151B] to-[#0E0F13] border border-white/[0.08] rounded-2xl p-5 sm:p-8 md:p-10 mb-6 sm:mb-8 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-2 sm:space-y-3 max-w-2xl">
+          <div className="space-y-2.5 sm:space-y-3 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="bg-[#2ABDBB]/20 text-[#2ABDBB] border border-[#2ABDBB]/40 text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
+              <span className="bg-[#2ABDBB]/15 text-[#2ABDBB] border border-[#2ABDBB]/30 text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1.5">
                 <Film className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 Feature Films
               </span>
-              <span className="bg-[#FAB818]/20 text-[#FAB818] border border-[#FAB818]/40 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded">
+              <span className="bg-[#FAB818]/15 text-[#FAB818] border border-[#FAB818]/30 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md">
                 1080p / 4K
               </span>
             </div>
-            <h1 className="font-display font-black text-2xl sm:text-4xl text-white tracking-tight">
+            <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
               Anime Movies Hub
             </h1>
-            <p className="text-xs sm:text-sm text-[#A0A0A0] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#8E93A0] leading-relaxed">
               Explore critically acclaimed theatrical releases, standalone films, and franchise epics. Stream immediately with zero-lag multi-server embeds or download directly to your device.
             </p>
           </div>
 
           {/* Sort Selector */}
           <div className="flex items-center gap-2 self-start md:self-center">
-            <span className="text-[11px] sm:text-xs text-[#A0A0A0] font-semibold">Sort:</span>
-            <div className="inline-flex rounded-lg bg-[#141519] p-0.5 sm:p-1 border border-[#4A4E58]/50">
+            <span className="text-xs text-[#8E93A0] font-medium">Sort:</span>
+            <div className="inline-flex rounded-xl bg-[#121316] p-1 border border-white/10">
               <button
                 onClick={() => setSort('POPULARITY_DESC')}
-                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded text-[11px] sm:text-xs font-bold transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   sort === 'POPULARITY_DESC'
-                    ? 'bg-[#F47521] text-black shadow'
-                    : 'text-[#A0A0A0] hover:text-white'
+                    ? 'bg-[#F47521] text-black shadow-sm font-bold'
+                    : 'text-[#8E93A0] hover:text-white'
                 }`}
               >
                 Popular
               </button>
               <button
                 onClick={() => setSort('SCORE_DESC')}
-                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded text-[11px] sm:text-xs font-bold transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   sort === 'SCORE_DESC'
-                    ? 'bg-[#F47521] text-black shadow'
-                    : 'text-[#A0A0A0] hover:text-white'
+                    ? 'bg-[#F47521] text-black shadow-sm font-bold'
+                    : 'text-[#8E93A0] hover:text-white'
                 }`}
               >
                 Top Rated
               </button>
               <button
                 onClick={() => setSort('START_DATE_DESC')}
-                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded text-[11px] sm:text-xs font-bold transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   sort === 'START_DATE_DESC'
-                    ? 'bg-[#F47521] text-black shadow'
-                    : 'text-[#A0A0A0] hover:text-white'
+                    ? 'bg-[#F47521] text-black shadow-sm font-bold'
+                    : 'text-[#8E93A0] hover:text-white'
                 }`}
               >
                 Newest
@@ -100,10 +101,7 @@ export const MoviesPage: React.FC = () => {
 
       {/* Movie Cards Grid */}
       {loading ? (
-        <div className="w-full min-h-[50vh] flex flex-col items-center justify-center gap-3 text-white">
-          <div className="w-10 h-10 rounded-full border-4 border-[#F47521] border-t-transparent animate-spin" />
-          <p className="text-xs text-[#A0A0A0]">Loading Anime Movies...</p>
-        </div>
+        <GridSkeleton count={24} />
       ) : error ? (
         <div className="w-full py-16 text-center text-red-400">{error}</div>
       ) : (
