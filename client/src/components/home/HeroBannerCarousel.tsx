@@ -269,25 +269,31 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
         <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
       </button>
 
-      {/* Interactive Progress Pills / Dots (Hidden on mobile views, visible on sm+) */}
-      <div className="hidden sm:flex absolute right-6 md:right-8 bottom-4 md:bottom-6 items-center gap-1.5 sm:gap-2 z-30">
-        {items.map((item, index) => (
-          <button
-            key={item.id}
-            onClick={() => setCurrentIndex(index)}
-            className={`relative h-1.5 sm:h-2 rounded-full overflow-hidden transition-all duration-300 ${
-              index === currentIndex ? 'w-6 sm:w-8 bg-white/30' : 'w-1.5 sm:w-2 bg-white/20 hover:bg-white/40'
-            }`}
-            title={item.title.english || item.title.romaji}
-          >
-            {index === currentIndex && (
-              <div
-                key={currentIndex}
-                className="absolute top-0 left-0 bottom-0 bg-[#F47521] rounded-full animate-hero-progress"
-              />
-            )}
-          </button>
-        ))}
+      {/* Interactive Progress Indicator Dots (Optimized for Mobile & Desktop) */}
+      <div className="absolute right-3 xs:right-4 sm:right-8 bottom-2.5 xs:bottom-3.5 sm:bottom-6 flex items-center gap-1.5 sm:gap-2 z-30 bg-black/40 backdrop-blur-md px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-white/10 shadow-lg">
+        {items.map((item, index) => {
+          const isActive = index === currentIndex;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setCurrentIndex(index)}
+              className={`relative h-1.5 sm:h-2 rounded-full overflow-hidden transition-all duration-300 focus:outline-none ${
+                isActive
+                  ? 'w-5 sm:w-8 bg-white/30'
+                  : 'w-1.5 sm:w-2 bg-white/30 hover:bg-white/60 active:scale-90'
+              }`}
+              title={item.title.english || item.title.romaji}
+              aria-label={`Go to slide ${index + 1}`}
+            >
+              {isActive && (
+                <div
+                  key={currentIndex}
+                  className="absolute top-0 left-0 bottom-0 bg-[#F47521] rounded-full animate-hero-progress"
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
