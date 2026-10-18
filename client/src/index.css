@@ -123,3 +123,34 @@ button, a {
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite ease-in-out;
 }
+
+/* Smooth 5-Second Hero Progress Animation */
+@keyframes heroProgress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-hero-progress {
+  animation: heroProgress 5s linear forwards;
+  will-change: width;
+}
+
+/* Fast, Butter-Smooth Content Fade-In */
+@keyframes heroContentFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-content {
+  animation: heroContentFadeUp 0.35s ease-out both;
+}

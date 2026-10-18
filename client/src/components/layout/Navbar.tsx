@@ -10,10 +10,13 @@ import {
   Calendar,
   Sparkles,
   Flame,
-  Menu
+  Menu,
+  Download
 } from 'lucide-react';
 import { fetchBrowse } from '../../api/animeApi';
 import { AnimeMedia } from '../../types/anime';
+import { usePWAInstall } from '../../hooks/usePWAInstall';
+import { PWAInstallModal } from '../common/PWAInstallModal';
 
 const GENRES = [
   'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy',
@@ -23,6 +26,7 @@ const GENRES = [
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const { canInstall, installApp, showIOSPrompt, setShowIOSPrompt } = usePWAInstall();
   const [isBrowseOpen, setIsBrowseOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -321,6 +325,18 @@ export const Navbar: React.FC = () => {
 
         {/* Right Zone: Search, Watchlist, History */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Top Bar Simple Text Install App Button (Desktop only; on mobile it stays under drawer) */}
+          {canInstall && (
+            <button
+              onClick={installApp}
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white/90 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors shadow-sm"
+              title="Install Animora App"
+            >
+              <Download className="w-3.5 h-3.5 text-[#F47521]" />
+              <span>Install App</span>
+            </button>
+          )}
+
           {/* Mobile Search Button Trigger (opens full-header mobile search overlay) */}
           <button
             onClick={() => {
@@ -442,8 +458,30 @@ export const Navbar: React.FC = () => {
           >
             Simulcast Calendar
           </Link>
+
+          {/* Mobile View: Under Drawer Install App Button */}
+          {canInstall && (
+            <div className="pt-3 border-t border-white/10">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  installApp();
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-white/5 hover:bg-white/10 active:bg-white/15 border border-white/10 transition-colors shadow-sm"
+              >
+                <Download className="w-4 h-4 text-[#F47521]" />
+                <span>Install App</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
+
+      {/* PWA iOS / Fallback Guide Modal */}
+      <PWAInstallModal
+        isOpen={showIOSPrompt}
+        onClose={() => setShowIOSPrompt(false)}
+      />
     </header>
   );
 };

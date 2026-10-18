@@ -25,6 +25,2152 @@
   ],
   "history": [
     {
+      "anilistId": 171627,
+      "episodeNumber": 1,
+      "progressSeconds": 120,
+      "totalSeconds": 1440,
+      "watchedAt": "2026-10-18T08:25:37.537Z",
+      "media": {
+        "id": 171627,
+        "idMal": 57555,
+        "title": {
+          "romaji": "Chainsaw Man: Reze-hen",
+          "english": "Chainsaw Man – The Movie: Reze Arc",
+          "native": "チェンソーマン レゼ篇"
+        },
+        "format": "MOVIE",
+        "status": "FINISHED",
+        "description": "Denji became “Chainsaw Man”, a boy with a devil’s heart, and is now part of Special Division 4’s devil hunters. After a date with Makima, the woman of his dreams, Denji takes shelter from the rain. There he meets Reze, a girl who works in a café.<br><br>\n\n(Source: MAPPA CHANNEL)",
+        "startDate": {
+          "year": 2025,
+          "month": 9,
+          "day": 19
+        },
+        "endDate": {
+          "year": 2025,
+          "month": 9,
+          "day": 19
+        },
+        "season": "SUMMER",
+        "seasonYear": 2025,
+        "episodes": 1,
+        "duration": 100,
+        "countryOfOrigin": "JP",
+        "source": "MANGA",
+        "genres": [
+          "Action",
+          "Drama",
+          "Horror",
+          "Romance",
+          "Supernatural"
+        ],
+        "averageScore": 90,
+        "popularity": 246341,
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/171627-7esVHhgw69rn.jpg",
+        "coverImage": {
+          "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx171627-ZN9D7P46yHnw.png",
+          "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171627-ZN9D7P46yHnw.png",
+          "color": "#e43550"
+        },
+        "trailer": {
+          "id": "pv8A7eubPQQ",
+          "site": "youtube",
+          "thumbnail": "https://i.ytimg.com/vi/pv8A7eubPQQ/hqdefault.jpg"
+        },
+        "nextAiringEpisode": null,
+        "airingSchedule": {
+          "nodes": [
+            {
+              "id": 394215,
+              "episode": 1,
+              "airingAt": 1758207600,
+              "timeUntilAiring": -34104330
+            }
+          ]
+        },
+        "studios": {
+          "nodes": [
+            {
+              "id": 569,
+              "name": "MAPPA"
+            }
+          ]
+        },
+        "streamingEpisodes": [],
+        "relations": {
+          "edges": [
+            {
+              "relationType": "PREQUEL",
+              "node": {
+                "id": 127230,
+                "idMal": 44511,
+                "type": "ANIME",
+                "format": "TV",
+                "status": "FINISHED",
+                "episodes": 12,
+                "season": "FALL",
+                "seasonYear": 2022,
+                "startDate": {
+                  "year": 2022,
+                  "month": 10,
+                  "day": 12
+                },
+                "title": {
+                  "romaji": "Chainsaw Man",
+                  "english": "Chainsaw Man"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx127230-DdP4vAdssLoz.png"
+                }
+              }
+            },
+            {
+              "relationType": "SOURCE",
+              "node": {
+                "id": 105778,
+                "idMal": 116778,
+                "type": "MANGA",
+                "format": "MANGA",
+                "status": "FINISHED",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2018,
+                  "month": 12,
+                  "day": 3
+                },
+                "title": {
+                  "romaji": "Chainsaw Man",
+                  "english": "Chainsaw Man"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx105778-euxXZEIfDY2u.png"
+                }
+              }
+            },
+            {
+              "relationType": "SEQUEL",
+              "node": {
+                "id": 204429,
+                "idMal": 63143,
+                "type": "ANIME",
+                "format": null,
+                "status": "NOT_YET_RELEASED",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": null,
+                  "month": null,
+                  "day": null
+                },
+                "title": {
+                  "romaji": "Chainsaw Man: Shikaku-hen",
+                  "english": null
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx204429-9scYA2ab3Zz3.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "CHARACTER",
+              "node": {
+                "id": 204080,
+                "idMal": null,
+                "type": "ANIME",
+                "format": "ONA",
+                "status": "FINISHED",
+                "episodes": 1,
+                "season": "FALL",
+                "seasonYear": 2025,
+                "startDate": {
+                  "year": 2025,
+                  "month": 12,
+                  "day": 12
+                },
+                "title": {
+                  "romaji": "IRIS OUT",
+                  "english": null
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b204080-VRTTOykaiNRV.png"
+                }
+              }
+            }
+          ]
+        },
+        "characters": {
+          "edges": [
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 130102,
+                "name": {
+                  "full": "Denji"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b130102-FO1VHNnEnLlB.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 284463,
+                  "name": {
+                    "full": "Kikunosuke Toya"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n284463-w0qcBQXvlz3Z.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 148740,
+                "name": {
+                  "full": "Reze"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b148740-ceAibPxLW8rR.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 118602,
+                  "name": {
+                    "full": "Reina Ueda"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n118602-C4bNcnyEhDTu.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 137080,
+                "name": {
+                  "full": "Makima"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b137080-UHcynYNjb5ZU.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 124923,
+                  "name": {
+                    "full": "Tomori Kusunoki"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n124923-SQtqIQeicb7f.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 157232,
+                "name": {
+                  "full": "Beam"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b157232-5GuWeqoFN9Kq.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 111635,
+                  "name": {
+                    "full": "Natsuki Hanae"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n111635-L385UcjTKCBq.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 137081,
+                "name": {
+                  "full": "Aki Hayakawa"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b137081-TSrUR3mUJL6r.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 158510,
+                  "name": {
+                    "full": "Shougo Sakata"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n158510-QDmd7dD9Rg89.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 152231,
+                "name": {
+                  "full": "Tenshi no Akuma"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b152231-jiMRx9je7H6y.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 108639,
+                  "name": {
+                    "full": "Maaya Uchida"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n108639-LLrR4WptCh5s.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 157231,
+                "name": {
+                  "full": "Bouryoku no Majin"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b157231-hV81SwGqxl2R.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 96637,
+                  "name": {
+                    "full": "Yuuya Uchida"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n96637-GOQaib9J8Mu6.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 137079,
+                "name": {
+                  "full": "Power"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b137079-6yLEUYR3bmpr.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 133625,
+                  "name": {
+                    "full": "Fairouz Ai"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n133625-YpEgKD7flV2S.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 144594,
+                "name": {
+                  "full": "Kobeni Higashiyama"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b144594-0dbO1NSYeZ12.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 125920,
+                  "name": {
+                    "full": "Karin Takahashi"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n125920-eGCWlgvsrOyz.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 144593,
+                "name": {
+                  "full": "Kishibe"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b144593-hdCTT9t54z0s.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95591,
+                  "name": {
+                    "full": "Kenjirou Tsuda"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95591-WQGdD3ubbeoq.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 170266,
+                "name": {
+                  "full": "Pochita"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b170266-bBXPkNJnd3mg.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 111453,
+                  "name": {
+                    "full": "Shiori Izawa"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n111453-7fe0B5uogy3Z.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 174271,
+                "name": {
+                  "full": "Nyaako"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b174271-iC0Ul9YfLOk6.png"
+                }
+              },
+              "voiceActors": []
+            }
+          ]
+        },
+        "recommendations": {
+          "nodes": [
+            {
+              "mediaRecommendation": {
+                "id": 174788,
+                "title": {
+                  "romaji": "Look Back",
+                  "english": "LOOK BACK"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 86,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx174788-9LsUnn0oEppv.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx174788-9LsUnn0oEppv.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 21400,
+                "title": {
+                  "romaji": "Kizumonogatari III: Reiketsu-hen",
+                  "english": "Kizumonogatari Part 3: Reiketsu"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 87,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21400-38ykNo3j4xXo.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21400-38ykNo3j4xXo.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 198188,
+                "title": {
+                  "romaji": "Fujimoto Tatsuki 17-26",
+                  "english": "Tatsuki Fujimoto 17-26"
+                },
+                "format": "MOVIE",
+                "episodes": 8,
+                "averageScore": 79,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx198188-h3w6uICVNhqh.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx198188-h3w6uICVNhqh.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 172463,
+                "title": {
+                  "romaji": "Jujutsu Kaisen: Shimetsu Kaiyuu - Zenpen",
+                  "english": "JUJUTSU KAISEN Season 3: The Culling Game Part 1"
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 86,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx172463-LnXqHzt74SJL.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx172463-LnXqHzt74SJL.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 98460,
+                "title": {
+                  "romaji": "DEVILMAN crybaby",
+                  "english": "Devilman Crybaby"
+                },
+                "format": "ONA",
+                "episodes": 10,
+                "averageScore": 76,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98460-bLtH2c3jd6sV.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98460-bLtH2c3jd6sV.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 204080,
+                "title": {
+                  "romaji": "IRIS OUT",
+                  "english": null
+                },
+                "format": "ONA",
+                "episodes": 1,
+                "averageScore": 83,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b204080-VRTTOykaiNRV.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b204080-VRTTOykaiNRV.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 9260,
+                "title": {
+                  "romaji": "Kizumonogatari I: Tekketsu-hen",
+                  "english": "Kizumonogatari Part 1: Tekketsu"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 83,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx9260-cl7sczYOpTeW.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx9260-cl7sczYOpTeW.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 21399,
+                "title": {
+                  "romaji": "Kizumonogatari II: Nekketsu-hen",
+                  "english": "Kizumonogatari Part 2: Nekketsu"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 85,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21399-VTAdAqc8u5AE.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21399-VTAdAqc8u5AE.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 5081,
+                "title": {
+                  "romaji": "Bakemonogatari",
+                  "english": "Bakemonogatari"
+                },
+                "format": "TV",
+                "episodes": 15,
+                "averageScore": 82,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx5081-9GocceQ5Z865.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx5081-9GocceQ5Z865.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 173172,
+                "title": {
+                  "romaji": "Dorohedoro Season 2",
+                  "english": "Dorohedoro Season 2"
+                },
+                "format": "ONA",
+                "episodes": 11,
+                "averageScore": 83,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx173172-404XnuOS0DhR.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx173172-404XnuOS0DhR.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 120377,
+                "title": {
+                  "romaji": "Cyberpunk: Edgerunners",
+                  "english": "Cyberpunk: Edgerunners"
+                },
+                "format": "ONA",
+                "episodes": 10,
+                "averageScore": 85,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx120377-ayZPoxiWt4Li.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx120377-ayZPoxiWt4Li.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 570,
+                "title": {
+                  "romaji": "JIN-ROH",
+                  "english": "Jin-Roh: The Wolf Brigade"
+                },
+                "format": "MOVIE",
+                "episodes": 1,
+                "averageScore": 77,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx570-xyP4IO7i3ua2.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx570-xyP4IO7i3ua2.jpg"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "anilistId": 195516,
+      "episodeNumber": 1,
+      "progressSeconds": 120,
+      "totalSeconds": 1440,
+      "watchedAt": "2026-10-18T08:06:31.497Z",
+      "media": {
+        "id": 195516,
+        "idMal": 61987,
+        "title": {
+          "romaji": "Kusuriya no Hitorigoto 3rd Season",
+          "english": "The Apothecary Diaries Season 3",
+          "native": "薬屋のひとりごと 第3期"
+        },
+        "format": "TV",
+        "status": "RELEASING",
+        "description": "In the aftermath of the Shi Clan’s rebellion, things have finally settled down, and Maomao has returned to her old life as a pharmacist in the pleasure district.\n<br><br>\nOne day, triggered by a breakfast served at the Verdigris House, Maomao senses an anomaly and begins investigating its true nature.\n<br><br>\nMeanwhile, Jinshi, who has revealed his true identity as the Imperial brother and begun to face his heavy responsibilities, is deeply troubled by the final message left by Loulan: a warning of an impending \"disaster that will strike the nation.\"\n<br><br>\nTo make matters worse, rumors of a mysterious shrine maiden who deceives the people begin to spread, casting a dark shadow over the country of Li once again.\n<br><br>\nFrom the depths of the inner court to the city streets, and across foreign borders—the world grows wider, and the stakes even higher for Maomao and Jinshi.\n<br><br>\n(Source: Crunchyroll)",
+        "startDate": {
+          "year": 2026,
+          "month": 10,
+          "day": 2
+        },
+        "endDate": {
+          "year": null,
+          "month": null,
+          "day": null
+        },
+        "season": "FALL",
+        "seasonYear": 2026,
+        "episodes": 12,
+        "duration": 24,
+        "countryOfOrigin": "JP",
+        "source": "LIGHT_NOVEL",
+        "genres": [
+          "Drama",
+          "Mystery"
+        ],
+        "averageScore": 85,
+        "popularity": 99660,
+        "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/195516-B5M0cPaQbQXI.jpg",
+        "coverImage": {
+          "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx195516-MJpUZlOberqH.jpg",
+          "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx195516-MJpUZlOberqH.jpg",
+          "color": "#e4a128"
+        },
+        "trailer": {
+          "id": "YvNvvUeCztE",
+          "site": "youtube",
+          "thumbnail": "https://i.ytimg.com/vi/YvNvvUeCztE/hqdefault.jpg"
+        },
+        "nextAiringEpisode": {
+          "airingAt": 1792764000,
+          "timeUntilAiring": 453212,
+          "episode": 4
+        },
+        "airingSchedule": {
+          "nodes": [
+            {
+              "id": 418781,
+              "episode": 1,
+              "airingAt": 1790949600,
+              "timeUntilAiring": -1361188
+            },
+            {
+              "id": 418782,
+              "episode": 2,
+              "airingAt": 1791554400,
+              "timeUntilAiring": -756388
+            },
+            {
+              "id": 418783,
+              "episode": 3,
+              "airingAt": 1792159200,
+              "timeUntilAiring": -151588
+            },
+            {
+              "id": 418784,
+              "episode": 4,
+              "airingAt": 1792764000,
+              "timeUntilAiring": 453212
+            },
+            {
+              "id": 418785,
+              "episode": 5,
+              "airingAt": 1793368800,
+              "timeUntilAiring": 1058012
+            },
+            {
+              "id": 418786,
+              "episode": 6,
+              "airingAt": 1793973600,
+              "timeUntilAiring": 1662812
+            },
+            {
+              "id": 418787,
+              "episode": 7,
+              "airingAt": 1794578400,
+              "timeUntilAiring": 2267612
+            },
+            {
+              "id": 418788,
+              "episode": 8,
+              "airingAt": 1795183200,
+              "timeUntilAiring": 2872412
+            },
+            {
+              "id": 418789,
+              "episode": 9,
+              "airingAt": 1795788000,
+              "timeUntilAiring": 3477212
+            },
+            {
+              "id": 418790,
+              "episode": 10,
+              "airingAt": 1796392800,
+              "timeUntilAiring": 4082012
+            },
+            {
+              "id": 418791,
+              "episode": 11,
+              "airingAt": 1796997600,
+              "timeUntilAiring": 4686812
+            },
+            {
+              "id": 418792,
+              "episode": 12,
+              "airingAt": 1797602400,
+              "timeUntilAiring": 5291612
+            }
+          ]
+        },
+        "studios": {
+          "nodes": [
+            {
+              "id": 28,
+              "name": "OLM"
+            }
+          ]
+        },
+        "streamingEpisodes": [],
+        "relations": {
+          "edges": [
+            {
+              "relationType": "SOURCE",
+              "node": {
+                "id": 99026,
+                "idMal": 86769,
+                "type": "MANGA",
+                "format": "NOVEL",
+                "status": "RELEASING",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2014,
+                  "month": 8,
+                  "day": 29
+                },
+                "title": {
+                  "romaji": "Kusuriya no Hitorigoto",
+                  "english": "The Apothecary Diaries"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/nx99026-5Eg650WAd9Rj.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "PREQUEL",
+              "node": {
+                "id": 176301,
+                "idMal": 58514,
+                "type": "ANIME",
+                "format": "TV",
+                "status": "FINISHED",
+                "episodes": 24,
+                "season": "WINTER",
+                "seasonYear": 2025,
+                "startDate": {
+                  "year": 2025,
+                  "month": 1,
+                  "day": 10
+                },
+                "title": {
+                  "romaji": "Kusuriya no Hitorigoto 2nd Season",
+                  "english": "The Apothecary Diaries Season 2"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx176301-TIGmldLffQGX.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "SEQUEL",
+              "node": {
+                "id": 200927,
+                "idMal": 62841,
+                "type": "ANIME",
+                "format": "TV",
+                "status": "NOT_YET_RELEASED",
+                "episodes": 12,
+                "season": "SPRING",
+                "seasonYear": 2027,
+                "startDate": {
+                  "year": 2027,
+                  "month": 4,
+                  "day": null
+                },
+                "title": {
+                  "romaji": "Kusuriya no Hitorigoto 3rd Season Part 2",
+                  "english": null
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx200927-IXFYyIb728bM.png"
+                }
+              }
+            },
+            {
+              "relationType": "SIDE_STORY",
+              "node": {
+                "id": 200929,
+                "idMal": 62844,
+                "type": "ANIME",
+                "format": "MOVIE",
+                "status": "NOT_YET_RELEASED",
+                "episodes": 1,
+                "season": "FALL",
+                "seasonYear": 2026,
+                "startDate": {
+                  "year": 2026,
+                  "month": 12,
+                  "day": 11
+                },
+                "title": {
+                  "romaji": "Kusuriya no Hitorigoto: Bouhi no Hihou",
+                  "english": "The Apothecary Diaries: The Late Lady’s Treasure"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx200929-ZnRFJbEqFbgJ.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "ALTERNATIVE",
+              "node": {
+                "id": 99022,
+                "idMal": 107562,
+                "type": "MANGA",
+                "format": "MANGA",
+                "status": "RELEASING",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2017,
+                  "month": 5,
+                  "day": 25
+                },
+                "title": {
+                  "romaji": "Kusuriya no Hitorigoto",
+                  "english": "The Apothecary Diaries"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/nx99022-Hh2WdyNgR8HM.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "OTHER",
+              "node": {
+                "id": 218387,
+                "idMal": 65097,
+                "type": "ANIME",
+                "format": "MUSIC",
+                "status": "FINISHED",
+                "episodes": 1,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2026,
+                  "month": 10,
+                  "day": 2
+                },
+                "title": {
+                  "romaji": "AIYOU",
+                  "english": "AIYOU"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx218387-aSD6Bq5zFIis.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "OTHER",
+              "node": {
+                "id": 218390,
+                "idMal": 65189,
+                "type": "ANIME",
+                "format": "MUSIC",
+                "status": "FINISHED",
+                "episodes": 1,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2026,
+                  "month": 10,
+                  "day": 14
+                },
+                "title": {
+                  "romaji": "Kumo wo Nuke Kazashimo e Watashi dake",
+                  "english": "Beyond the Clouds, Only Me Downwind"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx218390-5x0fFx3emeYE.png"
+                }
+              }
+            }
+          ]
+        },
+        "characters": {
+          "edges": [
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 126824,
+                "name": {
+                  "full": "Maomao"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b126824-MqsCncTO1qpv.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 101686,
+                  "name": {
+                    "full": "Aoi Yuuki"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n101686-PTd0lQZMsmcv.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 127278,
+                "name": {
+                  "full": "Jinshi"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b127278-0qCQciTkPOMS.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 128426,
+                  "name": {
+                    "full": "Takeo Ootsuka"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n128426-uB8KFqVLbogF.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 232926,
+                "name": {
+                  "full": "Lakan"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b232926-YIzdIzMMGcac.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95296,
+                  "name": {
+                    "full": "Takuya Kirimoto"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95296-fYLp5Ff3eDI3.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 244317,
+                "name": {
+                  "full": "Gaoshun"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b244317-zm6LeJmLN9kZ.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95020,
+                  "name": {
+                    "full": "Katsuyuki Konishi"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95020-uOJO2IlwpcX0.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 244319,
+                "name": {
+                  "full": "Meimei"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b244319-UtvzNJwwo7bD.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 107961,
+                  "name": {
+                    "full": "Megumi Han"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n107961-aMetTdEFTi2W.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 274187,
+                "name": {
+                  "full": "Yarite Baba"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b274187-WSsVDyNUT6SM.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95294,
+                  "name": {
+                    "full": "Kimiko Saitou"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95294-AN7KQALYLR9w.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 274189,
+                "name": {
+                  "full": "Pairin"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b274189-HUP7GDBJMzXs.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95070,
+                  "name": {
+                    "full": "Ami Koshimizu"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95070-klkIfKz1VItS.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 274193,
+                "name": {
+                  "full": "Joka"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b274193-0YeumFVEUR4j.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 151342,
+                  "name": {
+                    "full": "Hiroki Nanami"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n151342-XKmi9w02EzHU.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 323687,
+                "name": {
+                  "full": "Rikuson"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b323687-JlH1KOS7n11C.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 96764,
+                  "name": {
+                    "full": "Kouki Uchiyama"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n96764-yJWGrhjanDJQ.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 327822,
+                "name": {
+                  "full": "Basen"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b327822-QGtwgIM2lxUq.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 137436,
+                  "name": {
+                    "full": "Tatsumaru Tachibana"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n137436-Nm5rgzlEknqg.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 363535,
+                "name": {
+                  "full": "Kyou-u"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b363535-QzPNoetEggdD.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 119740,
+                  "name": {
+                    "full": "Natsumi Fujiwara"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n119740-EEZ5DErQhOht.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 364109,
+                "name": {
+                  "full": "Lahan"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b364109-C9Vl0FSPQlG2.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95600,
+                  "name": {
+                    "full": "Toshiyuki Toyonaga"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95600-giNVqkdeWKuF.png"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "recommendations": {
+          "nodes": [
+            {
+              "mediaRecommendation": {
+                "id": 188139,
+                "title": {
+                  "romaji": "Futsutsuka na Akujo de wa Gozaimasu ga: Suuguu Chouso Torikae Den",
+                  "english": "Though I Am an Inept Villainess"
+                },
+                "format": "TV",
+                "episodes": 11,
+                "averageScore": 81,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx188139-1qIJfWxym8FX.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx188139-1qIJfWxym8FX.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 161645,
+                "title": {
+                  "romaji": "Kusuriya no Hitorigoto",
+                  "english": "The Apothecary Diaries"
+                },
+                "format": "TV",
+                "episodes": 24,
+                "averageScore": 88,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx161645-QLbzHXiYRgV2.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx161645-QLbzHXiYRgV2.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 142701,
+                "title": {
+                  "romaji": "Koukyuu no Karasu",
+                  "english": "Raven of the Inner Palace"
+                },
+                "format": "TV",
+                "episodes": 13,
+                "averageScore": 73,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx142701-jyjYorMpj3lf.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx142701-jyjYorMpj3lf.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 190569,
+                "title": {
+                  "romaji": "Tenmaku no Jaadugar",
+                  "english": "Jaadugar: A Witch in Mongolia"
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 83,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx190569-KnCQLI3Z8hPX.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx190569-KnCQLI3Z8hPX.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 154587,
+                "title": {
+                  "romaji": "Sousou no Frieren",
+                  "english": "Frieren: Beyond Journey’s End"
+                },
+                "format": "TV",
+                "episodes": 28,
+                "averageScore": 91,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 20770,
+                "title": {
+                  "romaji": "Akatsuki no Yona",
+                  "english": "Yona of the Dawn"
+                },
+                "format": "TV",
+                "episodes": 24,
+                "averageScore": 79,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20770-brCDvhTXlums.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20770-brCDvhTXlums.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 170503,
+                "title": {
+                  "romaji": "Karasu wa Aruji wo Erabanai",
+                  "english": "YATAGARASU: The Raven Does Not Choose Its Master"
+                },
+                "format": "TV",
+                "episodes": 20,
+                "averageScore": 78,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx170503-PCr24JL8F8f9.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx170503-PCr24JL8F8f9.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 957,
+                "title": {
+                  "romaji": "Saiunkoku Monogatari",
+                  "english": "The Story of Saiunkoku"
+                },
+                "format": "TV",
+                "episodes": 39,
+                "averageScore": 73,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx957-FgHMLrokWm4x.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx957-FgHMLrokWm4x.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 1914,
+                "title": {
+                  "romaji": "Saiunkoku Monogatari 2nd Season",
+                  "english": "The Story of Saiunkoku Second Series"
+                },
+                "format": "TV",
+                "episodes": 39,
+                "averageScore": 75,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx1914-VmmTPSjufwMs.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1914-VmmTPSjufwMs.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 99935,
+                "title": {
+                  "romaji": "Tongling Fei",
+                  "english": "Psychic Princess"
+                },
+                "format": "ONA",
+                "episodes": 16,
+                "averageScore": 75,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99935-lQ2IPS31bJSK.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99935-lQ2IPS31bJSK.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 156082,
+                "title": {
+                  "romaji": "Bai Yao Pu: Si Fu Pian",
+                  "english": "Fairies Albums S4"
+                },
+                "format": "ONA",
+                "episodes": 12,
+                "averageScore": 67,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx156082-kZyIxeGqdgIL.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx156082-kZyIxeGqdgIL.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 185834,
+                "title": {
+                  "romaji": "Bai Yao Pu: Luoyang Pian",
+                  "english": null
+                },
+                "format": "ONA",
+                "episodes": 12,
+                "averageScore": 61,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx185834-NGUYpNPdZyRK.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx185834-NGUYpNPdZyRK.jpg"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "anilistId": 180136,
+      "episodeNumber": 1,
+      "progressSeconds": 120,
+      "totalSeconds": 1440,
+      "watchedAt": "2026-10-18T07:54:42.994Z",
+      "media": {
+        "id": 180136,
+        "idMal": 59741,
+        "title": {
+          "romaji": "Tsuihou Sareta Tensei Juukishi wa Game Chishiki de Musou Suru",
+          "english": "The Exiled Heavy Knight Knows How to Game the System",
+          "native": "追放された転生重騎士はゲーム知識で無双する"
+        },
+        "format": "TV",
+        "status": "RELEASING",
+        "description": "Born into a prestigious family of master swordsmen, Elymas Edvaughn’s future shatters when he awakens the so-called “defective” Heavy Knight class. Disowned and cast out, he regains memories of another life—and realizes this world mirrors a VR game he once mastered. Armed with knowledge no one else possesses, he sets out to rewrite his fate and prove the strength of the “weakest” class.<br>\n<br>\n(Source: Crunchyroll)",
+        "startDate": {
+          "year": 2026,
+          "month": 7,
+          "day": 3
+        },
+        "endDate": {
+          "year": 2026,
+          "month": 12,
+          "day": 25
+        },
+        "season": "SUMMER",
+        "seasonYear": 2026,
+        "episodes": 26,
+        "duration": 24,
+        "countryOfOrigin": "JP",
+        "source": "MANGA",
+        "genres": [
+          "Action",
+          "Fantasy"
+        ],
+        "averageScore": 68,
+        "popularity": 70522,
+        "bannerImage": null,
+        "coverImage": {
+          "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx180136-gtMTCRlOD4OE.jpg",
+          "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx180136-gtMTCRlOD4OE.jpg",
+          "color": "#50c9fe"
+        },
+        "trailer": {
+          "id": "uC13b3_8riU",
+          "site": "youtube",
+          "thumbnail": "https://i.ytimg.com/vi/uC13b3_8riU/hqdefault.jpg"
+        },
+        "nextAiringEpisode": {
+          "airingAt": 1792682760,
+          "timeUntilAiring": 373606,
+          "episode": 17
+        },
+        "airingSchedule": {
+          "nodes": [
+            {
+              "id": 416986,
+              "episode": 1,
+              "airingAt": 1783005960,
+              "timeUntilAiring": -9303194
+            },
+            {
+              "id": 416987,
+              "episode": 2,
+              "airingAt": 1783610760,
+              "timeUntilAiring": -8698394
+            },
+            {
+              "id": 416988,
+              "episode": 3,
+              "airingAt": 1784215560,
+              "timeUntilAiring": -8093594
+            },
+            {
+              "id": 416989,
+              "episode": 4,
+              "airingAt": 1784820360,
+              "timeUntilAiring": -7488794
+            },
+            {
+              "id": 416990,
+              "episode": 5,
+              "airingAt": 1785425160,
+              "timeUntilAiring": -6883994
+            },
+            {
+              "id": 416991,
+              "episode": 6,
+              "airingAt": 1786029960,
+              "timeUntilAiring": -6279194
+            },
+            {
+              "id": 416992,
+              "episode": 7,
+              "airingAt": 1786634760,
+              "timeUntilAiring": -5674394
+            },
+            {
+              "id": 416993,
+              "episode": 8,
+              "airingAt": 1787239560,
+              "timeUntilAiring": -5069594
+            },
+            {
+              "id": 416994,
+              "episode": 9,
+              "airingAt": 1787844360,
+              "timeUntilAiring": -4464794
+            },
+            {
+              "id": 416995,
+              "episode": 10,
+              "airingAt": 1788449160,
+              "timeUntilAiring": -3859994
+            },
+            {
+              "id": 416996,
+              "episode": 11,
+              "airingAt": 1789053960,
+              "timeUntilAiring": -3255194
+            },
+            {
+              "id": 416997,
+              "episode": 12,
+              "airingAt": 1789658760,
+              "timeUntilAiring": -2650394
+            },
+            {
+              "id": 416998,
+              "episode": 13,
+              "airingAt": 1790263560,
+              "timeUntilAiring": -2045594
+            },
+            {
+              "id": 416999,
+              "episode": 14,
+              "airingAt": 1790868360,
+              "timeUntilAiring": -1440794
+            },
+            {
+              "id": 417000,
+              "episode": 15,
+              "airingAt": 1791473160,
+              "timeUntilAiring": -835994
+            },
+            {
+              "id": 417001,
+              "episode": 16,
+              "airingAt": 1792077960,
+              "timeUntilAiring": -231194
+            },
+            {
+              "id": 417002,
+              "episode": 17,
+              "airingAt": 1792682760,
+              "timeUntilAiring": 373606
+            },
+            {
+              "id": 417003,
+              "episode": 18,
+              "airingAt": 1793287560,
+              "timeUntilAiring": 978406
+            },
+            {
+              "id": 417004,
+              "episode": 19,
+              "airingAt": 1793892360,
+              "timeUntilAiring": 1583206
+            },
+            {
+              "id": 417005,
+              "episode": 20,
+              "airingAt": 1794497160,
+              "timeUntilAiring": 2188006
+            },
+            {
+              "id": 417006,
+              "episode": 21,
+              "airingAt": 1795101960,
+              "timeUntilAiring": 2792806
+            },
+            {
+              "id": 417007,
+              "episode": 22,
+              "airingAt": 1795706760,
+              "timeUntilAiring": 3397606
+            },
+            {
+              "id": 417008,
+              "episode": 23,
+              "airingAt": 1796311560,
+              "timeUntilAiring": 4002406
+            },
+            {
+              "id": 417009,
+              "episode": 24,
+              "airingAt": 1796916360,
+              "timeUntilAiring": 4607206
+            },
+            {
+              "id": 417010,
+              "episode": 25,
+              "airingAt": 1797521160,
+              "timeUntilAiring": 5212006
+            }
+          ]
+        },
+        "studios": {
+          "nodes": [
+            {
+              "id": 309,
+              "name": "GoHands"
+            }
+          ]
+        },
+        "streamingEpisodes": [],
+        "relations": {
+          "edges": [
+            {
+              "relationType": "ALTERNATIVE",
+              "node": {
+                "id": 150194,
+                "idMal": null,
+                "type": "MANGA",
+                "format": "NOVEL",
+                "status": "RELEASING",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2022,
+                  "month": 6,
+                  "day": 2
+                },
+                "title": {
+                  "romaji": "Tsuihou Sareta Tensei Juukishi wa Game Chishiki de Musou Suru",
+                  "english": null
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx150194-PlunYzMoEUCH.jpg"
+                }
+              }
+            },
+            {
+              "relationType": "SOURCE",
+              "node": {
+                "id": 150193,
+                "idMal": 147799,
+                "type": "MANGA",
+                "format": "MANGA",
+                "status": "RELEASING",
+                "episodes": null,
+                "season": null,
+                "seasonYear": null,
+                "startDate": {
+                  "year": 2022,
+                  "month": 2,
+                  "day": 11
+                },
+                "title": {
+                  "romaji": "Tsuihou Sareta Tensei Juukishi wa Game Chishiki de Musou Suru",
+                  "english": "The Exiled Heavy Knight Knows How to Game the System"
+                },
+                "coverImage": {
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx150193-XBdISLm3IDr1.jpg"
+                }
+              }
+            }
+          ]
+        },
+        "characters": {
+          "edges": [
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 277688,
+                "name": {
+                  "full": "Elymas Edvan"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b277688-HqhBRnSIvnMQ.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 128426,
+                  "name": {
+                    "full": "Takeo Ootsuka"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n128426-uB8KFqVLbogF.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "MAIN",
+              "node": {
+                "id": 344248,
+                "name": {
+                  "full": "Luce Rubis"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b344248-yIAlePtvhgoo.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 148220,
+                  "name": {
+                    "full": "Shion Wakayama"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n148220-Tj3U7jdXZehG.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 342589,
+                "name": {
+                  "full": "Maris Edvan"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b342589-vt9AOwRFeY7B.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 273563,
+                  "name": {
+                    "full": "Natsuko Abe"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n273563-XdhkBSBljCPB.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 342590,
+                "name": {
+                  "full": "Ares"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/b342590-38kAaKVybBVM.png"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 150456,
+                  "name": {
+                    "full": "Masahiro Itou"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n150456-88d5OFEmD4Sj.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 405339,
+                "name": {
+                  "full": "Teal"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/default.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 303694,
+                  "name": {
+                    "full": "Haruki Asada"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n303694-JD7zAaUA0lzh.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 405340,
+                "name": {
+                  "full": "Uketsuke-jou"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/default.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 106641,
+                  "name": {
+                    "full": "Misaki Kuno"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n106641-zsyRkJ74NXvE.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 405341,
+                "name": {
+                  "full": "Cline"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/default.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 122731,
+                  "name": {
+                    "full": "Katsumi Fukuhara"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n122731-nAnzixFo0dLS.jpg"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 405342,
+                "name": {
+                  "full": "Goutan"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/default.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 95395,
+                  "name": {
+                    "full": "Tetsu Inada"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n95395-HpxLuh4ysrzJ.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 405343,
+                "name": {
+                  "full": "Aizas Edvaughn"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/default.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 105571,
+                  "name": {
+                    "full": "Kentarou Tone"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n105571-Ck9wy1fxMy3N.png"
+                  }
+                }
+              ]
+            },
+            {
+              "role": "SUPPORTING",
+              "node": {
+                "id": 405344,
+                "name": {
+                  "full": "Reiss"
+                },
+                "image": {
+                  "medium": "https://s4.anilist.co/file/anilistcdn/character/medium/default.jpg"
+                }
+              },
+              "voiceActors": [
+                {
+                  "id": 126579,
+                  "name": {
+                    "full": "Miyuri Shimabukuro"
+                  },
+                  "image": {
+                    "medium": "https://s4.anilist.co/file/anilistcdn/staff/medium/n126579-aYXUMZi7ozKD.png"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "recommendations": {
+          "nodes": [
+            {
+              "mediaRecommendation": {
+                "id": 106479,
+                "title": {
+                  "romaji": "Itai no wa Iya nano de Bougyoryoku ni Kyokufuri Shitai to Omoimasu.",
+                  "english": "BOFURI: I Don't Want to Get Hurt, so I'll Max Out My Defense."
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 73,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx106479-JmPk1F5ubMtm.png",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx106479-JmPk1F5ubMtm.png"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 209983,
+                "title": {
+                  "romaji": "Hell Mode: Yarikomi-zuki no Gamer wa Haisettei no Isekai de Musou Suru 2nd Season",
+                  "english": "HELL MODE: The Hardcore Gamer Dominates in Another World with Garbage Balancing Season 2"
+                },
+                "format": "TV",
+                "episodes": 13,
+                "averageScore": 72,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx209983-sFOcKyqMufxb.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx209983-sFOcKyqMufxb.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 132474,
+                "title": {
+                  "romaji": "Gaikotsu Kishi-sama, Tadaima Isekai e Odekakechuu",
+                  "english": "Skeleton Knight in Another World"
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 70,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx132474-J2ECHSPkfb9g.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx132474-J2ECHSPkfb9g.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 99263,
+                "title": {
+                  "romaji": "Tate no Yuusha no Nariagari",
+                  "english": "The Rising of the Shield Hero"
+                },
+                "format": "TV",
+                "episodes": 25,
+                "averageScore": 76,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx99263-LcazQwdlWzMy.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx99263-LcazQwdlWzMy.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 153845,
+                "title": {
+                  "romaji": "Isekai de Cheat Skill wo Te ni Shita Ore wa, Genjitsu Sekai wo mo Musou Suru: Level Up wa Jinsei wo Kaeta",
+                  "english": "I Got a Cheat Skill in Another World and Became Unrivaled in The Real World, Too"
+                },
+                "format": "TV",
+                "episodes": 13,
+                "averageScore": 63,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx153845-C47aoKy7wf19.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153845-C47aoKy7wf19.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 151970,
+                "title": {
+                  "romaji": "Shangri-La Frontier",
+                  "english": "Shangri-La Frontier"
+                },
+                "format": "TV",
+                "episodes": 25,
+                "averageScore": 80,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx151970-xtIx3VqEk02X.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151970-xtIx3VqEk02X.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 169935,
+                "title": {
+                  "romaji": "Saikyou Tank no Meikyuu Kouryaku: Tairyoku 9999 no Rare Skill-mochi Tank, Yuusha Party wo Tsuihou Sareru",
+                  "english": "The Strongest Tank's Labyrinth Raids -A Tank with a Rare 9999 Resistance Skill Got Kicked from the Hero's Party-"
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 59,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx169935-w808lLrdFXcl.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx169935-w808lLrdFXcl.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 179955,
+                "title": {
+                  "romaji": "Katainaka no Ossan, Kensei ni Naru",
+                  "english": "From Old Country Bumpkin to Master Swordsman"
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 69,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx179955-e4UPTow92B1O.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx179955-e4UPTow92B1O.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 185542,
+                "title": {
+                  "romaji": "Gaikotsu Kishi-sama, Tadaima Isekai e Odekakechuu II",
+                  "english": "Skeleton Knight in Another World Season 2"
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 66,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx185542-6a9LCWlLHa0T.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx185542-6a9LCWlLHa0T.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 188487,
+                "title": {
+                  "romaji": "Mikata ga Yowasugite Hojo Mahou ni Tesshiteita Kyuutei Mahoushi, Tsuihou Sarete Saikyou wo Mezasu",
+                  "english": "The Banished Court Magician Aims to Become the Strongest"
+                },
+                "format": "TV",
+                "episodes": 12,
+                "averageScore": 63,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx188487-kkeu3cMpHtup.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx188487-kkeu3cMpHtup.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 146493,
+                "title": {
+                  "romaji": "Ragna Crimson",
+                  "english": "Ragna Crimson"
+                },
+                "format": "TV",
+                "episodes": 24,
+                "averageScore": 74,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx146493-bThyDJ4ZmbfV.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx146493-bThyDJ4ZmbfV.jpg"
+                }
+              }
+            },
+            {
+              "mediaRecommendation": {
+                "id": 98861,
+                "title": {
+                  "romaji": "Quanzhi Gaoshou",
+                  "english": "The King's Avatar"
+                },
+                "format": "ONA",
+                "episodes": 12,
+                "averageScore": 75,
+                "coverImage": {
+                  "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx98861-MMwQxW1S8WkF.jpg",
+                  "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98861-MMwQxW1S8WkF.jpg"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
       "anilistId": 21519,
       "episodeNumber": 1,
       "progressSeconds": 120,

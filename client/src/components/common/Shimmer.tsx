@@ -43,7 +43,7 @@ export const SwimlaneSkeleton: React.FC = () => (
  * Hero Banner Carousel Shimmer
  */
 export const HeroBannerSkeleton: React.FC = () => (
-  <div className="relative w-full h-[390px] xs:h-[430px] sm:h-[500px] md:h-[580px] lg:h-[620px] bg-[#0E1015] overflow-hidden select-none animate-shimmer">
+  <div className="relative w-full aspect-[16/10] xs:aspect-[16/9] sm:aspect-[21/9] md:aspect-auto md:h-[480px] lg:h-[540px] xl:h-[600px] min-h-[240px] max-h-[85vh] bg-[#0E1015] overflow-hidden select-none animate-shimmer">
     {/* Dark Gradients overlay */}
     <div className="absolute inset-0 bg-gradient-to-t from-[#141519] via-[#141519]/70 via-50% to-transparent md:hidden" />
     <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[#141519]/95 via-[#141519]/60 via-45% to-transparent" />
