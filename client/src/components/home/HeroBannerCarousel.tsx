@@ -172,7 +172,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
               <div className="absolute top-0 left-0 right-0 h-14 sm:h-20 z-10 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
 
               {/* Slide Content Overlay */}
-              <div className="absolute inset-0 z-20 max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-3 xs:pb-4 sm:pb-8 md:pb-12 pointer-events-none">
+              <div className="absolute inset-0 z-20 max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-5 xs:pb-6 sm:pb-8 md:pb-12 pointer-events-none">
                 <div className="max-w-2xl space-y-1.5 xs:space-y-2 sm:space-y-3 pointer-events-auto">
                   {/* Metadata Badges */}
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold">
@@ -269,29 +269,22 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
         <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
       </button>
 
-      {/* Interactive Progress Indicator Dots (Optimized for Mobile & Desktop) */}
-      <div className="absolute right-3 xs:right-4 sm:right-8 bottom-2.5 xs:bottom-3.5 sm:bottom-6 flex items-center gap-1.5 sm:gap-2 z-30 bg-black/40 backdrop-blur-md px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-white/10 shadow-lg">
+      {/* Interactive Progress Indicator Dots (Pure Dots, No Background Box, Mobile Centered) */}
+      <div className="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 md:right-8 bottom-1.5 xs:bottom-2 sm:bottom-6 md:bottom-8 flex items-center gap-1.5 sm:gap-2 z-30 pointer-events-auto">
         {items.map((item, index) => {
           const isActive = index === currentIndex;
           return (
             <button
               key={item.id}
               onClick={() => setCurrentIndex(index)}
-              className={`relative h-1.5 sm:h-2 rounded-full overflow-hidden transition-all duration-300 focus:outline-none ${
+              className={`rounded-full transition-all duration-300 focus:outline-none drop-shadow-md cursor-pointer ${
                 isActive
-                  ? 'w-5 sm:w-8 bg-white/30'
-                  : 'w-1.5 sm:w-2 bg-white/30 hover:bg-white/60 active:scale-90'
+                  ? 'w-5 sm:w-6 h-1.5 sm:h-2 bg-[#F47521] shadow-[0_0_8px_rgba(244,117,33,0.6)]'
+                  : 'w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70 active:scale-75'
               }`}
               title={item.title.english || item.title.romaji}
               aria-label={`Go to slide ${index + 1}`}
-            >
-              {isActive && (
-                <div
-                  key={currentIndex}
-                  className="absolute top-0 left-0 bottom-0 bg-[#F47521] rounded-full animate-hero-progress"
-                />
-              )}
-            </button>
+            />
           );
         })}
       </div>
