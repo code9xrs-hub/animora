@@ -1,48 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { Film, Download, Star } from 'lucide-react';
 import { fetchBrowse } from '../api/animeApi';
 import { AnimeMedia } from '../types/anime';
-import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { HeroBannerCarousel } from '../components/home/HeroBannerCarousel';
+import { MediaSwimlane } from '../components/home/MediaSwimlane';
 import { SEO } from '../components/common/SEO';
-import { GridSkeleton } from '../components/common/Shimmer';
+import { HomePageSkeleton } from '../components/common/Shimmer';
 
 export const MoviesPage: React.FC = () => {
-  const [movies, setMovies] = useState<AnimeMedia[]>([]);
+  const [popularMovies, setPopularMovies] = useState<AnimeMedia[]>([]);
+  const [topRatedMovies, setTopRatedMovies] = useState<AnimeMedia[]>([]);
+  const [newestMovies, setNewestMovies] = useState<AnimeMedia[]>([]);
   const [spotlightMovies, setSpotlightMovies] = useState<AnimeMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sort, setSort] = useState<'POPULARITY_DESC' | 'SCORE_DESC' | 'START_DATE_DESC'>('POPULARITY_DESC');
-
-  // Load top spotlight movies once for home-page type hero slider
-  useEffect(() => {
-    async function loadSpotlight() {
-      try {
-        const res = await fetchBrowse({
-          format: 'MOVIE',
-          sort: 'POPULARITY_DESC',
-          perPage: 8
-        });
-        if (res.media && res.media.length > 0) {
-          setSpotlightMovies(res.media);
-        }
-      } catch (e) {
-        console.warn('Failed to load spotlight movies:', e);
-      }
-    }
-    loadSpotlight();
-  }, []);
 
   useEffect(() => {
-    async function loadMovies() {
+    async function loadAllMovies() {
       try {
         setLoading(true);
-        const res = await fetchBrowse({
-          format: 'MOVIE',
-          sort,
-          perPage: 36
-        });
-        setMovies(res.media || []);
+        const [popularRes, topRatedRes, newestRes] = await Promise.all([
+          fetchBrowse({ format: 'MOVIE', sort: 'POPULARITY_DESC', perPage: 24 }),
+          fetchBrowse({ format: 'MOVIE', sort: 'SCORE_DESC', perPage: 24 }),
+          fetchBrowse({ format: 'MOVIE', sort: 'START_DATE_DESC', perPage: 24 })
+        ]);
+
+        const pop = popularRes.media || [];
+        const top = topRatedRes.media || [];
+        const recent = newestRes.media || [];
+
+        setPopularMovies(pop);
+        setTopRatedMovies(top);
+        setNewestMovies(recent);
+
+        // Top 8 movies for the hero banner carousel
+        setSpotlightMovies(pop.slice(0, 8));
       } catch (err: any) {
         console.error('Failed to load anime movies:', err);
         setError(err.message || 'Error loading movies');
@@ -50,8 +41,26 @@ export const MoviesPage: React.FC = () => {
         setLoading(false);
       }
     }
-    loadMovies();
-  }, [sort]);
+    loadAllMovies();
+  }, []);
+
+  if (loading) {
+    return <HomePageSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-4 text-white px-4">
+        <p className="text-red-400 font-semibold">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-[#F47521] text-black font-bold px-5 py-2 rounded-xl text-xs hover:bg-[#FF8533] transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full pb-20">
@@ -61,84 +70,42 @@ export const MoviesPage: React.FC = () => {
         type="video.movie"
       />
 
-      {/* Home Page Style Feature Film Slider */}
+      {/* 1. Feature Film Hero Carousel Slider */}
       {spotlightMovies.length > 0 && (
         <HeroBannerCarousel items={spotlightMovies} />
       )}
 
-      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-8 w-full">
-        {/* Hub Header & Sort Controls */}
-      <div className="bg-gradient-to-r from-[#181A22] via-[#14151B] to-[#0E0F13] border border-white/[0.08] rounded-2xl p-5 sm:p-8 md:p-10 mb-6 sm:mb-8 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-2.5 sm:space-y-3 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="bg-[#2ABDBB]/15 text-[#2ABDBB] border border-[#2ABDBB]/30 text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1.5">
-                <Film className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                Feature Films
-              </span>
-              <span className="bg-[#FAB818]/15 text-[#FAB818] border border-[#FAB818]/30 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md">
-                1080p / 4K
-              </span>
-            </div>
-            <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
-              Anime Movies Hub
-            </h1>
-            <p className="text-xs sm:text-sm text-[#8E93A0] leading-relaxed">
-              Explore critically acclaimed theatrical releases, standalone films, and franchise epics. Stream immediately with zero-lag multi-server embeds or download directly to your device.
-            </p>
-          </div>
+      {/* 2. Left-to-Right Scrolling Horizontal Swimlanes */}
+      <div className="w-full py-2 sm:py-4 space-y-2 sm:space-y-4">
+        {popularMovies.length > 0 && (
+          <MediaSwimlane
+            title="Popular Movies"
+            subtitle="Most watched theatrical anime"
+            items={popularMovies}
+            viewAllLink="/browse?format=MOVIE&sort=POPULARITY_DESC"
+            badge="POPULAR"
+          />
+        )}
 
-          {/* Sort Selector */}
-          <div className="flex items-center gap-2 self-start md:self-center">
-            <span className="text-xs text-[#8E93A0] font-medium">Sort:</span>
-            <div className="inline-flex rounded-xl bg-[#121316] p-1 border border-white/10">
-              <button
-                onClick={() => setSort('POPULARITY_DESC')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  sort === 'POPULARITY_DESC'
-                    ? 'bg-[#F47521] text-black shadow-sm font-bold'
-                    : 'text-[#8E93A0] hover:text-white'
-                }`}
-              >
-                Popular
-              </button>
-              <button
-                onClick={() => setSort('SCORE_DESC')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  sort === 'SCORE_DESC'
-                    ? 'bg-[#F47521] text-black shadow-sm font-bold'
-                    : 'text-[#8E93A0] hover:text-white'
-                }`}
-              >
-                Top Rated
-              </button>
-              <button
-                onClick={() => setSort('START_DATE_DESC')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  sort === 'START_DATE_DESC'
-                    ? 'bg-[#F47521] text-black shadow-sm font-bold'
-                    : 'text-[#8E93A0] hover:text-white'
-                }`}
-              >
-                Newest
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        {topRatedMovies.length > 0 && (
+          <MediaSwimlane
+            title="Top Rated Movies"
+            subtitle="Critically acclaimed feature masterworks"
+            items={topRatedMovies}
+            viewAllLink="/browse?format=MOVIE&sort=SCORE_DESC"
+            badge="TOP RATED"
+          />
+        )}
 
-      {/* Movie Cards Grid */}
-      {loading ? (
-        <GridSkeleton count={24} />
-      ) : error ? (
-        <div className="w-full py-16 text-center text-red-400">{error}</div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
-          {movies.map((movie) => (
-            <AnimePosterCard key={movie.id} anime={movie} />
-          ))}
-        </div>
-      )}
+        {newestMovies.length > 0 && (
+          <MediaSwimlane
+            title="Newest Movies"
+            subtitle="Latest additions and theatrical releases"
+            items={newestMovies}
+            viewAllLink="/browse?format=MOVIE&sort=START_DATE_DESC"
+            badge="NEWEST"
+          />
+        )}
       </div>
     </div>
   );
