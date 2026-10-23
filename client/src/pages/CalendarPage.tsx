@@ -122,14 +122,20 @@ export const CalendarPage: React.FC = () => {
         })}
       </div>
 
-      {/* Daily Schedule 3/3 Column Row Grid */}
+      {/* Daily Schedule List */}
       {loading ? (
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="flex flex-col space-y-2 select-none">
-              <div className="w-full aspect-[2/3] rounded-xl bg-[#1A1C24] border border-[#2B2E38]/40 animate-shimmer overflow-hidden" />
-              <div className="w-4/5 h-3.5 rounded bg-[#1A1C24] animate-shimmer" />
-              <div className="w-1/2 h-2.5 rounded bg-[#1A1C24] opacity-70 animate-shimmer" />
+            <div
+              key={i}
+              className="flex gap-3.5 p-3.5 rounded-xl bg-[#1A1C24] border border-[#2B2E38]/50 animate-shimmer h-28"
+            >
+              <div className="w-16 h-full rounded-lg animate-shimmer flex-shrink-0" />
+              <div className="flex-1 space-y-2.5 py-1">
+                <div className="w-3/4 h-4 rounded animate-shimmer" />
+                <div className="w-1/2 h-3 rounded animate-shimmer opacity-60" />
+                <div className="w-1/3 h-3 rounded animate-shimmer opacity-40" />
+              </div>
             </div>
           ))}
         </div>
@@ -141,7 +147,7 @@ export const CalendarPage: React.FC = () => {
           <p className="text-xs text-[#8E93A0]">Select another day or check back closer to broadcast.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {activeDayItems.map((item) => {
             const date = new Date(item.airingAt * 1000);
             const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -151,97 +157,77 @@ export const CalendarPage: React.FC = () => {
             const totalHours = Math.max(0, Math.floor(diffSeconds / 3600));
             const minutesRemaining = Math.max(0, Math.floor((diffSeconds % 3600) / 60));
             const secondsRemaining = Math.max(0, Math.floor(diffSeconds % 60));
-            const watchUrl = `/watch/${item.media.id}/ep/${item.episode}`;
-            const detailUrl = `/series/${item.media.id}`;
 
             return (
               <div
                 key={item.id}
-                className="group relative flex flex-col w-full text-left"
+                className="flex items-center gap-3.5 sm:gap-4 p-3 sm:p-3.5 rounded-xl bg-[#181A20] border border-white/[0.08] hover:border-white/20 transition-all group shadow-sm"
               >
-                {/* 2:3 Poster Card with Live Badges */}
-                <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden bg-[#181A22] border border-white/[0.08] shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:border-white/20">
+                {/* Poster image */}
+                <Link
+                  to={`/series/${item.media.id}`}
+                  className="w-16 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-black border border-white/5"
+                >
                   <img
                     src={item.media.coverImage?.large || item.media.coverImage?.extraLarge}
                     alt={title}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
+                </Link>
 
-                  {/* Gradient Shadow Overlays for badge clarity */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/60 pointer-events-none" />
-
-                  {/* Top Left: Local Airing Time */}
-                  <div className="absolute top-1.5 left-1.5 z-10 pointer-events-none">
-                    <span className="bg-black/80 backdrop-blur-md text-[8.5px] sm:text-[10.5px] font-mono text-[#F47521] font-semibold px-1 sm:px-1.5 py-0.5 rounded border border-[#F47521]/30 flex items-center gap-0.5 shadow-sm">
-                      <Clock className="w-2.5 h-2.5" />
-                      <span>{timeStr}</span>
-                    </span>
-                  </div>
-
-                  {/* Top Right: Episode Number */}
-                  <div className="absolute top-1.5 right-1.5 z-10 pointer-events-none">
-                    <span className="bg-black/80 backdrop-blur-md text-[8.5px] sm:text-[10.5px] font-bold text-[#2ABDBB] px-1 sm:px-1.5 py-0.5 rounded border border-[#2ABDBB]/30 shadow-sm">
+                {/* Details */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1 mb-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[11px] font-mono font-medium text-[#F47521] flex items-center gap-1 bg-[#F47521]/10 px-2 py-0.5 rounded-md border border-[#F47521]/20" title="Local Broadcast Time">
+                        <Clock className="w-3 h-3" />
+                        {timeStr}
+                      </span>
+                      {!isAired ? (
+                        <span className="text-[10px] font-mono font-medium text-[#2ABDBB] bg-[#2ABDBB]/10 px-1.5 py-0.5 rounded-md border border-[#2ABDBB]/20 flex items-center gap-1 shadow-sm">
+                          <Timer className="w-2.5 h-2.5 text-[#2ABDBB] animate-pulse" />
+                          <span>{totalHours}h {String(minutesRemaining).padStart(2, '0')}m {String(secondsRemaining).padStart(2, '0')}s</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium text-[#8E93A0] bg-white/5 px-1.5 py-0.5 rounded-md">
+                          AIRED
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-black/60 text-[#2ABDBB] border border-[#2ABDBB]/25 flex-shrink-0">
                       EP {item.episode}
                     </span>
                   </div>
 
-                  {/* Bottom on Poster: Live Countdown or AIRED */}
-                  <div className="absolute bottom-1.5 left-1.5 right-1.5 z-10 pointer-events-none">
-                    {!isAired ? (
-                      <span className="w-full bg-black/85 backdrop-blur-md text-[8px] sm:text-[10px] font-mono font-medium text-[#2ABDBB] py-0.5 px-1 rounded border border-[#2ABDBB]/30 flex items-center justify-center gap-1 truncate shadow-sm">
-                        <Timer className="w-2 h-2 sm:w-2.5 sm:h-2.5 animate-pulse flex-shrink-0" />
-                        <span className="truncate">
-                          <span className="sm:hidden">{totalHours}h {minutesRemaining}m</span>
-                          <span className="hidden sm:inline">{totalHours}h {minutesRemaining}m {secondsRemaining}s</span>
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="bg-emerald-500/90 text-black font-extrabold text-[8px] sm:text-[10px] px-1.5 py-0.5 rounded shadow-sm inline-block">
-                        AIRED
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Play Hover Overlay */}
                   <Link
-                    to={isAired ? watchUrl : detailUrl}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-20"
-                    title={isAired ? `Watch Episode ${item.episode}` : title}
-                  >
-                    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#F47521] text-black flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
-                      <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current ml-0.5" />
-                    </div>
-                  </Link>
-                </div>
-
-                {/* Title & Action Below Card */}
-                <div className="mt-1.5 sm:mt-2 space-y-0.5">
-                  <Link
-                    to={detailUrl}
-                    className="block text-[11px] sm:text-xs md:text-sm font-semibold text-white/95 line-clamp-1 hover:text-[#F47521] transition-colors leading-tight tracking-tight"
+                    to={`/series/${item.media.id}`}
+                    className="text-xs sm:text-sm font-semibold text-white/90 group-hover:text-[#F47521] transition line-clamp-1"
                     title={title}
                   >
                     {title}
                   </Link>
-                  <div className="flex items-center justify-between text-[10px] sm:text-xs">
+
+                  <div className="mt-2.5 pt-2 border-t border-white/[0.06] flex items-center justify-between gap-2">
                     {isAired ? (
                       <Link
-                        to={watchUrl}
-                        className="inline-flex items-center gap-1 text-[9px] sm:text-[11px] font-bold text-[#F47521] hover:text-[#FF8533] transition-colors"
+                        to={`/watch/${item.media.id}/ep/${item.episode}`}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-black bg-[#F47521] hover:bg-[#FF8533] px-3 py-1 rounded-lg transition-all shadow-sm"
                       >
-                        <Play className="w-2.5 h-2.5 fill-current" />
+                        <Play className="w-3 h-3 fill-current" />
                         <span>Watch Ep {item.episode}</span>
                       </Link>
                     ) : (
-                      <span className="text-[8.5px] sm:text-[10.5px] font-mono text-[#8E93A0]">
-                        In {totalHours}h {minutesRemaining}m
-                      </span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1 text-[11px] font-medium text-[#2ABDBB]">
+                          <Clock className="w-3 h-3 animate-pulse" />
+                          <span>{totalHours}h remaining</span>
+                        </div>
+                      </div>
                     )}
+
                     <Link
-                      to={detailUrl}
-                      className="text-[8.5px] sm:text-[10.5px] text-[#8E93A0] hover:text-white transition-colors"
+                      to={`/series/${item.media.id}`}
+                      className="text-xs font-medium text-[#8E93A0] hover:text-white px-2 py-0.5 rounded hover:bg-white/5 transition flex-shrink-0"
                     >
                       Details →
                     </Link>
