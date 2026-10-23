@@ -90,11 +90,12 @@ export const MediaSwimlane: React.FC<MediaSwimlaneProps> = ({
         <div
           ref={scrollContainerRef}
           className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth py-1 sm:py-2"
+          style={{ WebkitOverflowScrolling: 'touch', overscrollBehaviorX: 'contain' }}
         >
           {items.map((anime) => (
             <div
               key={anime.id}
-              className="flex-shrink-0 w-32 sm:w-44 md:w-52 lg:w-56"
+              className="flex-shrink-0 w-[138px] xs:w-40 sm:w-44 md:w-52 lg:w-56"
             >
               <AnimePosterCard anime={anime} />
             </div>

@@ -119,7 +119,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className="relative w-full aspect-[16/10] xs:aspect-[16/9] sm:aspect-[21/9] md:aspect-auto md:h-[480px] lg:h-[540px] xl:h-[600px] min-h-[240px] max-h-[85vh] bg-[#0A0B0E] overflow-hidden select-none"
+      className="relative w-full h-[330px] xs:h-[370px] sm:h-[420px] md:h-[480px] lg:h-[540px] xl:h-[600px] max-h-[85vh] bg-[#0A0B0E] overflow-hidden select-none"
     >
       {/* Horizontal Touch-Scroll Slide Track */}
       <div
@@ -173,7 +173,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
               <div className="absolute top-0 left-0 right-0 h-14 sm:h-20 z-10 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
 
               {/* Slide Content Overlay */}
-              <div className="absolute inset-0 z-20 max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-5 xs:pb-6 sm:pb-8 md:pb-12 pointer-events-none">
+              <div className="absolute inset-0 z-20 max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-6 xs:pb-7 sm:pb-8 md:pb-12 pointer-events-none">
                 <div className="max-w-2xl space-y-1.5 xs:space-y-2 sm:space-y-3 pointer-events-auto">
                   {/* Metadata Badges */}
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold">
@@ -193,8 +193,8 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
                     </span>
                   </div>
 
-                  {/* Heading (Full Title without truncation) */}
-                  <h1 className="font-display font-extrabold text-base xs:text-lg sm:text-2xl md:text-4xl lg:text-5xl text-white tracking-tight leading-snug drop-shadow-md">
+                  {/* Heading (Full Title with 2-line clamp on mobile for safety) */}
+                  <h1 className="font-display font-extrabold text-lg xs:text-xl sm:text-2xl md:text-4xl lg:text-5xl text-white tracking-tight leading-snug drop-shadow-md line-clamp-2 md:line-clamp-none">
                     {itemTitle}
                   </h1>
 
@@ -271,7 +271,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
       </button>
 
       {/* Interactive Progress Indicator Dots (Pure Dots, No Background Box, Mobile Centered) */}
-      <div className="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 md:right-8 bottom-1.5 xs:bottom-2 sm:bottom-6 md:bottom-8 flex items-center gap-1.5 sm:gap-2 z-30 pointer-events-auto">
+      <div className="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 md:right-8 bottom-2 xs:bottom-2.5 sm:bottom-6 md:bottom-8 flex items-center gap-1.5 sm:gap-2 z-30 pointer-events-auto">
         {items.map((item, index) => {
           const isActive = index === currentIndex;
           return (

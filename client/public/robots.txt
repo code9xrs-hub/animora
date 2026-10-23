@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://animora.web.app/sitemap.xml

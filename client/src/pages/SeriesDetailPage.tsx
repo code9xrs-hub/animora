@@ -391,16 +391,16 @@ export const SeriesDetailPage: React.FC = () => {
                   {filteredEpisodes.map((ep) => (
                     <div
                       key={ep.episodeNumber}
-                      className="flex items-center justify-between p-3 rounded-xl bg-[#181A20] hover:bg-[#20222B] border border-white/[0.08] transition-all"
+                      className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#181A20] hover:bg-[#20222B] border border-white/[0.08] transition-all"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <Link
                           to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
-                          className="w-8 h-8 rounded-full bg-[#121318] flex items-center justify-center text-[#F47521] hover:bg-[#F47521] hover:text-black transition-all"
+                          className="w-8 h-8 rounded-full bg-[#121318] flex items-center justify-center text-[#F47521] hover:bg-[#F47521] hover:text-black transition-all flex-shrink-0"
                         >
                           <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                         </Link>
-                        <div>
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <Link
                               to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
@@ -409,7 +409,7 @@ export const SeriesDetailPage: React.FC = () => {
                               {ep.displayTitle || (ep.title?.toLowerCase().startsWith('episode') ? ep.title : `Episode ${ep.episodeNumber}: ${ep.title}`)}
                             </Link>
                             {lastWatchedItem?.anilistId === media.id && lastWatchedItem?.episodeNumber === ep.episodeNumber && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F47521]/20 text-[#F47521] border border-[#F47521]/30">
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F47521]/20 text-[#F47521] border border-[#F47521]/30 flex-shrink-0">
                                 Last Played
                               </span>
                             )}
@@ -423,7 +423,7 @@ export const SeriesDetailPage: React.FC = () => {
                         href={ep.mirrorBoxStream?.downloadUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-2.5 py-1 rounded-lg bg-[#2ABDBB]/10 text-[#2ABDBB] text-xs font-medium hover:bg-[#2ABDBB] hover:text-black transition-all flex items-center gap-1"
+                        className="px-2.5 py-1 rounded-lg bg-[#2ABDBB]/10 text-[#2ABDBB] text-xs font-medium hover:bg-[#2ABDBB] hover:text-black transition-all flex items-center gap-1 flex-shrink-0"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download</span>
