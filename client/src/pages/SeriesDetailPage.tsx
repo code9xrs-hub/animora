@@ -16,7 +16,7 @@ import {
   List,
   X
 } from 'lucide-react';
-import { fetchAnimeDetail, AnimeDetailResponse, toggleWatchlist, getContinuePlayUrl } from '../api/animeApi';
+import { fetchAnimeDetail, AnimeDetailResponse, toggleWatchlist, getContinuePlayUrl, detectSeasonNumber } from '../api/animeApi';
 import { EpisodeCard } from '../components/cards/EpisodeCard';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
@@ -88,11 +88,18 @@ export const SeriesDetailPage: React.FC = () => {
   const continuePlayLabel = continuePlayInfo.label;
   const lastWatchedItem = continuePlayInfo.lastWatched;
 
+  // Current active season in franchise
+  const currentSeasonNode = (franchiseSeasons || []).find((s) => s.anilistId === media.id);
+  const currentSeasonMatch = currentSeasonNode?.seasonNumberLabel?.match(/Season\s+(\d+)/i);
+  const activeSeasonNumber = currentSeasonMatch
+    ? parseInt(currentSeasonMatch[1], 10)
+    : (episodes[0]?.seasonNumber || media.seasonNumber || detectSeasonNumber(media) || 1);
+
   const firstStream = episodes[0]?.mirrorBoxStream;
   const externalId = firstStream?.externalId || media.id;
   const firstDownloadUrl = firstStream?.downloadUrl || (isMovie
     ? `https://mirrorboxapi.web.app/download/movie/${externalId}`
-    : `https://mirrorboxapi.web.app/download/tv/${externalId}/1/1`);
+    : `https://mirrorboxapi.web.app/download/tv/${externalId}/${activeSeasonNumber}/1`);
 
   const handleBookmarkToggle = async () => {
     const added = await toggleWatchlist(media);
@@ -104,11 +111,6 @@ export const SeriesDetailPage: React.FC = () => {
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
   };
-
-  // Current active season in franchise
-  const currentSeasonNode = (franchiseSeasons || []).find((s) => s.anilistId === media.id);
-  const currentSeasonMatch = currentSeasonNode?.seasonNumberLabel?.match(/Season\s+(\d+)/i);
-  const activeSeasonNumber = currentSeasonMatch ? parseInt(currentSeasonMatch[1], 10) : (episodes[0]?.seasonNumber || 1);
 
   // Filter and sort episodes
   let filteredEpisodes = [...episodes];

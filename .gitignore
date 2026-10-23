@@ -32,3 +32,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Cached crosswalk index
+server/data/fribb-mini.json

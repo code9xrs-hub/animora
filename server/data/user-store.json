@@ -4923,7 +4923,7 @@
       "episodeNumber": 1,
       "progressSeconds": 120,
       "totalSeconds": 1440,
-      "watchedAt": "2026-10-16T16:44:01.107Z",
+      "watchedAt": "2026-10-23T10:21:44.512Z",
       "media": {
         "id": 20954,
         "idMal": 28851,
@@ -4957,7 +4957,7 @@
           "Slice of Life"
         ],
         "averageScore": 88,
-        "popularity": 724957,
+        "popularity": 726603,
         "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/20954-f30bHMXa5Qoe.jpg",
         "coverImage": {
           "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx20954-sYRfE5jQRtSB.jpg",
@@ -4970,6 +4970,16 @@
           "thumbnail": "https://i.ytimg.com/vi/Sy4bPCuzfiQ/hqdefault.jpg"
         },
         "nextAiringEpisode": null,
+        "airingSchedule": {
+          "nodes": [
+            {
+              "id": 60303,
+              "episode": 1,
+              "airingAt": 1474038000,
+              "timeUntilAiring": -318712379
+            }
+          ]
+        },
         "studios": {
           "nodes": [
             {

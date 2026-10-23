@@ -133,6 +133,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
           const itemTitle = item.title.english || item.title.romaji || 'Featured Anime';
           const isMovie = item.format === 'MOVIE';
           const continueInfo = getContinuePlayUrl(item);
+          const seasonNum = item.seasonNumber || continueInfo.seasonNumber || 1;
           const playUrl = continueInfo.url;
           const playLabel = continueInfo.label;
           const detailUrl = isMovie ? `/movie/${item.id}` : `/series/${item.id}`;
@@ -185,7 +186,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
                       </span>
                     )}
                     <span className="bg-[#1A1C24]/90 backdrop-blur-md border border-white/10 text-white/90 px-2 py-0.5 rounded-md">
-                      {isMovie ? 'Movie' : `${item.episodes || 12} Episodes`}
+                      {isMovie ? 'Movie' : `Season ${seasonNum} • ${item.episodes || 12} Episodes`}
                     </span>
                     <span className="text-[#2ABDBB] font-medium hidden xs:inline">
                       Sub | Dub Available

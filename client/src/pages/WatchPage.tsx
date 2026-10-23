@@ -21,15 +21,31 @@ export const WatchPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [selectedEpNum, setSelectedEpNum] = useState<number>(() => {
+    return episodeNumber ? parseInt(episodeNumber, 10) : 1;
+  });
 
-  const currentEpNum = episodeNumber ? parseInt(episodeNumber, 10) : 1;
+  // Sync selected episode with URL parameter when browser back/forward is used
+  useEffect(() => {
+    if (episodeNumber) {
+      const parsed = parseInt(episodeNumber, 10);
+      if (parsed && parsed !== selectedEpNum) {
+        setSelectedEpNum(parsed);
+      }
+    }
+  }, [episodeNumber]);
 
+  // 1. Fetch Anime Detail ONLY when 'id' changes (avoids page refresh/skeleton flash on ep change)
   useEffect(() => {
     if (!id) return;
+    let isCurrent = true;
+
     async function loadDetail() {
       try {
         setLoading(true);
         const res = await fetchAnimeDetail(id!);
+        if (!isCurrent) return;
+
         const isMovie = res.media.format === 'MOVIE';
 
         // Auto-resume: if user accessed /watch/:id without specifying episode, play last played season & episode
@@ -37,19 +53,15 @@ export const WatchPage: React.FC = () => {
           const franchiseIds = (res.franchiseSeasons || []).map((s: any) => s.anilistId);
           const last = getLastWatched(res.media.id, franchiseIds);
           if (last) {
+            setSelectedEpNum(last.episodeNumber);
             navigate(`/watch/${last.anilistId}/ep/${last.episodeNumber}`, { replace: true });
+            setData(res);
+            setLoading(false);
             return;
           }
         }
 
         setData(res);
-
-        // Record watch history with effective season
-        const effectiveSeason =
-          res.episodes?.find((ep: any) => ep.episodeNumber === currentEpNum)?.seasonNumber ||
-          res.episodes?.[0]?.mirrorBoxStream?.resolvedSeason ||
-          1;
-        recordHistory(res.media.id, currentEpNum, 120, 1440, res.media, effectiveSeason);
 
         // Check watchlist
         const stored = localStorage.getItem('animora_watchlist') || localStorage.getItem('crunchyroll_watchlist');
@@ -58,14 +70,33 @@ export const WatchPage: React.FC = () => {
           setIsBookmarked(list.some((item: any) => item.id === res.media.id));
         }
       } catch (err: any) {
-        console.error('Failed to load anime stream:', err);
-        setError(err.message || 'Error loading playback');
+        if (isCurrent) {
+          console.error('Failed to load anime stream:', err);
+          setError(err.message || 'Error loading playback');
+        }
       } finally {
-        setLoading(false);
+        if (isCurrent) {
+          setLoading(false);
+        }
       }
     }
+
     loadDetail();
-  }, [id, currentEpNum, episodeNumber, navigate]);
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [id]);
+
+  // 2. Record watch history in background whenever episode changes (zero UI interruption)
+  useEffect(() => {
+    if (!data?.media) return;
+    const effectiveSeason =
+      data.episodes?.find((ep: any) => ep.episodeNumber === selectedEpNum)?.seasonNumber ||
+      data.episodes?.[0]?.mirrorBoxStream?.resolvedSeason ||
+      1;
+    recordHistory(data.media.id, selectedEpNum, 120, 1440, data.media, effectiveSeason);
+  }, [data, selectedEpNum]);
 
   if (loading) {
     return <WatchPageSkeleton />;
@@ -87,7 +118,7 @@ export const WatchPage: React.FC = () => {
   const title = media.title.english || media.title.romaji || 'Untitled';
 
   // Find active episode item
-  const activeEpisodeIndex = episodes.findIndex((ep) => ep.episodeNumber === currentEpNum);
+  const activeEpisodeIndex = episodes.findIndex((ep) => ep.episodeNumber === selectedEpNum);
   const fallbackStream = episodes[0]?.mirrorBoxStream;
   const fallbackExternalId = fallbackStream?.externalId || String(media.id);
   const fallbackSeason = fallbackStream?.resolvedSeason || 1;
@@ -95,8 +126,8 @@ export const WatchPage: React.FC = () => {
   const activeEpisode: EpisodeItemDTO = activeEpisodeIndex >= 0
     ? episodes[activeEpisodeIndex]
     : episodes[0] || {
-        episodeNumber: currentEpNum,
-        title: isMovie ? title : `Episode ${currentEpNum}`,
+        episodeNumber: selectedEpNum,
+        title: isMovie ? title : `Episode ${selectedEpNum}`,
         thumbnailUrl: media.bannerImage || media.coverImage?.extraLarge || '',
         durationMinutes: 24,
         isAired: true,
@@ -106,13 +137,13 @@ export const WatchPage: React.FC = () => {
           mediaType: isMovie ? 'movie' : 'tv',
           externalId: fallbackExternalId,
           resolvedSeason: fallbackSeason,
-          resolvedEpisode: isMovie ? 1 : currentEpNum,
+          resolvedEpisode: isMovie ? 1 : selectedEpNum,
           embedUrl: isMovie
             ? `https://mirrorboxapi.web.app/movie/${fallbackExternalId}`
-            : `https://mirrorboxapi.web.app/tv/${fallbackExternalId}/${fallbackSeason}/${currentEpNum}`,
+            : `https://mirrorboxapi.web.app/tv/${fallbackExternalId}/${fallbackSeason}/${selectedEpNum}`,
           downloadUrl: isMovie
             ? `https://mirrorboxapi.web.app/download/movie/${fallbackExternalId}`
-            : `https://mirrorboxapi.web.app/download/tv/${fallbackExternalId}/${fallbackSeason}/${currentEpNum}`,
+            : `https://mirrorboxapi.web.app/download/tv/${fallbackExternalId}/${fallbackSeason}/${selectedEpNum}`,
           availableServers: fallbackStream?.availableServers || ['Abyss', 'FileMoon', 'Vidmoly', 'Streamwish']
         }
       };
@@ -121,15 +152,22 @@ export const WatchPage: React.FC = () => {
   const hasNextEpisode = activeEpisodeIndex >= 0 && activeEpisodeIndex < episodes.length - 1;
   const nextEpisode = hasNextEpisode ? episodes[activeEpisodeIndex + 1] : null;
 
+  // Seamless in-place episode switching (Zero page reload / Zero skeleton flash)
+  const handleEpisodeChange = (newEpNum: number) => {
+    if (newEpNum === selectedEpNum) return;
+    setSelectedEpNum(newEpNum);
+    navigate(`/watch/${media.id}/ep/${newEpNum}`, { replace: true });
+  };
+
   const handleSelectPrev = () => {
     if (hasPrevEpisode) {
-      navigate(`/watch/${media.id}/ep/${episodes[activeEpisodeIndex - 1].episodeNumber}`);
+      handleEpisodeChange(episodes[activeEpisodeIndex - 1].episodeNumber);
     }
   };
 
   const handleSelectNext = () => {
     if (hasNextEpisode) {
-      navigate(`/watch/${media.id}/ep/${episodes[activeEpisodeIndex + 1].episodeNumber}`);
+      handleEpisodeChange(episodes[activeEpisodeIndex + 1].episodeNumber);
     }
   };
 
@@ -140,12 +178,12 @@ export const WatchPage: React.FC = () => {
 
   const seoTitle = isMovie
     ? `Watch ${title} Full Movie Online Free in HD`
-    : `Watch ${title} Episode ${currentEpNum} Sub & Dub in HD`;
-  const seoDesc = `Stream ${title} ${isMovie ? 'movie' : `Episode ${currentEpNum}`} in 1080p Full HD on Animora. High-speed multi-server streaming with subtitle and audio options.`;
+    : `Watch ${title} Episode ${selectedEpNum} Sub & Dub in HD`;
+  const seoDesc = `Stream ${title} ${isMovie ? 'movie' : `Episode ${selectedEpNum}`} in 1080p Full HD on Animora. High-speed multi-server streaming with subtitle and audio options.`;
   const seoImage = activeEpisode.thumbnailUrl || media.bannerImage || media.coverImage?.extraLarge;
   const canonicalUrl = isMovie
     ? `/watch/${media.id}`
-    : `/watch/${media.id}/ep/${currentEpNum}`;
+    : `/watch/${media.id}/ep/${selectedEpNum}`;
 
   const watchJsonLd = isMovie
     ? {
@@ -160,8 +198,8 @@ export const WatchPage: React.FC = () => {
     : {
         '@context': 'https://schema.org',
         '@type': 'TVEpisode',
-        name: activeEpisode.title || `Episode ${currentEpNum}`,
-        episodeNumber: currentEpNum,
+        name: activeEpisode.title || `Episode ${selectedEpNum}`,
+        episodeNumber: selectedEpNum,
         partOfSeries: {
           '@type': 'TVSeries',
           name: title
@@ -228,17 +266,6 @@ export const WatchPage: React.FC = () => {
                   {isBookmarked ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
                   <span>{isBookmarked ? 'In Watchlist' : 'Watchlist'}</span>
                 </button>
-
-                <a
-                  href={activeEpisode.mirrorBoxStream?.downloadUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 bg-[#2ABDBB] text-black hover:bg-[#2ABDBB]/90 transition-all shadow-sm"
-                  title="Direct CDN Download"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>{isMovie ? 'Download Movie' : 'Download Ep'}</span>
-                </a>
               </div>
             </div>
 
@@ -404,9 +431,10 @@ export const WatchPage: React.FC = () => {
                   <span className="text-[10px] font-bold uppercase text-[#F47521] tracking-wider block">
                     UP NEXT
                   </span>
-                  <Link
-                    to={`/watch/${media.id}/ep/${nextEpisode.episodeNumber}`}
-                    className="flex items-center gap-3 group"
+                  <button
+                    type="button"
+                    onClick={() => handleEpisodeChange(nextEpisode.episodeNumber)}
+                    className="flex items-center gap-3 group w-full text-left cursor-pointer"
                   >
                     <div className="relative w-20 aspect-video rounded-lg overflow-hidden flex-shrink-0 bg-black">
                       <img
@@ -426,7 +454,7 @@ export const WatchPage: React.FC = () => {
                         {nextEpisode.durationMinutes || 24} mins
                       </span>
                     </div>
-                  </Link>
+                  </button>
                 </div>
               )}
 
@@ -435,10 +463,11 @@ export const WatchPage: React.FC = () => {
                 {episodes.map((ep) => {
                   const isCurrent = ep.episodeNumber === activeEpisode.episodeNumber;
                   return (
-                    <Link
+                    <button
+                      type="button"
                       key={ep.episodeNumber}
-                      to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
-                      className={`flex items-center gap-3 p-2 rounded-xl border transition-all ${
+                      onClick={() => handleEpisodeChange(ep.episodeNumber)}
+                      className={`flex items-center gap-3 p-2 rounded-xl border transition-all w-full text-left cursor-pointer ${
                         isCurrent
                           ? 'bg-[#F47521]/15 border-[#F47521]/60'
                           : 'bg-[#121318] border-white/5 hover:bg-[#20222B]'
@@ -464,7 +493,7 @@ export const WatchPage: React.FC = () => {
                           {ep.durationMinutes || 24}m
                         </p>
                       </div>
-                    </Link>
+                    </button>
                   );
                 })}
               </div>

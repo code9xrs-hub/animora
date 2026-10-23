@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { anilistService } from './anilist.service.js';
-import { fribbService } from './fribb.service.js';
+import { fribbService, detectSeasonFromTitle } from './fribb.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,7 +42,21 @@ function saveUserData(data) {
 app.get('/api/v1/anime/home', async (req, res) => {
   try {
     const data = await anilistService.getHomeCatalog();
-    res.json(data);
+    const enrich = (list) => (list || []).map(item => ({
+      ...item,
+      seasonNumber: detectSeasonFromTitle(item.title?.english || item.title?.romaji) || 1
+    }));
+
+    res.json({
+      ...data,
+      spotlight: enrich(data.spotlight),
+      trending: enrich(data.trending),
+      simulcast: enrich(data.simulcast),
+      popularMovies: enrich(data.popularMovies),
+      topRated: enrich(data.topRated),
+      actionRail: enrich(data.actionRail),
+      fantasyRail: enrich(data.fantasyRail)
+    });
   } catch (err) {
     console.error('Error fetching home catalog:', err);
     res.status(500).json({ error: err.message });
@@ -76,6 +90,13 @@ app.get('/api/v1/anime/browse', async (req, res) => {
       sort
     });
 
+    if (data && Array.isArray(data.media)) {
+      data.media = data.media.map(item => ({
+        ...item,
+        seasonNumber: detectSeasonFromTitle(item.title?.english || item.title?.romaji) || 1
+      }));
+    }
+
     res.json(data);
   } catch (err) {
     console.error('Error browsing anime:', err);
@@ -102,12 +123,21 @@ app.get('/api/v1/anime/calendar', async (req, res) => {
 // Helper to construct normalized episode list strictly aligned with AniList
 async function buildEpisodeList(media, franchiseSeasons = []) {
   const isMovie = media.format === 'MOVIE';
-  const mapping = await fribbService.getMapping(media.id, media.idMal);
+  const mediaTitle = media.title?.english || media.title?.romaji || '';
+  const mapping = await fribbService.getMapping(media.id, media.idMal, mediaTitle);
 
-  // Find franchise season info if available
-  const currentSeasonItem = (franchiseSeasons || []).find(s => s.anilistId === media.id);
-  const seasonNumMatch = currentSeasonItem?.seasonNumberLabel?.match(/Season\s+(\d+)/i);
-  const seasonNumber = seasonNumMatch ? parseInt(seasonNumMatch[1], 10) : 1;
+  // Determine canonical season number
+  let seasonNumber = mapping?.season;
+  if (!seasonNumber || seasonNumber === 1) {
+    const titleSeason = detectSeasonFromTitle(mediaTitle);
+    if (titleSeason && titleSeason > 1) {
+      seasonNumber = titleSeason;
+    } else {
+      const currentSeasonItem = (franchiseSeasons || []).find(s => s.anilistId === media.id);
+      const seasonNumMatch = currentSeasonItem?.seasonNumberLabel?.match(/Season\s+(\d+)/i);
+      seasonNumber = seasonNumMatch ? parseInt(seasonNumMatch[1], 10) : 1;
+    }
+  }
 
   if (isMovie) {
     const movieTitle = media.title?.english || media.title?.romaji || 'Full Movie';
@@ -340,11 +370,11 @@ async function buildFranchiseSeasons(media) {
   // Calculate clean, authentic season labels
   let tvSeasonCounter = 0;
   for (const s of sorted) {
-    if (s.format === 'TV' || s.format === 'TV_SHORT') {
+    if (s.format === 'TV' || s.format === 'TV_SHORT' || s.format === 'ONA') {
       tvSeasonCounter++;
-      const match = s.title.match(/Season\s*(\d+)/i) || s.title.match(/(\d+)(?:nd|rd|th|st)\s*Season/i);
-      if (match) {
-        s.seasonNumberLabel = `Season ${match[1]}`;
+      const detectedSeason = detectSeasonFromTitle(s.title);
+      if (detectedSeason) {
+        s.seasonNumberLabel = `Season ${detectedSeason}`;
       } else if (/final\s*season/i.test(s.title)) {
         s.seasonNumberLabel = 'Final Season';
       } else {
@@ -354,8 +384,6 @@ async function buildFranchiseSeasons(media) {
       s.seasonNumberLabel = 'Movie';
     } else if (s.format === 'OVA') {
       s.seasonNumberLabel = 'OVA';
-    } else if (s.format === 'ONA') {
-      s.seasonNumberLabel = 'ONA';
     } else {
       s.seasonNumberLabel = 'Special';
     }
@@ -394,8 +422,9 @@ app.get('/api/v1/stream/resolve/:anilistId', async (req, res) => {
   const episode = parseInt(req.query.episode || '1', 10);
   const format = req.query.format || 'TV';
   const malId = req.query.malId ? parseInt(req.query.malId, 10) : null;
+  const title = req.query.title || null;
 
-  const result = await fribbService.resolve(anilistId, episode, format, malId);
+  const result = await fribbService.resolve(anilistId, episode, format, malId, title);
   res.json(result);
 });
 

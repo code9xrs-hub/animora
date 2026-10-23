@@ -17,6 +17,7 @@ export const AnimePosterCard: React.FC<AnimePosterCardProps> = ({ anime }) => {
   const isMovie = anime.format === 'MOVIE';
   const detailUrl = isMovie ? `/movie/${anime.id}` : `/series/${anime.id}`;
   const continueInfo = getContinuePlayUrl(anime);
+  const seasonNum = anime.seasonNumber || continueInfo.seasonNumber || 1;
   const playUrl = continueInfo.url;
 
   useEffect(() => {
@@ -92,7 +93,7 @@ export const AnimePosterCard: React.FC<AnimePosterCardProps> = ({ anime }) => {
                 {anime.averageScore ? `★ ${(anime.averageScore / 10).toFixed(1)}` : 'Popular'}
               </span>
               <span>•</span>
-              <span>{isMovie ? 'Movie' : `${anime.episodes || '?'} Eps`}</span>
+              <span>{isMovie ? 'Movie' : `S${seasonNum} • ${anime.episodes || '?'} Eps`}</span>
             </div>
 
             <p className="text-[11px] text-[#9AA0A6] line-clamp-3 sm:line-clamp-4 leading-relaxed">
@@ -120,7 +121,15 @@ export const AnimePosterCard: React.FC<AnimePosterCardProps> = ({ anime }) => {
               className="flex-1 bg-[#F47521] hover:bg-[#FF8533] text-black font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
-              <span>{isMovie ? 'Play' : continueInfo.lastWatched ? `Resume E${continueInfo.lastWatched.episodeNumber}` : 'S1 E1'}</span>
+              <span>
+                {isMovie
+                  ? 'Play'
+                  : continueInfo.lastWatched
+                    ? (continueInfo.lastWatched.seasonNumber && continueInfo.lastWatched.seasonNumber > 1
+                        ? `Resume S${continueInfo.lastWatched.seasonNumber} E${continueInfo.lastWatched.episodeNumber}`
+                        : `Resume E${continueInfo.lastWatched.episodeNumber}`)
+                    : `S${seasonNum} E1`}
+              </span>
             </button>
 
             <button
@@ -148,7 +157,7 @@ export const AnimePosterCard: React.FC<AnimePosterCardProps> = ({ anime }) => {
           {title}
         </Link>
         <p className="text-[11px] text-[#8E93A0] flex items-center gap-1.5 font-normal">
-          <span>{isMovie ? 'Feature Film' : 'Sub | Dub'}</span>
+          <span>{isMovie ? 'Feature Film' : `Season ${seasonNum} • Sub | Dub`}</span>
           {anime.seasonYear && (
             <>
               <span>•</span>

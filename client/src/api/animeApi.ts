@@ -213,28 +213,109 @@ export function getLastWatched(anilistId: number, franchiseIds?: number[]): Watc
   }
 }
 
+/**
+ * Robust season detector for AnimeMedia
+ */
+export function detectSeasonNumber(media: any): number {
+  if (!media) return 1;
+  if (typeof media.seasonNumber === 'number' && media.seasonNumber > 0) {
+    return media.seasonNumber;
+  }
+
+  const titles = [
+    media.title?.english,
+    media.title?.romaji,
+    media.title?.userPreferred,
+    typeof media.title === 'string' ? media.title : ''
+  ].filter(Boolean);
+
+  for (const t of titles) {
+    // 1. Explicit Season X (e.g. 'Season 3', 'Season 2', 'S2', 'S3')
+    const matchExplicit = t.match(/\b(?:Season|S)\s*(\d+)\b/i);
+    if (matchExplicit) return parseInt(matchExplicit[1], 10);
+
+    // 2. Ordinal Season (e.g. '2nd Season', '3rd Season', '4th Season')
+    const matchOrdinal = t.match(/\b(\d+)(?:st|nd|rd|th)\s*Season\b/i);
+    if (matchOrdinal) return parseInt(matchOrdinal[1], 10);
+
+    // 3. Final Season
+    if (/\bfinal\s*season\b/i.test(t)) return 4;
+
+    // 4. Roman numerals: e.g. 'Mob Psycho 100 III', 'Overlord IV'
+    const matchRoman = t.match(/\b(?:Season\s*)?(VII|VI|IV|V|III|II)\b/i);
+    if (matchRoman) {
+      const romanMap: Record<string, number> = { II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7 };
+      const val = romanMap[matchRoman[1].toUpperCase()];
+      if (val) return val;
+    }
+
+    // 5. Title ends with number: e.g. 'KonoSuba 3', 'Kingdom 5'
+    const matchEndNum = t.match(/\b([2-9])\s*(?::|$)/);
+    if (matchEndNum && !/\b(?:20\d\d|19\d\d)\b/.test(t)) {
+      return parseInt(matchEndNum[1], 10);
+    }
+
+    // 6. Known Demon Slayer arcs
+    if (/swordsmith\s*village|katanakaji/i.test(t)) return 4;
+    if (/entertainment\s*district|yukaku/i.test(t)) return 3;
+    if (/hashira\s*training|hashira\s*geiko/i.test(t)) return 5;
+    if (/mugen\s*train|mugen\s*ressha/i.test(t)) return 2;
+    if (/thousand-year\s*blood\s*war/i.test(t)) return 2;
+  }
+
+  // Fallback: check prequels count in relations if available
+  if (media.relations?.edges) {
+    let prequelCount = 0;
+    for (const edge of media.relations.edges) {
+      if (edge.relationType === 'PREQUEL') prequelCount++;
+    }
+    if (prequelCount > 0) return prequelCount + 1;
+  }
+
+  return 1;
+}
+
 export function getContinuePlayUrl(
   media: AnimeMedia,
   franchiseIds?: number[]
-): { url: string; label: string; lastWatched: WatchHistoryItem | null } {
+): {
+  url: string;
+  label: string;
+  seasonNumber: number;
+  episodeNumber: number;
+  lastWatched: WatchHistoryItem | null;
+} {
   const isMovie = media.format === 'MOVIE';
   if (isMovie) {
-    return { url: `/watch/${media.id}`, label: 'WATCH MOVIE', lastWatched: null };
+    return {
+      url: `/watch/${media.id}`,
+      label: 'WATCH MOVIE',
+      seasonNumber: 1,
+      episodeNumber: 1,
+      lastWatched: null
+    };
   }
 
+  const detectedSeason = media.seasonNumber || detectSeasonNumber(media);
   const lastWatched = getLastWatched(media.id, franchiseIds);
+
   if (lastWatched) {
-    const seasonStr = lastWatched.seasonNumber && lastWatched.seasonNumber > 1 ? `S${lastWatched.seasonNumber} ` : '';
+    const sNum = lastWatched.seasonNumber || detectedSeason;
+    const seasonStr = sNum > 1 ? `S${sNum} ` : '';
     return {
       url: `/watch/${lastWatched.anilistId}/ep/${lastWatched.episodeNumber}`,
       label: `CONTINUE ${seasonStr}E${lastWatched.episodeNumber}`,
+      seasonNumber: sNum,
+      episodeNumber: lastWatched.episodeNumber,
       lastWatched
     };
   }
 
   return {
     url: `/watch/${media.id}/ep/1`,
-    label: 'WATCH S1 E1',
+    label: `WATCH S${detectedSeason} E1`,
+    seasonNumber: detectedSeason,
+    episodeNumber: 1,
     lastWatched: null
   };
 }

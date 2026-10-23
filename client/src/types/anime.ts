@@ -37,6 +37,7 @@ export interface AnimeMedia {
   duration?: number | null;
   season?: string;
   seasonYear?: number;
+  seasonNumber?: number;
   averageScore?: number;
   popularity?: number;
   source?: string;

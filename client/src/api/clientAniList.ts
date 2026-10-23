@@ -6,7 +6,7 @@ import {
   AiringScheduleItem
 } from '../types/anime';
 import { AnimeDetailResponse } from './animeApi';
-import { resolveCrosswalkStream } from './crosswalkResolver';
+import { resolveCrosswalkStream, detectSeasonNumber } from './crosswalkResolver';
 
 const ANILIST_GRAPHQL_ENDPOINT = 'https://graphql.anilist.co';
 
@@ -127,16 +127,21 @@ export async function clientFetchHomeCatalog(): Promise<HomeCatalogResponse> {
   `;
 
   const data = await fetchGraphQL(query, { season, seasonYear: year });
+  const enrich = (list: any[]) => (list || []).map((m: any) => ({
+    ...m,
+    seasonNumber: detectSeasonNumber(m)
+  }));
+
   return {
     season,
     year,
-    spotlight: data?.spotlight?.media || [],
-    trending: data?.trending?.media || [],
-    simulcast: data?.simulcast?.media || [],
-    popularMovies: data?.popularMovies?.media || [],
-    topRated: data?.topRated?.media || [],
-    actionRail: data?.actionRail?.media || [],
-    fantasyRail: data?.fantasyRail?.media || []
+    spotlight: enrich(data?.spotlight?.media),
+    trending: enrich(data?.trending?.media),
+    simulcast: enrich(data?.simulcast?.media),
+    popularMovies: enrich(data?.popularMovies?.media),
+    topRated: enrich(data?.topRated?.media),
+    actionRail: enrich(data?.actionRail?.media),
+    fantasyRail: enrich(data?.fantasyRail?.media)
   };
 }
 
@@ -194,7 +199,10 @@ export async function clientFetchBrowse(params: any = {}): Promise<BrowseRespons
   const data = await fetchGraphQL(query, variables);
   return {
     pageInfo: data?.Page?.pageInfo || { total: 0, perPage: 24, currentPage: 1, lastPage: 1, hasNextPage: false },
-    media: data?.Page?.media || []
+    media: (data?.Page?.media || []).map((m: any) => ({
+      ...m,
+      seasonNumber: detectSeasonNumber(m)
+    }))
   };
 }
 
@@ -328,9 +336,12 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
   if (!media) throw new Error('Anime not found on AniList');
 
   const isMovie = media.format === 'MOVIE';
+  const mediaTitle = media.title?.english || media.title?.romaji || '';
 
   // Resolve true crosswalk stream (TMDb / IMDb ID with season & offset)
-  const defaultStream = await resolveCrosswalkStream(media.id, 1, media.format, media.idMal);
+  const defaultStream = await resolveCrosswalkStream(media.id, 1, media.format, media.idMal, mediaTitle);
+  const detectedMediaSeason = detectSeasonNumber(media);
+  const effectiveSeason = defaultStream.resolvedSeason || detectedMediaSeason || 1;
 
   // Generate episode items & streams
   let episodes: EpisodeItemDTO[] = [];
@@ -379,7 +390,7 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
     }
 
     const externalId = defaultStream.externalId;
-    const season = defaultStream.resolvedSeason || 1;
+    const season = effectiveSeason;
     const offset = Math.max(0, (defaultStream.resolvedEpisode || 1) - 1);
 
     for (let i = 1; i <= count; i++) {
@@ -416,8 +427,8 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
   const franchiseSeasons: FranchiseSeasonNode[] = [{
     anilistId: media.id,
     malId: media.idMal,
-    seasonNumberLabel: 'Season 1',
-    title: media.title.english || media.title.romaji || 'Season 1',
+    seasonNumberLabel: `Season ${effectiveSeason}`,
+    title: media.title.english || media.title.romaji || `Season ${effectiveSeason}`,
     format: media.format,
     episodesCount: media.episodes || episodes.length,
     seasonYear: media.seasonYear,
@@ -426,16 +437,16 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
   }];
 
   if (media.relations?.edges) {
-    let sIdx = 2;
     for (const rel of media.relations.edges) {
       if (rel.relationType === 'SEQUEL' || rel.relationType === 'PREQUEL') {
         const node = rel.node;
         if (node && (node.format === 'TV' || node.format === 'TV_SHORT' || node.format === 'ONA')) {
+          const nodeSeason = detectSeasonNumber(node);
           franchiseSeasons.push({
             anilistId: node.id,
             malId: node.idMal,
-            seasonNumberLabel: `Season ${sIdx++}`,
-            title: node.title?.english || node.title?.romaji || `Season ${sIdx}`,
+            seasonNumberLabel: `Season ${nodeSeason}`,
+            title: node.title?.english || node.title?.romaji || `Season ${nodeSeason}`,
             format: node.format,
             episodesCount: node.episodes || 12,
             seasonYear: node.seasonYear,
