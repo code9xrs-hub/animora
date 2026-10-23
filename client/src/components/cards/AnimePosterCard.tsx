@@ -156,17 +156,17 @@ export const AnimePosterCard: React.FC<AnimePosterCardProps> = ({ anime }) => {
         >
           {title}
         </Link>
-        <div className="flex items-center justify-between gap-1 text-[11px] text-[#8E93A0] leading-none pt-0.5">
-          <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-            <span className="text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider text-[#F47521] bg-[#F47521]/15 border border-[#F47521]/30 px-1.5 py-0.5 rounded leading-none flex-shrink-0 shadow-sm">
-              {isMovie ? 'Movie' : <><span className="xs:hidden">S{seasonNum}</span><span className="hidden xs:inline">Season {seasonNum}</span></>}
+        <div className="flex items-center justify-between gap-1 w-full overflow-hidden whitespace-nowrap text-[10px] sm:text-[11px] text-[#8E93A0] leading-none pt-0.5 select-none">
+          <div className="flex items-center gap-1.5 min-w-0 flex-shrink-0">
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#F47521] bg-[#F47521]/15 border border-[#F47521]/30 px-1.5 py-0.5 rounded leading-none flex-shrink-0 shadow-sm">
+              {isMovie ? 'Movie' : <><span className="sm:hidden">S{seasonNum}</span><span className="hidden sm:inline">Season {seasonNum}</span></>}
             </span>
-            <span className="text-[9.5px] sm:text-[11px] text-[#2ABDBB] font-medium tracking-tight truncate">
+            <span className="text-[9.5px] sm:text-[11px] text-[#2ABDBB] font-semibold tracking-tight flex-shrink-0">
               Sub | Dub
             </span>
           </div>
           {anime.seasonYear && (
-            <span className="text-[9.5px] sm:text-[11px] font-mono text-[#8E93A0] font-medium flex-shrink-0">
+            <span className="text-[9.5px] sm:text-[11px] font-mono text-[#8E93A0] font-medium flex-shrink-0 ml-auto">
               {anime.seasonYear}
             </span>
           )}

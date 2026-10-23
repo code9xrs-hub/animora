@@ -3,14 +3,35 @@ import { Film, Download, Star } from 'lucide-react';
 import { fetchBrowse } from '../api/animeApi';
 import { AnimeMedia } from '../types/anime';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
+import { HeroBannerCarousel } from '../components/home/HeroBannerCarousel';
 import { SEO } from '../components/common/SEO';
 import { GridSkeleton } from '../components/common/Shimmer';
 
 export const MoviesPage: React.FC = () => {
   const [movies, setMovies] = useState<AnimeMedia[]>([]);
+  const [spotlightMovies, setSpotlightMovies] = useState<AnimeMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<'POPULARITY_DESC' | 'SCORE_DESC' | 'START_DATE_DESC'>('POPULARITY_DESC');
+
+  // Load top spotlight movies once for home-page type hero slider
+  useEffect(() => {
+    async function loadSpotlight() {
+      try {
+        const res = await fetchBrowse({
+          format: 'MOVIE',
+          sort: 'POPULARITY_DESC',
+          perPage: 8
+        });
+        if (res.media && res.media.length > 0) {
+          setSpotlightMovies(res.media);
+        }
+      } catch (e) {
+        console.warn('Failed to load spotlight movies:', e);
+      }
+    }
+    loadSpotlight();
+  }, []);
 
   useEffect(() => {
     async function loadMovies() {
@@ -33,13 +54,20 @@ export const MoviesPage: React.FC = () => {
   }, [sort]);
 
   return (
-    <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 w-full pb-20">
+    <div className="w-full pb-20">
       <SEO
         title="Anime Movies — Watch Popular Feature Films in HD"
         description="Stream critically acclaimed theatrical releases, standalone anime films, and franchise epics in HD with zero-wait direct downloads on Animora."
         type="video.movie"
       />
-      {/* Hero Header */}
+
+      {/* Home Page Style Feature Film Slider */}
+      {spotlightMovies.length > 0 && (
+        <HeroBannerCarousel items={spotlightMovies} />
+      )}
+
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-8 w-full">
+        {/* Hub Header & Sort Controls */}
       <div className="bg-gradient-to-r from-[#181A22] via-[#14151B] to-[#0E0F13] border border-white/[0.08] rounded-2xl p-5 sm:p-8 md:p-10 mb-6 sm:mb-8 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2.5 sm:space-y-3 max-w-2xl">
@@ -111,6 +139,7 @@ export const MoviesPage: React.FC = () => {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 };
