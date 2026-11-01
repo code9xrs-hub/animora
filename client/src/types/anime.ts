@@ -61,12 +61,12 @@ export interface AnimeMedia {
       node: {
         id: number;
         name: { full: string };
-        image: { medium: string };
+        image: { large?: string; medium: string };
       };
       voiceActors: Array<{
         id: number;
         name: { full: string };
-        image: { medium: string };
+        image: { large?: string; medium: string };
       }>;
     }>;
   };

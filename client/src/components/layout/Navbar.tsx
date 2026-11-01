@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Search,
   Bookmark,
@@ -11,125 +11,156 @@ import {
   Sparkles,
   Flame,
   Menu,
-  Download
+  Download,
+  Home,
+  Compass
 } from 'lucide-react';
 import { fetchBrowse } from '../../api/animeApi';
+import { getAnimeUrl } from '../../lib/slug';
+import { getHighResPoster } from '../../lib/imageUtils';
 import { AnimeMedia } from '../../types/anime';
 import { usePWAInstall } from '../../hooks/usePWAInstall';
+import { useWatchlist } from '../../lib/userStore';
+import { GENRES } from '../../constants/catalog';
 import { PWAInstallModal } from '../common/PWAInstallModal';
 
-const GENRES = [
-  'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy',
-  'Horror', 'Mystery', 'Psychological', 'Romance',
-  'Sci-Fi', 'Slice of Life', 'Sports', 'Supernatural', 'Thriller'
+const MOBILE_LINKS = [
+  { to: '/', label: 'Home', icon: Home },
+  { to: '/browse', label: 'Browse All Anime', icon: Compass },
+  { to: '/movies', label: 'Anime Movies', icon: Film },
+  { to: '/calendar', label: 'Simulcast Calendar', icon: Calendar }
 ];
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { canInstall, installApp, showIOSPrompt, setShowIOSPrompt } = usePWAInstall();
   const [isBrowseOpen, setIsBrowseOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<AnimeMedia[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [watchlistCount, setWatchlistCount] = useState(0);
+  // The query the current results belong to; while it lags behind the input a search is pending.
+  const [resultsFor, setResultsFor] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const watchlistCount = useWatchlist().length;
 
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  // Separate refs: both inputs exist in the DOM, only one is visible per breakpoint.
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchInputRef = useRef<HTMLInputElement>(null);
   const browseDropdownRef = useRef<HTMLDivElement>(null);
+  const trimmedQuery = searchQuery.trim();
+  const isSearching = trimmedQuery !== resultsFor;
 
-  // Sync Watchlist Count
-  const updateWatchlistCount = () => {
-    try {
-      const stored = localStorage.getItem('animora_watchlist') || localStorage.getItem('crunchyroll_watchlist');
-      if (stored) {
-        const list = JSON.parse(stored);
-        setWatchlistCount(list.length);
-      } else {
-        setWatchlistCount(0);
-      }
-    } catch {
-      setWatchlistCount(0);
-    }
-  };
-
-  useEffect(() => {
-    updateWatchlistCount();
-    window.addEventListener('watchlist_updated', updateWatchlistCount);
-    return () => window.removeEventListener('watchlist_updated', updateWatchlistCount);
+  const closeSearch = useCallback(() => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setResultsFor('');
   }, []);
 
-  // Debounced Live Search
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
-    }
+  // Close every overlay when the route changes (covers browser back/forward too)
+  const [lastPath, setLastPath] = useState(location.pathname + location.search);
+  const currentPath = location.pathname + location.search;
+  if (currentPath !== lastPath) {
+    setLastPath(currentPath);
+    setIsBrowseOpen(false);
+    setIsMobileMenuOpen(false);
+    closeSearch();
+  }
 
-    setIsSearching(true);
+  // Debounced live search; stale responses from earlier keystrokes are ignored
+  useEffect(() => {
+    if (!trimmedQuery) return;
+
+    let isStale = false;
     const timeout = setTimeout(async () => {
       try {
-        const data = await fetchBrowse({ search: searchQuery, perPage: 6 });
-        setSearchResults(data.media || []);
+        const data = await fetchBrowse({ search: trimmedQuery, perPage: 6 });
+        if (!isStale) {
+          setSearchResults(data.media || []);
+          setResultsFor(trimmedQuery);
+        }
       } catch (e) {
+        if (!isStale) {
+          setSearchResults([]);
+          setResultsFor(trimmedQuery);
+        }
         console.error('Search error:', e);
-      } finally {
-        setIsSearching(false);
       }
     }, 300);
 
-    return () => clearTimeout(timeout);
-  }, [searchQuery]);
+    return () => {
+      isStale = true;
+      clearTimeout(timeout);
+    };
+  }, [trimmedQuery]);
 
   // Auto focus input when search drawer opens
   useEffect(() => {
-    if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
+    if (!isSearchOpen) return;
+    const visibleInput = [mobileSearchInputRef.current, desktopSearchInputRef.current].find(
+      (el) => el && el.offsetParent !== null
+    );
+    visibleInput?.focus();
   }, [isSearchOpen]);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click or Escape
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (browseDropdownRef.current && !browseDropdownRef.current.contains(e.target as Node)) {
         setIsBrowseOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsBrowseOpen(false);
+        setIsMobileMenuOpen(false);
+        closeSearch();
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [closeSearch]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/browse?search=${encodeURIComponent(searchQuery.trim())}`);
-      setIsSearchOpen(false);
-      setSearchQuery('');
+    if (trimmedQuery) {
+      navigate(`/browse?search=${encodeURIComponent(trimmedQuery)}`);
+      closeSearch();
     }
   };
 
+  const showResults = Boolean(trimmedQuery);
+
   const renderSearchResultsList = () => (
     <>
-      {isSearching && (
-        <div className="p-3 text-center text-xs text-[#A0A0A0]">
-          Searching AniList catalog...
+      {isSearching && searchResults.length === 0 && (
+        <div className="p-4 text-center text-xs text-[#A0A0A0]">
+          Searching…
         </div>
       )}
-      {!isSearching && searchResults.map((anime) => (
+      {!isSearching && searchResults.length === 0 && (
+        <div className="p-4 text-center text-xs text-[#A0A0A0]">
+          No titles match “{trimmedQuery}”
+        </div>
+      )}
+      {searchResults.map((anime) => (
         <Link
           key={anime.id}
-          to={anime.format === 'MOVIE' ? `/movie/${anime.id}` : `/series/${anime.id}`}
-          onClick={() => {
-            setIsSearchOpen(false);
-            setSearchQuery('');
-          }}
-          className="flex items-center gap-3 p-3 hover:bg-[#2B2E36] transition border-b border-[#4A4E58]/30 last:border-b-0"
+          to={getAnimeUrl(anime)}
+          state={{ anilistId: anime.id }}
+          onClick={closeSearch}
+          className={`flex items-center gap-3 p-3 hover:bg-white/[0.06] transition border-b border-white/[0.05] last:border-b-0 ${isSearching ? 'opacity-60' : ''}`}
         >
           <img
-            src={anime.coverImage?.large || anime.coverImage?.extraLarge}
-            alt={anime.title.english || anime.title.romaji}
-            className="w-12 h-16 object-cover rounded shadow flex-shrink-0"
+            src={getHighResPoster(anime)}
+            alt=""
+            loading="lazy"
+            className="w-11 h-15 object-cover rounded-md shadow flex-shrink-0 bg-white/5"
           />
           <div className="flex-1 min-w-0">
             <h4 className="text-sm font-semibold text-white truncate">
@@ -139,37 +170,34 @@ export const Navbar: React.FC = () => {
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#F47521]/20 text-[#F47521]">
                 {anime.format}
               </span>
-              {anime.averageScore && (
+              {anime.averageScore ? (
                 <span className="text-xs text-[#FAB818] font-semibold">
                   ★ {(anime.averageScore / 10).toFixed(1)}
                 </span>
-              )}
-              {anime.seasonYear && (
+              ) : null}
+              {anime.seasonYear ? (
                 <span className="text-xs text-[#A0A0A0]">
                   {anime.seasonYear}
                 </span>
-              )}
+              ) : null}
             </div>
           </div>
         </Link>
       ))}
-      {!isSearching && searchResults.length > 0 && (
+      {searchResults.length > 0 && (
         <Link
-          to={`/browse?search=${encodeURIComponent(searchQuery)}`}
-          onClick={() => {
-            setIsSearchOpen(false);
-            setSearchQuery('');
-          }}
-          className="block p-2.5 text-center text-xs font-bold text-[#F47521] bg-[#141519] hover:underline"
+          to={`/browse?search=${encodeURIComponent(trimmedQuery)}`}
+          onClick={closeSearch}
+          className="block p-2.5 text-center text-xs font-bold text-[#F47521] bg-black/30 hover:bg-black/50 transition-colors"
         >
-          View all matching results →
+          View all results →
         </Link>
       )}
     </>
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#000000]/95 backdrop-blur-md border-b border-[#2B2E36]/80">
+    <header className="sticky top-0 z-50 w-full bg-[#0B0C10]/90 backdrop-blur-xl border-b border-white/[0.06]">
       {/* Mobile Full-Header Search Overlay */}
       {isSearchOpen && (
         <>
@@ -177,9 +205,10 @@ export const Navbar: React.FC = () => {
             <form onSubmit={handleSearchSubmit} className="relative flex-1 flex items-center">
               <Search className="w-4 h-4 text-[#A0A0A0] absolute left-3.5 pointer-events-none" />
               <input
-                ref={searchInputRef}
-                type="text"
-                autoFocus
+                ref={mobileSearchInputRef}
+                type="search"
+                aria-label="Search anime"
+                enterKeyHint="search"
                 placeholder="Search anime, movies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -189,6 +218,7 @@ export const Navbar: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
+                  aria-label="Clear search"
                   className="absolute right-2.5 text-[#A0A0A0] hover:text-white p-1"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -197,10 +227,7 @@ export const Navbar: React.FC = () => {
             </form>
             <button
               type="button"
-              onClick={() => {
-                setIsSearchOpen(false);
-                setSearchQuery('');
-              }}
+              onClick={closeSearch}
               className="text-xs font-semibold text-[#A0A0A0] hover:text-white px-2 py-1.5 transition-colors flex-shrink-0"
             >
               Cancel
@@ -208,8 +235,8 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Instant Search Results Dropdown */}
-          {(searchResults.length > 0 || isSearching) && (
-            <div className="md:hidden fixed top-16 left-0 right-0 max-h-[75vh] overflow-y-auto bg-[#1C1E25]/98 backdrop-blur-xl border-b border-[#363A45] shadow-2xl z-50">
+          {showResults && (
+            <div className="md:hidden fixed top-16 left-0 right-0 max-h-[75vh] overflow-y-auto overscroll-contain animate-pop bg-[#16181F]/98 backdrop-blur-xl border-b border-[#363A45] shadow-2xl z-50">
               {renderSearchResultsList()}
             </div>
           )}
@@ -236,6 +263,8 @@ export const Navbar: React.FC = () => {
             <div className="relative" ref={browseDropdownRef}>
               <button
                 onClick={() => setIsBrowseOpen(!isBrowseOpen)}
+                aria-expanded={isBrowseOpen}
+                aria-haspopup="true"
                 className={`flex items-center gap-1.5 transition-colors py-2 ${
                   isBrowseOpen ? 'text-[#F47521]' : 'text-white hover:text-[#F47521]'
                 }`}
@@ -246,7 +275,7 @@ export const Navbar: React.FC = () => {
 
               {/* Mega-Menu Popover */}
               {isBrowseOpen && (
-                <div className="absolute top-full left-0 mt-2 w-[680px] bg-[#181A22]/98 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-6 grid grid-cols-12 gap-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full left-0 mt-2 w-[680px] bg-[#181A22]/98 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-6 grid grid-cols-12 gap-6 z-50 animate-pop">
                   {/* Left Column: Quick Curated Links */}
                   <div className="col-span-4 border-r border-white/[0.08] pr-4 space-y-1.5">
                     <span className="text-xs font-semibold text-[#8E93A0] uppercase tracking-wider block mb-3">
@@ -339,10 +368,8 @@ export const Navbar: React.FC = () => {
 
           {/* Mobile Search Button Trigger (opens full-header mobile search overlay) */}
           <button
-            onClick={() => {
-              setIsSearchOpen(true);
-              setTimeout(() => searchInputRef.current?.focus(), 50);
-            }}
+            onClick={() => setIsSearchOpen(true)}
+            aria-label="Search anime"
             className="md:hidden p-2 text-[#8E93A0] hover:text-white hover:bg-white/10 rounded-full transition-colors"
             title="Search Anime"
           >
@@ -354,8 +381,9 @@ export const Navbar: React.FC = () => {
             {isSearchOpen ? (
               <form onSubmit={handleSearchSubmit} className="relative flex items-center">
                 <input
-                  ref={searchInputRef}
-                  type="text"
+                  ref={desktopSearchInputRef}
+                  type="search"
+                  aria-label="Search anime"
                   placeholder="Search anime..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -364,10 +392,8 @@ export const Navbar: React.FC = () => {
                 <Search className="w-4 h-4 text-[#8E93A0] absolute left-3 pointer-events-none" />
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsSearchOpen(false);
-                    setSearchQuery('');
-                  }}
+                  onClick={closeSearch}
+                  aria-label="Close search"
                   className="absolute right-2.5 text-[#8E93A0] hover:text-white p-1"
                 >
                   <X className="w-4 h-4" />
@@ -375,10 +401,8 @@ export const Navbar: React.FC = () => {
               </form>
             ) : (
               <button
-                onClick={() => {
-                  setIsSearchOpen(true);
-                  setTimeout(() => searchInputRef.current?.focus(), 50);
-                }}
+                onClick={() => setIsSearchOpen(true)}
+                aria-label="Search anime"
                 className="p-2 text-[#8E93A0] hover:text-white hover:bg-white/10 rounded-full transition-colors"
                 title="Search Anime"
               >
@@ -387,8 +411,8 @@ export const Navbar: React.FC = () => {
             )}
 
             {/* Desktop Instant Search Results Dropdown */}
-            {isSearchOpen && (searchResults.length > 0 || isSearching) && (
-              <div className="absolute right-0 top-full mt-2 w-96 bg-[#181A22]/98 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
+            {isSearchOpen && showResults && (
+              <div className="absolute right-0 top-full mt-2 w-96 bg-[#181A22]/98 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-pop">
                 {renderSearchResultsList()}
               </div>
             )}
@@ -399,11 +423,12 @@ export const Navbar: React.FC = () => {
             to="/watchlist"
             className="hidden md:flex relative p-2 text-[#8E93A0] hover:text-white hover:bg-white/10 rounded-full transition-colors"
             title="My Watchlist"
+            aria-label={`My Watchlist${watchlistCount ? ` (${watchlistCount})` : ''}`}
           >
             <Bookmark className="w-5 h-5" />
             {watchlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#F47521] text-black font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-                {watchlistCount}
+              <span className="absolute -top-1 -right-1 bg-[#F47521] text-black font-bold text-[10px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+                {watchlistCount > 99 ? '99+' : watchlistCount}
               </span>
             )}
           </Link>
@@ -413,6 +438,7 @@ export const Navbar: React.FC = () => {
             to="/watchlist?tab=history"
             className="p-2 text-[#8E93A0] hover:text-white hover:bg-white/10 rounded-full transition-colors"
             title="Watch History"
+            aria-label="Watch History"
           >
             <History className="w-5 h-5" />
           </Link>
@@ -420,6 +446,8 @@ export const Navbar: React.FC = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
             className="md:hidden p-2 text-[#8E93A0] hover:text-white transition-colors"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -429,35 +457,18 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#181A22]/98 backdrop-blur-2xl border-t border-white/10 px-4 py-4 space-y-3">
-          <Link
-            to="/"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-white font-semibold hover:text-[#F47521] transition-colors"
-          >
-            Home
-          </Link>
-          <Link
-            to="/browse"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-white font-semibold hover:text-[#F47521] transition-colors"
-          >
-            Browse All Anime
-          </Link>
-          <Link
-            to="/movies"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-white font-semibold hover:text-[#F47521] transition-colors"
-          >
-            Anime Movies
-          </Link>
-          <Link
-            to="/calendar"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-white font-semibold hover:text-[#F47521] transition-colors"
-          >
-            Simulcast Calendar
-          </Link>
+        <nav aria-label="Mobile menu" className="md:hidden animate-pop bg-[#16181F]/98 backdrop-blur-2xl border-t border-white/10 px-4 py-3 space-y-1">
+          {MOBILE_LINKS.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-white/90 hover:bg-white/[0.06] hover:text-[#F47521] transition-colors"
+            >
+              <link.icon className="w-4 h-4 text-[#8E93A0]" />
+              {link.label}
+            </Link>
+          ))}
 
           {/* Mobile View: Under Drawer Install App Button */}
           {canInstall && (
@@ -474,7 +485,7 @@ export const Navbar: React.FC = () => {
               </button>
             </div>
           )}
-        </div>
+        </nav>
       )}
 
       {/* PWA iOS / Fallback Guide Modal */}

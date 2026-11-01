@@ -206,8 +206,42 @@ export async function clientFetchBrowse(params: any = {}): Promise<BrowseRespons
   };
 }
 
-export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailResponse> {
-  const numericId = Number(id);
+export async function clientFetchAnimeDetail(
+  id: string,
+  options?: { format?: string; seasonYear?: number }
+): Promise<AnimeDetailResponse> {
+  let numericId = Number(id);
+
+  if (isNaN(numericId) || numericId <= 0) {
+    let cleanSearch = String(id);
+    const match1x1 = cleanSearch.match(/^(.+?)-(\d+)x(\d+)$/i);
+    if (match1x1) {
+      cleanSearch = match1x1[1];
+    }
+    const matchSeason = cleanSearch.match(/^(.+?)-season-(\d+)$/i);
+    if (matchSeason) {
+      cleanSearch = matchSeason[1];
+    }
+    cleanSearch = cleanSearch.replace(/-/g, ' ').trim();
+
+    const resolveQuery = `
+      query ResolveMediaId($search: String, $format: MediaFormat, $seasonYear: Int) {
+        Media(search: $search, format: $format, seasonYear: $seasonYear, type: ANIME) {
+          id
+        }
+      }
+    `;
+    const searchData = await fetchGraphQL(resolveQuery, {
+      search: cleanSearch,
+      format: options?.format || undefined,
+      seasonYear: options?.seasonYear ? Number(options?.seasonYear) : undefined
+    });
+    if (searchData?.Media?.id) {
+      numericId = searchData.Media.id;
+    } else {
+      throw new Error(`Anime not found for "${id}"`);
+    }
+  }
 
   const query = `
     query MediaDetailWithRelations($id: Int!) {
@@ -385,7 +419,11 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
       if (match) {
         const epNum = parseInt(match[1], 10);
         let cleanTitle = s.title.replace(/^(?:Episode\s+\d+|E\d+|\d+)\s*[-.:]\s*/i, '').trim() || `Episode ${epNum}`;
-        streamMap.set(epNum, { cleanTitle, thumbnail: s.thumbnail });
+        let highResThumbnail = s.thumbnail;
+        if (highResThumbnail && typeof highResThumbnail === 'string' && highResThumbnail.includes('crunchyroll.com')) {
+          highResThumbnail = highResThumbnail.replace(/_(?:thumb|small|medium|wide|widestar)\.jpg(\?.*)?$/i, '_full.jpg$1');
+        }
+        streamMap.set(epNum, { cleanTitle, thumbnail: highResThumbnail });
       }
     }
 
@@ -432,7 +470,7 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
     format: media.format,
     episodesCount: media.episodes || episodes.length,
     seasonYear: media.seasonYear,
-    coverImage: media.coverImage?.large,
+    coverImage: media.coverImage?.extraLarge || media.coverImage?.large,
     isCurrent: true
   }];
 
@@ -450,7 +488,7 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
             format: node.format,
             episodesCount: node.episodes || 12,
             seasonYear: node.seasonYear,
-            coverImage: node.coverImage?.large,
+            coverImage: node.coverImage?.extraLarge || node.coverImage?.large,
             isCurrent: false
           });
         }
@@ -465,15 +503,19 @@ export async function clientFetchAnimeDetail(id: string): Promise<AnimeDetailRes
   };
 }
 
-export async function clientFetchCalendar(year: number, month: number): Promise<AiringScheduleItem[]> {
-  const startOfMonth = Math.floor(new Date(year, month - 1, 1).getTime() / 1000);
-  const endOfMonth = Math.floor(new Date(year, month, 0, 23, 59, 59).getTime() / 1000);
+export async function clientFetchCalendar(year?: number, month?: number, startUnix?: number, endUnix?: number): Promise<AiringScheduleItem[]> {
+  const now = Math.floor(Date.now() / 1000);
+  const start = startUnix || (year && month ? Math.floor(new Date(year, month - 1, 1).getTime() / 1000) : (now - 3 * 86400));
+  const end = endUnix || (year && month ? Math.floor(new Date(year, month, 0, 23, 59, 59).getTime() / 1000) : (now + 4 * 86400));
 
   const query = `
     ${MEDIA_CARD_FRAGMENT}
-    query AiringCalendarBatch($start: Int, $end: Int) {
-      Page(page: 1, perPage: 50) {
-        airingSchedules(airingAt_greater: $start, airingAt_lesser: $end) {
+    query AiringCalendarBatch($start: Int, $end: Int, $page: Int) {
+      Page(page: $page, perPage: 50) {
+        pageInfo {
+          hasNextPage
+        }
+        airingSchedules(airingAt_greater: $start, airingAt_lesser: $end, sort: TIME) {
           id
           airingAt
           timeUntilAiring
@@ -486,6 +528,17 @@ export async function clientFetchCalendar(year: number, month: number): Promise<
     }
   `;
 
-  const data = await fetchGraphQL(query, { start: startOfMonth, end: endOfMonth });
-  return data?.Page?.airingSchedules || [];
+  const allSchedules: AiringScheduleItem[] = [];
+  for (let page = 1; page <= 4; page++) {
+    try {
+      const data = await fetchGraphQL(query, { start, end, page });
+      const items = data?.Page?.airingSchedules || [];
+      allSchedules.push(...items);
+      if (!data?.Page?.pageInfo?.hasNextPage) break;
+    } catch {
+      break;
+    }
+  }
+
+  return allSchedules;
 }

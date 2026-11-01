@@ -1,32 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Compass, Film, Calendar, Bookmark } from 'lucide-react';
+import { useWatchlist } from '../../lib/userStore';
 
 export const MobileBottomNav: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const [watchlistCount, setWatchlistCount] = useState(0);
-
-  // Sync watchlist count from localStorage
-  const updateWatchlistCount = () => {
-    try {
-      const stored = localStorage.getItem('animora_watchlist') || localStorage.getItem('crunchyroll_watchlist');
-      if (stored) {
-        const list = JSON.parse(stored);
-        setWatchlistCount(list.length);
-      } else {
-        setWatchlistCount(0);
-      }
-    } catch {
-      setWatchlistCount(0);
-    }
-  };
-
-  useEffect(() => {
-    updateWatchlistCount();
-    window.addEventListener('watchlist_updated', updateWatchlistCount);
-    return () => window.removeEventListener('watchlist_updated', updateWatchlistCount);
-  }, []);
+  const watchlistCount = useWatchlist().length;
 
   const navItems = [
     {
@@ -79,6 +59,7 @@ export const MobileBottomNav: React.FC = () => {
             <Link
               key={item.name}
               to={item.to}
+              aria-current={item.isActive ? 'page' : undefined}
               className={`relative flex flex-col items-center justify-center flex-1 py-1 px-1 transition-all duration-200 select-none active:scale-95 ${
                 item.isActive ? 'text-[#F47521]' : 'text-[#8A8F9D] hover:text-white'
               }`}

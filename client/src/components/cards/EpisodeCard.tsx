@@ -1,42 +1,46 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Download, CheckCircle2 } from 'lucide-react';
+import { Play, CheckCircle2 } from 'lucide-react';
 import { EpisodeItemDTO } from '../../types/anime';
+import { getWatchUrl } from '../../lib/slug';
+import { getHighResEpisodeThumbnail } from '../../lib/imageUtils';
 
 interface EpisodeCardProps {
   anilistId: number;
   episode: EpisodeItemDTO;
+  animeTitle?: string;
   seasonNumber?: number;
   isActive?: boolean;
   isWatched?: boolean;
   progressPercent?: number;
 }
 
-export const EpisodeCard: React.FC<EpisodeCardProps> = ({
+export const EpisodeCardBase: React.FC<EpisodeCardProps> = ({
   anilistId,
   episode,
+  animeTitle,
   seasonNumber = 1,
   isActive = false,
   isWatched = false,
   progressPercent = 0
 }) => {
   const effectiveSeason = episode.seasonNumber || seasonNumber || 1;
-  const watchUrl = `/watch/${anilistId}/ep/${episode.episodeNumber}`;
-  const targetId = episode.mirrorBoxStream?.externalId || anilistId;
-  const downloadUrl = episode.mirrorBoxStream?.downloadUrl || `https://mirrorboxapi.web.app/download/tv/${targetId}/${effectiveSeason}/${episode.episodeNumber}`;
+  const watchUrl = animeTitle
+    ? getWatchUrl({ id: anilistId, title: animeTitle }, effectiveSeason, episode.episodeNumber)
+    : `/watch/${anilistId}/ep/${episode.episodeNumber}`;
 
   return (
     <div
-      className={`group relative flex flex-col rounded-xl overflow-hidden bg-[#181A20] border transition-all duration-200 ${
+      className={`group relative flex flex-col rounded-xl overflow-hidden bg-[#16181F] border transition-all duration-200 ${
         isActive
-          ? 'border-[#F47521] ring-1 ring-[#F47521]/60 shadow-lg shadow-[#F47521]/15'
-          : 'border-white/[0.07] hover:border-white/20'
+          ? 'border-[#F47521] ring-1 ring-[#F47521]/60 shadow-md shadow-[#F47521]/15'
+          : 'border-white/[0.07] hover:border-white/20 hover:bg-[#1A1C24]'
       }`}
     >
-      {/* 16:9 Thumbnail Container */}
-      <Link to={watchUrl} className="relative aspect-video w-full overflow-hidden bg-black block">
+      {/* Compact Standard 16:9 Thumbnail Container */}
+      <Link to={watchUrl} state={{ anilistId }} className="relative aspect-video w-full overflow-hidden bg-black block">
         <img
-          src={episode.thumbnailUrl}
+          src={getHighResEpisodeThumbnail(episode.thumbnailUrl)}
           alt={episode.title}
           loading="lazy"
           decoding="async"
@@ -48,29 +52,29 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({
 
         {/* Play Icon on Hover */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-          <div className="w-11 h-11 rounded-full bg-[#F47521] flex items-center justify-center text-black shadow-lg transform group-hover:scale-110 transition-transform">
-            <Play className="w-4 h-4 fill-current ml-0.5" />
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#F47521] flex items-center justify-center text-black shadow-lg transform group-hover:scale-110 transition-transform">
+            <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
           </div>
         </div>
 
         {/* Episode Number Badge (Top Left) */}
-        <div className="absolute top-2 left-2 z-10 pointer-events-none">
-          <span className="bg-black/75 backdrop-blur-md text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md text-white border border-white/10">
+        <div className="absolute top-1.5 left-1.5 z-10 pointer-events-none">
+          <span className="bg-black/80 backdrop-blur-md text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded text-white border border-white/10">
             E{episode.episodeNumber}
           </span>
         </div>
 
         {/* Watched Indicator (Top Right) */}
         {isWatched && (
-          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 bg-emerald-500/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow">
-            <CheckCircle2 className="w-3 h-3" />
+          <div className="absolute top-1.5 right-1.5 z-10 flex items-center gap-1 bg-emerald-500/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+            <CheckCircle2 className="w-2.5 h-2.5" />
             <span>Watched</span>
           </div>
         )}
 
         {/* Duration Badge (Bottom Right) */}
-        <div className="absolute bottom-2 right-2 z-10 pointer-events-none">
-          <span className="bg-black/75 backdrop-blur-md text-[10px] font-mono text-[#A0A0A0] px-1.5 py-0.5 rounded-md border border-white/5">
+        <div className="absolute bottom-1.5 right-1.5 z-10 pointer-events-none">
+          <span className="bg-black/80 backdrop-blur-md text-[9px] font-mono text-[#A0A0A0] px-1.5 py-0.5 rounded border border-white/5">
             {episode.durationMinutes || 24}m
           </span>
         </div>
@@ -87,46 +91,29 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({
       </Link>
 
       {/* Episode Content Below Thumbnail */}
-      <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1">
+      <div className="p-2.5 sm:p-3 flex flex-col justify-between flex-1">
         <div>
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start justify-between gap-1.5">
             <Link
               to={watchUrl}
-              className={`text-xs sm:text-sm font-semibold line-clamp-1 hover:text-[#F47521] transition ${
+              state={{ anilistId }}
+              className={`text-xs font-semibold line-clamp-1 hover:text-[#F47521] transition ${
                 isActive ? 'text-[#F47521]' : 'text-white/90'
               }`}
+              title={episode.displayTitle || episode.title}
             >
               {episode.displayTitle || (episode.title?.toLowerCase().startsWith('episode') ? episode.title : `Episode ${episode.episodeNumber}: ${episode.title}`)}
             </Link>
           </div>
-          <p className="text-[11px] text-[#8E93A0] mt-1 font-normal">
+          <p className="text-[10px] sm:text-[11px] text-[#8E93A0] mt-0.5 font-normal">
             Season {effectiveSeason} • Episode {episode.episodeNumber}
           </p>
         </div>
 
-        {/* Action Bar (Direct Download) */}
-        <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-xs">
-          <Link
-            to={watchUrl}
-            className="text-[#F47521] hover:text-[#FF8533] font-semibold flex items-center gap-1.5 transition-colors"
-          >
-            <Play className="w-3 h-3 fill-current" />
-            <span>Watch Now</span>
-          </Link>
 
-          <a
-            href={downloadUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#2ABDBB]/10 text-[#2ABDBB] hover:bg-[#2ABDBB] hover:text-black font-medium transition-all text-[11px] sm:text-xs"
-            title="Download Episode"
-          >
-            <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            <span>Download</span>
-          </a>
-        </div>
       </div>
     </div>
   );
 };
+
+export const EpisodeCard = memo(EpisodeCardBase);

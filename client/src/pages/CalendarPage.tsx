@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar as CalendarIcon, Clock, Play, ChevronLeft, ChevronRight, Timer } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Play, Timer } from 'lucide-react';
 import { fetchCalendar } from '../api/animeApi';
+import { getAnimeUrl, getWatchUrl } from '../lib/slug';
+import { getHighResPoster } from '../lib/imageUtils';
 import { AiringScheduleItem } from '../types/anime';
 import { SEO } from '../components/common/SEO';
+import { StatusMessage } from '../components/common/StatusMessage';
 
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -12,10 +15,10 @@ export const CalendarPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [nowUnix, setNowUnix] = useState<number>(() => Math.floor(Date.now() / 1000));
-  const [selectedDay, setSelectedDay] = useState<string>(() => {
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    return today;
-  });
+
+  // Determine current day of week once on mount
+  const currentDayName = useMemo(() => new Date().toLocaleDateString('en-US', { weekday: 'long' }), []);
+  const [selectedDay, setSelectedDay] = useState<string>(currentDayName);
 
   // Real-time ticking interval every second for live countdowns
   useEffect(() => {
@@ -25,40 +28,47 @@ export const CalendarPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    async function loadCalendar() {
-      try {
-        setLoading(true);
-        const res = await fetchCalendar();
-        setSchedules(res.schedules || []);
-      } catch (err: any) {
-        console.error('Failed to load release calendar:', err);
-        setError(err.message || 'Error loading schedule');
-      } finally {
-        setLoading(false);
-      }
+  const loadCalendar = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetchCalendar();
+      setSchedules(res.schedules || []);
+    } catch (err: unknown) {
+      console.error('Failed to load release calendar:', err);
+      setError(err instanceof Error ? err.message : 'Error loading schedule');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadCalendar();
   }, []);
 
   // Group schedules by weekday
-  const groupedByDay: Record<string, AiringScheduleItem[]> = {
-    Monday: [],
-    Tuesday: [],
-    Wednesday: [],
-    Thursday: [],
-    Friday: [],
-    Saturday: [],
-    Sunday: []
-  };
+  const groupedByDay = useMemo(() => {
+    const grouped: Record<string, AiringScheduleItem[]> = {
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+      Sunday: []
+    };
 
-  schedules.forEach((item) => {
-    const date = new Date(item.airingAt * 1000);
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-    if (groupedByDay[dayName]) {
-      groupedByDay[dayName].push(item);
-    }
-  });
+    schedules.forEach((item) => {
+      if (!item?.media || (item.media as any).isAdult) return;
+      const date = new Date(item.airingAt * 1000);
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+      if (grouped[dayName]) {
+        grouped[dayName].push(item);
+      }
+    });
+
+    return grouped;
+  }, [schedules]);
 
   const activeDayItems = groupedByDay[selectedDay] || [];
 
@@ -89,8 +99,7 @@ export const CalendarPage: React.FC = () => {
         {WEEKDAYS.map((day) => {
           const count = groupedByDay[day]?.length || 0;
           const isSelected = selectedDay === day;
-          const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-          const isToday = day === todayName;
+          const isToday = day === currentDayName;
 
           return (
             <button
@@ -140,7 +149,11 @@ export const CalendarPage: React.FC = () => {
           ))}
         </div>
       ) : error ? (
-        <div className="w-full py-16 text-center text-red-400 font-medium">{error}</div>
+        <StatusMessage
+          title="Failed to Load Calendar"
+          description={error}
+          onRetry={loadCalendar}
+        />
       ) : activeDayItems.length === 0 ? (
         <div className="w-full py-16 text-center bg-[#181A22] rounded-2xl border border-white/[0.08] space-y-2 p-6">
           <p className="text-sm font-semibold text-white">No episodes scheduled for {selectedDay}.</p>
@@ -165,11 +178,12 @@ export const CalendarPage: React.FC = () => {
               >
                 {/* Poster image */}
                 <Link
-                  to={`/series/${item.media.id}`}
+                  to={getAnimeUrl(item.media)}
+                  state={{ anilistId: item.media.id }}
                   className="w-16 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-black border border-white/5"
                 >
                   <img
-                    src={item.media.coverImage?.large || item.media.coverImage?.extraLarge}
+                    src={getHighResPoster(item.media)}
                     alt={title}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
@@ -200,7 +214,8 @@ export const CalendarPage: React.FC = () => {
                   </div>
 
                   <Link
-                    to={`/series/${item.media.id}`}
+                    to={getAnimeUrl(item.media)}
+                    state={{ anilistId: item.media.id }}
                     className="text-xs sm:text-sm font-semibold text-white/90 group-hover:text-[#F47521] transition line-clamp-1"
                     title={title}
                   >
@@ -210,7 +225,8 @@ export const CalendarPage: React.FC = () => {
                   <div className="mt-2.5 pt-2 border-t border-white/[0.06] flex items-center justify-between gap-2">
                     {isAired ? (
                       <Link
-                        to={`/watch/${item.media.id}/ep/${item.episode}`}
+                        to={getWatchUrl(item.media, 1, item.episode)}
+                        state={{ anilistId: item.media.id }}
                         className="inline-flex items-center gap-1 text-xs font-semibold text-black bg-[#F47521] hover:bg-[#FF8533] px-3 py-1 rounded-lg transition-all shadow-sm"
                       >
                         <Play className="w-3 h-3 fill-current" />
@@ -226,7 +242,8 @@ export const CalendarPage: React.FC = () => {
                     )}
 
                     <Link
-                      to={`/series/${item.media.id}`}
+                      to={getAnimeUrl(item.media)}
+                      state={{ anilistId: item.media.id }}
                       className="text-xs font-medium text-[#8E93A0] hover:text-white px-2 py-0.5 rounded hover:bg-white/5 transition flex-shrink-0"
                     >
                       Details →

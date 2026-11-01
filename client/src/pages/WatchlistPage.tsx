@@ -4,13 +4,13 @@ import { Bookmark, History, Trash2, Play, Sparkles } from 'lucide-react';
 import {
   getWatchlist,
   getWatchHistory,
-  WatchHistoryItem,
-  toggleWatchlist,
   clearWatchHistory,
   removeHistoryItem
 } from '../api/animeApi';
-import { AnimeMedia } from '../types/anime';
+import { useWatchlist, useWatchHistory } from '../lib/userStore';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
+import { getWatchUrl } from '../lib/slug';
+import { getHighResPoster } from '../lib/imageUtils';
 import { SEO } from '../components/common/SEO';
 import { GridSkeleton } from '../components/common/Shimmer';
 
@@ -18,51 +18,29 @@ export const WatchlistPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = searchParams.get('tab') === 'history' ? 'history' : 'watchlist';
 
-  const [watchlist, setWatchlist] = useState<AnimeMedia[]>([]);
-  const [history, setHistory] = useState<WatchHistoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Local store is reactive: adding/removing anywhere in the app updates this page instantly.
+  const watchlist = useWatchlist();
+  const history = useWatchHistory();
+  const [hydrating, setHydrating] = useState(() => watchlist.length === 0 || history.length === 0);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [wl, hist] = await Promise.all([
-        getWatchlist(),
-        getWatchHistory()
-      ]);
-      setWatchlist(wl);
-      setHistory(hist);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // One-time hydration from the backend for devices with no local data yet.
   useEffect(() => {
-    loadData();
-    window.addEventListener('watchlist_updated', loadData);
-    window.addEventListener('history_updated', loadData);
+    let active = true;
+    Promise.allSettled([getWatchlist(), getWatchHistory()]).finally(() => {
+      if (active) setHydrating(false);
+    });
     return () => {
-      window.removeEventListener('watchlist_updated', loadData);
-      window.removeEventListener('history_updated', loadData);
+      active = false;
     };
   }, []);
 
-  const handleRemoveFromWatchlist = async (anime: AnimeMedia) => {
-    await toggleWatchlist(anime);
-    setWatchlist((prev) => prev.filter((i) => i.id !== anime.id));
-  };
+  const loading = hydrating && watchlist.length === 0 && history.length === 0;
 
-  const handleClearHistory = async () => {
-    if (window.confirm('Are you sure you want to clear your entire watch history?')) {
-      await clearWatchHistory();
-      setHistory([]);
+  const handleClearHistory = () => {
+    if (window.confirm('Clear your entire watch history? This cannot be undone.')) {
+      clearWatchHistory();
     }
   };
-
-  const handleRemoveHistoryItem = async (anilistId: number) => {
-    await removeHistoryItem(anilistId);
-    setHistory((prev) => prev.filter((i) => i.anilistId !== anilistId));
-  };
-
   const setTab = (tab: 'watchlist' | 'history') => {
     const next = new URLSearchParams(searchParams);
     if (tab === 'history') {
@@ -143,16 +121,8 @@ export const WatchlistPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-5">
             {watchlist.map((anime) => (
-              <div key={anime.id} className="relative group">
-                <AnimePosterCard anime={anime} />
-                <button
-                  onClick={() => handleRemoveFromWatchlist(anime)}
-                  className="absolute top-2 right-2 z-30 p-1.5 rounded-lg bg-black/80 hover:bg-red-500 text-white transition-all opacity-0 group-hover:opacity-100 shadow border border-white/10"
-                  title="Remove from Watchlist"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <AnimePosterCard key={anime.id} anime={anime} />
+
             ))}
           </div>
         )
@@ -191,15 +161,15 @@ export const WatchlistPage: React.FC = () => {
               {history.map((item) => {
                 const anime = item.media;
                 const title = anime?.title?.english || anime?.title?.romaji || `Anime #${item.anilistId}`;
-                const resumeUrl = `/watch/${item.anilistId}/ep/${item.episodeNumber}`;
-                const thumbnail = anime?.bannerImage || anime?.coverImage?.large || '';
+                const resumeUrl = item.media ? getWatchUrl(item.media, item.seasonNumber || 1, item.episodeNumber) : `/watch/${item.anilistId}/ep/${item.episodeNumber}`;
+                const thumbnail = anime?.bannerImage || getHighResPoster(anime);
 
                 return (
                   <div
-                    key={`${item.anilistId}_${item.episodeNumber}`}
+                    key={item.anilistId}
                     className="flex flex-col rounded-xl overflow-hidden bg-[#181A20] border border-white/[0.08] group hover:border-white/20 transition-all shadow-sm"
                   >
-                    <Link to={resumeUrl} className="relative aspect-video w-full bg-black block overflow-hidden">
+                    <Link to={resumeUrl} state={{ anilistId: item.anilistId }} className="relative aspect-video w-full bg-black block overflow-hidden">
                       <img
                         src={thumbnail}
                         alt={title}
@@ -222,13 +192,15 @@ export const WatchlistPage: React.FC = () => {
                         <div className="flex items-start justify-between gap-2">
                           <Link
                             to={resumeUrl}
+                            state={{ anilistId: item.anilistId }}
                             className="text-xs sm:text-sm font-semibold text-white/90 hover:text-[#F47521] transition line-clamp-1 flex-1"
                           >
                             {title}
                           </Link>
                           <button
-                            onClick={() => handleRemoveHistoryItem(item.anilistId)}
-                            className="text-[#8E93A0] hover:text-red-400 p-1 rounded-md transition opacity-0 group-hover:opacity-100"
+                            onClick={() => removeHistoryItem(item.anilistId)}
+                            aria-label={`Remove ${title} from history`}
+                            className="text-[#8E93A0] hover:text-red-400 p-1 rounded-md transition sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
                             title="Remove from history"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

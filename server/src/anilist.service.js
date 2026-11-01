@@ -256,8 +256,52 @@ export class AniListService {
     return result;
   }
 
-  async getMediaDetail(id) {
-    const numericId = Number(id);
+  async getMediaDetail(id, options = {}) {
+    let numericId = Number(id);
+
+    if (isNaN(numericId) || numericId <= 0) {
+      let cleanSearch = String(id);
+      const match1x1 = cleanSearch.match(/^(.+?)-(\d+)x(\d+)$/i);
+      if (match1x1) {
+        cleanSearch = match1x1[1];
+      }
+      const matchSeason = cleanSearch.match(/^(.+?)-season-(\d+)$/i);
+      if (matchSeason) {
+        cleanSearch = matchSeason[1];
+      }
+      cleanSearch = cleanSearch.replace(/-/g, ' ').trim();
+
+      const searchCacheKey = `slug_search_${cleanSearch.toLowerCase()}`;
+      const cachedSearchId = cache.get(searchCacheKey);
+      if (cachedSearchId) {
+        numericId = cachedSearchId;
+      } else {
+        try {
+          const resolveQuery = `
+            query ResolveMediaId($search: String, $format: MediaFormat, $seasonYear: Int) {
+              Media(search: $search, format: $format, seasonYear: $seasonYear, type: ANIME) {
+                id
+              }
+            }
+          `;
+          const searchData = await fetchGraphQL(resolveQuery, {
+            search: cleanSearch,
+            format: options.format || undefined,
+            seasonYear: options.seasonYear ? Number(options.seasonYear) : undefined
+          });
+          if (searchData?.Media?.id) {
+            numericId = searchData.Media.id;
+            cache.set(searchCacheKey, numericId, 3600);
+          } else {
+            return null;
+          }
+        } catch (e) {
+          console.error(`[AniList] Failed to resolve slug "${id}":`, e.message);
+          return null;
+        }
+      }
+    }
+
     const cacheKey = `media_detail_${numericId}`;
     const cached = cache.get(cacheKey);
     if (cached) return cached;
@@ -351,12 +395,12 @@ export class AniListService {
               node {
                 id
                 name { full }
-                image { medium }
+                image { large medium }
               }
               voiceActors(language: JAPANESE, sort: [RELEVANCE]) {
                 id
                 name { full }
-                image { medium }
+                image { large medium }
               }
             }
           }

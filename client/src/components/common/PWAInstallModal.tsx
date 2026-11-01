@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Share2, PlusSquare, Download } from 'lucide-react';
+import { X, Share2, PlusSquare } from 'lucide-react';
 
 interface PWAInstallModalProps {
   isOpen: boolean;

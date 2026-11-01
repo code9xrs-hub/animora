@@ -1,3 +1,4 @@
+import { getWatchUrl, getAnimeTitle } from '../lib/slug';
 import {
   HomeCatalogResponse,
   BrowseResponse,
@@ -14,25 +15,60 @@ import {
   clientFetchCalendar
 } from './clientAniList';
 import { resolveCrosswalkStream } from './crosswalkResolver';
+import {
+  watchlistStore,
+  historyStore,
+  MAX_HISTORY_ITEMS,
+  type WatchHistoryItem
+} from '../lib/userStore';
+
+export type { WatchHistoryItem };
 
 const API_BASE = '/api/v1';
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
-async function fetchSafeJson(url: string) {
-  const res = await fetch(url);
+async function fetchSafeJson(url: string, init?: RequestInit) {
+  const res = await fetch(url, init);
   const contentType = res.headers.get('content-type') || '';
   if (!res.ok || !contentType.includes('application/json')) {
-    throw new Error(`Invalid response: ${res.status}`);
+    throw new Error(`Request failed (${res.status})`);
   }
   return res.json();
 }
 
-export async function fetchHomeCatalog(): Promise<HomeCatalogResponse> {
+/**
+ * Memoises catalog lookups for a few minutes and shares in-flight promises, so
+ * concurrent callers (StrictMode double effects, re-mounts, back navigation)
+ * never fire duplicate requests. Failed lookups are evicted immediately.
+ */
+const responseCache = new Map<string, { at: number; promise: Promise<unknown> }>();
+
+function cached<T>(key: string, loader: () => Promise<T>): Promise<T> {
+  const hit = responseCache.get(key);
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.promise as Promise<T>;
+
+  const promise = loader().catch((err) => {
+    responseCache.delete(key);
+    throw err;
+  });
+  responseCache.set(key, { at: Date.now(), promise });
+  return promise;
+}
+
+/** Tries the BFF first, then falls back to querying AniList directly from the browser. */
+async function withFallback<T>(label: string, primary: () => Promise<T>, fallback: () => Promise<T>): Promise<T> {
   try {
-    return await fetchSafeJson(`${API_BASE}/anime/home`);
+    return await primary();
   } catch (err) {
-    console.warn('Backend home catalog unreachable, falling back to direct AniList GraphQL:', err);
-    return await clientFetchHomeCatalog();
+    console.warn(`Backend ${label} unreachable, falling back to direct AniList GraphQL:`, err);
+    return fallback();
   }
+}
+
+export function fetchHomeCatalog(): Promise<HomeCatalogResponse> {
+  return cached('home', () =>
+    withFallback('home catalog', () => fetchSafeJson(`${API_BASE}/anime/home`), clientFetchHomeCatalog)
+  );
 }
 
 export interface BrowseParams {
@@ -47,24 +83,20 @@ export interface BrowseParams {
   sort?: string;
 }
 
-export async function fetchBrowse(params: BrowseParams = {}): Promise<BrowseResponse> {
-  try {
-    const query = new URLSearchParams();
-    if (params.page) query.set('page', String(params.page));
-    if (params.perPage) query.set('perPage', String(params.perPage));
-    if (params.search) query.set('search', params.search);
-    if (params.genre) query.set('genre', params.genre);
-    if (params.format) query.set('format', params.format);
-    if (params.season) query.set('season', params.season);
-    if (params.seasonYear) query.set('seasonYear', String(params.seasonYear));
-    if (params.status) query.set('status', params.status);
-    if (params.sort) query.set('sort', params.sort);
-
-    return await fetchSafeJson(`${API_BASE}/anime/browse?${query.toString()}`);
-  } catch (err) {
-    console.warn('Backend browse unreachable, falling back to direct AniList GraphQL:', err);
-    return await clientFetchBrowse(params);
+export function fetchBrowse(params: BrowseParams = {}): Promise<BrowseResponse> {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') query.set(key, String(value));
   }
+  const qs = query.toString();
+
+  return cached(`browse?${qs}`, () =>
+    withFallback(
+      'browse',
+      () => fetchSafeJson(`${API_BASE}/anime/browse?${qs}`),
+      () => clientFetchBrowse(params)
+    )
+  );
 }
 
 export interface AnimeDetailResponse {
@@ -73,28 +105,40 @@ export interface AnimeDetailResponse {
   franchiseSeasons: FranchiseSeasonNode[];
 }
 
-export async function fetchAnimeDetail(id: string | number): Promise<AnimeDetailResponse> {
-  try {
-    return await fetchSafeJson(`${API_BASE}/anime/${id}`);
-  } catch (err) {
-    console.warn('Backend detail unreachable, falling back to direct AniList GraphQL:', err);
-    return await clientFetchAnimeDetail(String(id));
-  }
+export function fetchAnimeDetail(
+  id: string | number,
+  options?: { format?: string; seasonYear?: number }
+): Promise<AnimeDetailResponse> {
+  const query = new URLSearchParams();
+  if (options?.format) query.set('format', options.format);
+  if (options?.seasonYear) query.set('year', String(options.seasonYear));
+  const qs = query.toString() ? `?${query.toString()}` : '';
+
+  return cached(`detail:${id}${qs}`, () =>
+    withFallback(
+      'detail',
+      () => fetchSafeJson(`${API_BASE}/anime/${id}${qs}`),
+      () => clientFetchAnimeDetail(String(id), options)
+    )
+  );
 }
 
-export async function fetchCalendar(startUnix?: number, endUnix?: number): Promise<{ schedules: AiringScheduleItem[] }> {
-  try {
-    const query = new URLSearchParams();
-    if (startUnix) query.set('startUnix', String(startUnix));
-    if (endUnix) query.set('endUnix', String(endUnix));
+export function fetchCalendar(startUnix?: number, endUnix?: number): Promise<{ schedules: AiringScheduleItem[] }> {
+  const query = new URLSearchParams();
+  if (startUnix) query.set('startUnix', String(startUnix));
+  if (endUnix) query.set('endUnix', String(endUnix));
+  const qs = query.toString();
 
-    return await fetchSafeJson(`${API_BASE}/anime/calendar?${query.toString()}`);
-  } catch (err) {
-    console.warn('Backend calendar unreachable, falling back to direct AniList GraphQL:', err);
-    const date = startUnix ? new Date(startUnix * 1000) : new Date();
-    const schedules = await clientFetchCalendar(date.getFullYear(), date.getMonth() + 1);
-    return { schedules };
-  }
+  return cached(`calendar?${qs}`, () =>
+    withFallback(
+      'calendar',
+      () => fetchSafeJson(`${API_BASE}/anime/calendar?${qs}`),
+      async () => {
+        const schedules = await clientFetchCalendar(undefined, undefined, startUnix, endUnix);
+        return { schedules };
+      }
+    )
+  );
 }
 
 export async function resolveStream(
@@ -104,125 +148,100 @@ export async function resolveStream(
   malId?: number | null
 ): Promise<MirrorBoxStream> {
   try {
-    const query = new URLSearchParams({
-      episode: String(episode),
-      format
-    });
+    const query = new URLSearchParams({ episode: String(episode), format });
     if (malId) query.set('malId', String(malId));
-
     return await fetchSafeJson(`${API_BASE}/stream/resolve/${anilistId}?${query.toString()}`);
-  } catch (err) {
-    return await resolveCrosswalkStream(anilistId, episode, format, malId);
+  } catch {
+    return resolveCrosswalkStream(anilistId, episode, format, malId);
   }
 }
 
-const WATCHLIST_KEY = 'animora_watchlist';
-const LEGACY_WATCHLIST_KEY = 'crunchyroll_watchlist';
+/** Fire-and-forget sync to the BFF; local storage remains the source of truth for the UI. */
+function syncToServer(path: string, init: RequestInit) {
+  fetch(`${API_BASE}${path}`, init).catch(() => {
+    /* offline or backend unavailable — local state is already updated */
+  });
+}
 
-const HISTORY_KEY = 'animora_history';
-const LEGACY_HISTORY_KEY = 'crunchyroll_history';
+const jsonPost = (body: unknown): RequestInit => ({
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body)
+});
 
-// User Watchlist & History API
+/**
+ * Returns the local watchlist. If this device has nothing stored yet, it is
+ * hydrated once from the backend so existing server-side data is not lost.
+ */
 export async function getWatchlist(): Promise<AnimeMedia[]> {
+  const local = watchlistStore.get();
+  if (local.length > 0) return local;
   try {
-    const res = await fetch(`${API_BASE}/user/watchlist`);
-    if (res.ok) {
-      const data = await res.json();
-      return data.watchlist || [];
+    const data = await fetchSafeJson(`${API_BASE}/user/watchlist`);
+    if (Array.isArray(data.watchlist) && data.watchlist.length > 0) {
+      watchlistStore.set(data.watchlist);
+      return data.watchlist;
     }
-  } catch (e) {
-    console.warn('Backend watchlist fetch failed, falling back to local storage', e);
+  } catch {
+    /* backend unavailable */
   }
-  const local = localStorage.getItem(WATCHLIST_KEY) || localStorage.getItem(LEGACY_WATCHLIST_KEY);
-  return local ? JSON.parse(local) : [];
+  return local;
 }
 
+export function isInWatchlist(id: number): boolean {
+  return watchlistStore.get().some((m) => m.id === id);
+}
+
+/** Adds or removes a title. Returns `true` when the title is now in the watchlist. */
 export async function toggleWatchlist(media: AnimeMedia): Promise<boolean> {
-  // Sync to backend & localStorage
-  let isAdded = false;
-  try {
-    const res = await fetch(`${API_BASE}/user/watchlist`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ media })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      isAdded = data.added;
-    }
-  } catch (e) {
-    console.warn('Backend watchlist toggle failed', e);
-  }
+  const list = watchlistStore.get();
+  const exists = list.some((m) => m.id === media.id);
+  const next = exists ? list.filter((m) => m.id !== media.id) : [media, ...list];
+  watchlistStore.set(next);
 
-  // Also update localStorage
-  const local = localStorage.getItem(WATCHLIST_KEY) || localStorage.getItem(LEGACY_WATCHLIST_KEY);
-  let list: AnimeMedia[] = local ? JSON.parse(local) : [];
-  const idx = list.findIndex(m => m.id === media.id);
-  if (idx >= 0) {
-    list.splice(idx, 1);
-    isAdded = false;
-  } else {
-    list.unshift(media);
-    isAdded = true;
-  }
-  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(list));
-  localStorage.removeItem(LEGACY_WATCHLIST_KEY);
-  window.dispatchEvent(new Event('watchlist_updated'));
-  return isAdded;
-}
-
-export interface WatchHistoryItem {
-  anilistId: number;
-  episodeNumber: number;
-  seasonNumber?: number;
-  progressSeconds: number;
-  totalSeconds: number;
-  watchedAt: string;
-  media?: AnimeMedia;
+  // An explicit action keeps the server idempotent even if it drifted from local state.
+  syncToServer('/user/watchlist', jsonPost({ media, action: exists ? 'remove' : 'add' }));
+  return !exists;
 }
 
 export async function getWatchHistory(): Promise<WatchHistoryItem[]> {
+  const local = historyStore.get();
+  if (local.length > 0) return local;
   try {
-    const res = await fetch(`${API_BASE}/user/history`);
-    if (res.ok) {
-      const data = await res.json();
-      return data.history || [];
+    const data = await fetchSafeJson(`${API_BASE}/user/history`);
+    if (Array.isArray(data.history) && data.history.length > 0) {
+      const hydrated = data.history.slice(0, MAX_HISTORY_ITEMS);
+      historyStore.set(hydrated);
+      return hydrated;
     }
-  } catch (e) {
-    console.warn('History fetch fallback', e);
+  } catch {
+    /* backend unavailable */
   }
-  const local = localStorage.getItem(HISTORY_KEY) || localStorage.getItem(LEGACY_HISTORY_KEY);
-  return local ? JSON.parse(local) : [];
+  return local;
 }
 
 export function getLastWatched(anilistId: number, franchiseIds?: number[]): WatchHistoryItem | null {
-  try {
-    const local = localStorage.getItem(HISTORY_KEY) || localStorage.getItem(LEGACY_HISTORY_KEY);
-    if (!local) return null;
-    const history: WatchHistoryItem[] = JSON.parse(local);
-    if (!Array.isArray(history) || history.length === 0) return null;
+  const history = historyStore.get();
+  if (history.length === 0) return null;
 
-    if (franchiseIds && franchiseIds.length > 0) {
-      const franchiseMatch = history.find((h) => franchiseIds.includes(h.anilistId));
-      if (franchiseMatch) return franchiseMatch;
-    }
-
-    return history.find((h) => h.anilistId === anilistId) || null;
-  } catch {
-    return null;
+  if (franchiseIds && franchiseIds.length > 0) {
+    const franchiseMatch = history.find((h) => franchiseIds.includes(h.anilistId));
+    if (franchiseMatch) return franchiseMatch;
   }
+  return history.find((h) => h.anilistId === anilistId) || null;
 }
 
 /**
  * Robust season detector for AnimeMedia
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function detectSeasonNumber(media: any): number {
   if (!media) return 1;
   if (typeof media.seasonNumber === 'number' && media.seasonNumber > 0) {
     return media.seasonNumber;
   }
 
-  const titles = [
+  const titles: string[] = [
     media.title?.english,
     media.title?.romaji,
     media.title?.userPreferred,
@@ -285,10 +304,9 @@ export function getContinuePlayUrl(
   episodeNumber: number;
   lastWatched: WatchHistoryItem | null;
 } {
-  const isMovie = media.format === 'MOVIE';
-  if (isMovie) {
+  if (media.format === 'MOVIE') {
     return {
-      url: `/watch/${media.id}`,
+      url: getWatchUrl(media, 1, 1),
       label: 'WATCH MOVIE',
       seasonNumber: 1,
       episodeNumber: 1,
@@ -303,7 +321,7 @@ export function getContinuePlayUrl(
     const sNum = lastWatched.seasonNumber || detectedSeason;
     const seasonStr = sNum > 1 ? `S${sNum} ` : '';
     return {
-      url: `/watch/${lastWatched.anilistId}/ep/${lastWatched.episodeNumber}`,
+      url: getWatchUrl(lastWatched.media || media, sNum, lastWatched.episodeNumber),
       label: `CONTINUE ${seasonStr}E${lastWatched.episodeNumber}`,
       seasonNumber: sNum,
       episodeNumber: lastWatched.episodeNumber,
@@ -312,7 +330,7 @@ export function getContinuePlayUrl(
   }
 
   return {
-    url: `/watch/${media.id}/ep/1`,
+    url: getWatchUrl(media, detectedSeason, 1),
     label: `WATCH S${detectedSeason} E1`,
     seasonNumber: detectedSeason,
     episodeNumber: 1,
@@ -328,26 +346,14 @@ export async function recordHistory(
   media?: AnimeMedia,
   seasonNumber: number = 1
 ): Promise<void> {
-  try {
-    await fetch(`${API_BASE}/user/history`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        anilistId,
-        episodeNumber,
-        seasonNumber,
-        progressSeconds,
-        totalSeconds,
-        media
-      })
-    });
-  } catch (e) {
-    console.warn('History save fallback', e);
+  const history = historyStore.get();
+  const previous = history.find((h) => h.anilistId === anilistId);
+
+  // Skip redundant writes (e.g. re-renders or StrictMode re-running effects).
+  if (previous && previous.episodeNumber === episodeNumber && history[0] === previous) {
+    return;
   }
 
-  const local = localStorage.getItem(HISTORY_KEY) || localStorage.getItem(LEGACY_HISTORY_KEY);
-  let history: WatchHistoryItem[] = local ? JSON.parse(local) : [];
-  const idx = history.findIndex((h) => h.anilistId === anilistId);
   const item: WatchHistoryItem = {
     anilistId,
     episodeNumber,
@@ -355,45 +361,24 @@ export async function recordHistory(
     progressSeconds,
     totalSeconds,
     watchedAt: new Date().toISOString(),
-    media: media || (idx >= 0 ? history[idx].media : undefined)
+    media: media || previous?.media
   };
-  if (idx >= 0) {
-    history[idx] = item;
-  } else {
-    history.unshift(item);
-  }
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 30)));
-  localStorage.removeItem(LEGACY_HISTORY_KEY);
-  window.dispatchEvent(new Event('history_updated'));
+
+  // Most recently watched always goes first so "Continue Watching" is ordered correctly.
+  historyStore.set([item, ...history.filter((h) => h.anilistId !== anilistId)].slice(0, MAX_HISTORY_ITEMS));
+
+  syncToServer(
+    '/user/history',
+    jsonPost({ anilistId, episodeNumber, seasonNumber, progressSeconds, totalSeconds, media })
+  );
 }
 
 export async function clearWatchHistory(): Promise<void> {
-  try {
-    await fetch(`${API_BASE}/user/history`, {
-      method: 'DELETE'
-    });
-  } catch (e) {
-    console.warn('Backend clear history failed', e);
-  }
-  localStorage.removeItem(HISTORY_KEY);
-  localStorage.removeItem(LEGACY_HISTORY_KEY);
-  window.dispatchEvent(new Event('history_updated'));
+  historyStore.set([]);
+  syncToServer('/user/history', { method: 'DELETE' });
 }
 
 export async function removeHistoryItem(anilistId: number): Promise<void> {
-  try {
-    await fetch(`${API_BASE}/user/history/${anilistId}`, {
-      method: 'DELETE'
-    });
-  } catch (e) {
-    console.warn('Backend remove history item failed', e);
-  }
-  const local = localStorage.getItem(HISTORY_KEY) || localStorage.getItem(LEGACY_HISTORY_KEY);
-  if (local) {
-    const history: WatchHistoryItem[] = JSON.parse(local);
-    const updated = history.filter(h => h.anilistId !== anilistId);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-    localStorage.removeItem(LEGACY_HISTORY_KEY);
-  }
-  window.dispatchEvent(new Event('history_updated'));
+  historyStore.set(historyStore.get().filter((h) => h.anilistId !== anilistId));
+  syncToServer(`/user/history/${anilistId}`, { method: 'DELETE' });
 }

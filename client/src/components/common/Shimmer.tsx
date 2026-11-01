@@ -43,11 +43,11 @@ export const SwimlaneSkeleton: React.FC = () => (
  * Hero Banner Carousel Shimmer
  */
 export const HeroBannerSkeleton: React.FC = () => (
-  <div className="relative w-full aspect-[16/10] xs:aspect-[16/9] sm:aspect-[21/9] md:aspect-auto md:h-[480px] lg:h-[540px] xl:h-[600px] min-h-[240px] max-h-[85vh] bg-[#0E1015] overflow-hidden select-none animate-shimmer">
+  <div className="relative w-full aspect-[16/10] xs:aspect-[16/9] sm:aspect-[21/9] md:aspect-auto md:h-[480px] lg:h-[540px] xl:h-[600px] min-h-[240px] max-h-[85vh] bg-[#09090b] overflow-hidden select-none animate-shimmer">
     {/* Dark Gradients overlay */}
-    <div className="absolute inset-0 bg-gradient-to-t from-[#141519] via-[#141519]/70 via-50% to-transparent md:hidden" />
-    <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[#141519]/95 via-[#141519]/60 via-45% to-transparent" />
-    <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-[#141519] via-[#141519]/25 via-20% to-transparent" />
+    <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/70 via-50% to-transparent md:hidden" />
+    <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[#09090b]/95 via-[#09090b]/60 via-45% to-transparent" />
+    <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/25 via-20% to-transparent" />
 
     {/* Content Container Skeleton */}
     <div className="relative z-10 max-w-[1440px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-7 sm:pb-12 md:pb-16">
@@ -81,7 +81,7 @@ export const HeroBannerSkeleton: React.FC = () => (
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3 pt-2">
-          <div className="w-32 sm:w-40 h-10 sm:h-12 rounded-lg animate-shimmer border border-[#F47521]/30" />
+          <div className="w-32 sm:w-40 h-10 sm:h-12 rounded-lg animate-shimmer border border-[#9333ea]/30" />
           <div className="w-28 sm:w-32 h-10 sm:h-12 rounded-lg animate-shimmer opacity-70" />
           <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-lg animate-shimmer opacity-50" />
         </div>
@@ -130,8 +130,8 @@ export const GridSkeleton: React.FC<{ count?: number; title?: string }> = ({
 export const SeriesDetailPageSkeleton: React.FC = () => (
   <div className="w-full pb-20 select-none">
     {/* Backdrop Banner Skeleton */}
-    <div className="relative w-full h-[260px] sm:h-[340px] md:h-[420px] bg-[#0E1015] animate-shimmer">
-      <div className="absolute inset-0 bg-gradient-to-t from-[#141519] via-[#141519]/70 to-transparent" />
+    <div className="relative w-full h-[260px] sm:h-[340px] md:h-[420px] bg-[#09090b] animate-shimmer">
+      <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/70 to-transparent" />
     </div>
 
     {/* Content Container */}
@@ -168,7 +168,7 @@ export const SeriesDetailPageSkeleton: React.FC = () => (
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-3">
-            <div className="w-36 h-11 rounded-lg animate-shimmer border border-[#F47521]/30" />
+            <div className="w-36 h-11 rounded-lg animate-shimmer border border-[#9333ea]/30" />
             <div className="w-32 h-11 rounded-lg animate-shimmer opacity-70" />
           </div>
         </div>
@@ -206,7 +206,7 @@ export const WatchPageSkeleton: React.FC = () => (
   <div className="w-full pb-20 select-none">
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-6">
       {/* 16:9 Cinema Player Skeleton */}
-      <div className="w-full aspect-video rounded-xl sm:rounded-2xl bg-[#0E1015] animate-shimmer border border-[#2B2E38]/60 overflow-hidden relative shadow-2xl">
+      <div className="w-full aspect-video rounded-xl sm:rounded-2xl bg-[#09090b] animate-shimmer border border-[#2B2E38]/60 overflow-hidden relative shadow-2xl">
         <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-6">
           <div className="w-48 h-6 rounded animate-shimmer opacity-60" />
           <div className="flex items-center justify-between pt-4 border-t border-white/10">
@@ -239,7 +239,7 @@ export const WatchPageSkeleton: React.FC = () => (
 
         {/* Server & Action Controls */}
         <div className="flex items-center gap-2.5">
-          <div className="w-28 h-9 rounded-lg animate-shimmer border border-[#F47521]/30" />
+          <div className="w-28 h-9 rounded-lg animate-shimmer border border-[#9333ea]/30" />
           <div className="w-24 h-9 rounded-lg animate-shimmer opacity-70" />
           <div className="w-24 h-9 rounded-lg animate-shimmer opacity-70" />
         </div>

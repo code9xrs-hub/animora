@@ -1,43 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { fetchBrowse, BrowseParams } from '../api/animeApi';
-import { AnimeMedia, BrowseResponse } from '../types/anime';
+import { fetchBrowse } from '../api/animeApi';
+import { BrowseResponse } from '../types/anime';
 import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
 import { GridSkeleton } from '../components/common/Shimmer';
-
-const GENRES = [
-  'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy',
-  'Horror', 'Mystery', 'Psychological', 'Romance',
-  'Sci-Fi', 'Slice of Life', 'Sports', 'Supernatural', 'Thriller'
-];
-
-const FORMATS = [
-  { label: 'All Formats', value: '' },
-  { label: 'TV Series', value: 'TV' },
-  { label: 'Movie', value: 'MOVIE' },
-  { label: 'TV Short', value: 'TV_SHORT' },
-  { label: 'OVA', value: 'OVA' },
-  { label: 'ONA', value: 'ONA' },
-  { label: 'Special', value: 'SPECIAL' }
-];
-
-const SEASONS = [
-  { label: 'All Seasons', value: '' },
-  { label: 'Winter', value: 'WINTER' },
-  { label: 'Spring', value: 'SPRING' },
-  { label: 'Summer', value: 'SUMMER' },
-  { label: 'Fall', value: 'FALL' }
-];
-
-const SORTS = [
-  { label: 'Most Popular', value: 'POPULARITY_DESC' },
-  { label: 'Trending Now', value: 'TRENDING_DESC' },
-  { label: 'Highest Rated', value: 'SCORE_DESC' },
-  { label: 'Recently Released', value: 'START_DATE_DESC' },
-  { label: 'Alphabetical', value: 'TITLE_ROMAJI' }
-];
+import { StatusMessage } from '../components/common/StatusMessage';
+import { GENRES, FORMATS, SEASONS, SORTS, YEARS } from '../constants/catalog';
 
 export const BrowsePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,6 +15,7 @@ export const BrowsePage: React.FC = () => {
   const [data, setData] = useState<BrowseResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
 
   // Read current filters from URL
   const search = searchParams.get('search') || '';
@@ -58,33 +29,38 @@ export const BrowsePage: React.FC = () => {
 
   const [searchInput, setSearchInput] = useState(search);
 
-  useEffect(() => {
+  // Sync input with external URL changes if they diverge
+  const [prevSearchParam, setPrevSearchParam] = useState(search);
+  if (search !== prevSearchParam) {
+    setPrevSearchParam(search);
     setSearchInput(search);
-  }, [search]);
+  }
+
+  const loadBrowse = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetchBrowse({
+        page,
+        perPage: 24,
+        search: search || undefined,
+        genre: genre || undefined,
+        format: format || undefined,
+        season: season || undefined,
+        seasonYear: seasonYear ? Number(seasonYear) : undefined,
+        status: status || undefined,
+        sort
+      });
+      setData(res);
+    } catch (err: unknown) {
+      console.error('Failed to browse:', err);
+      setError(err instanceof Error ? err.message : 'Error browsing catalog');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadBrowse() {
-      try {
-        setLoading(true);
-        const res = await fetchBrowse({
-          page,
-          perPage: 24,
-          search: search || undefined,
-          genre: genre || undefined,
-          format: format || undefined,
-          season: season || undefined,
-          seasonYear: seasonYear ? Number(seasonYear) : undefined,
-          status: status || undefined,
-          sort
-        });
-        setData(res);
-      } catch (err: any) {
-        console.error('Failed to browse:', err);
-        setError(err.message || 'Error browsing catalog');
-      } finally {
-        setLoading(false);
-      }
-    }
     loadBrowse();
   }, [search, genre, format, season, seasonYear, status, sort, page]);
 
@@ -96,7 +72,9 @@ export const BrowsePage: React.FC = () => {
       next.delete(key);
     }
     next.set('page', '1'); // Reset to page 1 on filter change
-    setSearchParams(next);
+    startTransition(() => {
+      setSearchParams(next);
+    });
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -105,14 +83,18 @@ export const BrowsePage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
-    setSearchParams(new URLSearchParams());
+    startTransition(() => {
+      setSearchParams(new URLSearchParams());
+    });
     setSearchInput('');
   };
 
   const handlePageChange = (newPage: number) => {
     const next = new URLSearchParams(searchParams);
     next.set('page', String(newPage));
-    setSearchParams(next);
+    startTransition(() => {
+      setSearchParams(next);
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -142,7 +124,7 @@ export const BrowsePage: React.FC = () => {
         {/* Live Search Input */}
         <form onSubmit={handleSearchSubmit} className="relative w-full md:w-80">
           <input
-            type="text"
+            type="search"
             placeholder="Search anime title..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -162,7 +144,7 @@ export const BrowsePage: React.FC = () => {
 
           <button
             onClick={handleResetFilters}
-            className="flex items-center gap-1.5 text-xs text-[#8E93A0] hover:text-[#F47521] transition-colors font-medium"
+            className="flex items-center gap-1.5 text-xs text-[#8E93A0] hover:text-[#F47521] transition-colors font-medium cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Filters</span>
@@ -237,7 +219,7 @@ export const BrowsePage: React.FC = () => {
               className="w-full bg-[#121318] text-xs text-white/90 border border-white/10 rounded-xl px-3 py-2.5 focus:border-[#F47521] focus:ring-1 focus:ring-[#F47521] focus:outline-none transition-all cursor-pointer"
             >
               <option value="">Any Year</option>
-              {[2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2015, 2010, 2005, 2000].map((y) => (
+              {YEARS.map((y) => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
@@ -249,16 +231,18 @@ export const BrowsePage: React.FC = () => {
       {loading ? (
         <GridSkeleton count={24} />
       ) : error || !data ? (
-        <div className="w-full py-16 text-center text-red-400 font-medium">
-          {error || 'Error loading results'}
-        </div>
+        <StatusMessage
+          title="Failed to Load Anime"
+          description={error || 'An error occurred while loading the catalog.'}
+          onRetry={loadBrowse}
+        />
       ) : data.media.length === 0 ? (
         <div className="w-full py-20 text-center bg-[#181A22] rounded-2xl border border-white/[0.08] space-y-3 p-6">
           <p className="text-base text-white font-semibold">No anime matched your active filters</p>
           <p className="text-xs text-[#8E93A0] max-w-sm mx-auto">Try adjusting your search query, genre, or format settings.</p>
           <button
             onClick={handleResetFilters}
-            className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-4 py-2 rounded-xl text-xs transition-colors"
+            className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-4 py-2 rounded-xl text-xs transition-colors cursor-pointer"
           >
             Reset Filters
           </button>
@@ -277,7 +261,7 @@ export const BrowsePage: React.FC = () => {
             <button
               disabled={page <= 1}
               onClick={() => handlePageChange(page - 1)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181A22] hover:bg-[#F47521] hover:text-black text-white/90 text-xs font-semibold transition disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 shadow-sm"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181A22] hover:bg-[#F47521] hover:text-black text-white/90 text-xs font-semibold transition disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 shadow-sm cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
@@ -290,7 +274,7 @@ export const BrowsePage: React.FC = () => {
             <button
               disabled={!data.pageInfo.hasNextPage}
               onClick={() => handlePageChange(page + 1)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181A22] hover:bg-[#F47521] hover:text-black text-white/90 text-xs font-semibold transition disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 shadow-sm"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181A22] hover:bg-[#F47521] hover:text-black text-white/90 text-xs font-semibold transition disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 shadow-sm cursor-pointer"
             >
               <span>Next</span>
               <ChevronRight className="w-4 h-4" />

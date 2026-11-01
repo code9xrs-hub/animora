@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { getAnimeUrl, getWatchUrl, cacheSlugId, getCachedSlugId, slugify, getAnimeTitle } from '../lib/slug';
+import { getHighResPoster, getHighResEpisodeThumbnail } from '../lib/imageUtils';
 import {
   Play,
   Bookmark,
@@ -7,7 +9,6 @@ import {
   Download,
   Share2,
   Film,
-  Calendar,
   Star,
   Tv,
   Search,
@@ -17,41 +18,75 @@ import {
   X
 } from 'lucide-react';
 import { fetchAnimeDetail, AnimeDetailResponse, toggleWatchlist, getContinuePlayUrl, detectSeasonNumber } from '../api/animeApi';
+import { useIsInWatchlist } from '../lib/userStore';
+import { StatusMessage } from '../components/common/StatusMessage';
 import { EpisodeCard } from '../components/cards/EpisodeCard';
-import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
 import { SeriesDetailPageSkeleton } from '../components/common/Shimmer';
 
 export const SeriesDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug, id: routeId, year } = useParams<{ slug?: string; id?: string; year?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [data, setData] = useState<AnimeDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const rawParam = slug || routeId || '';
+  const isMovieRoute = location.pathname.startsWith('/movie') || (year !== undefined);
+
   const [activeSeasonId, setActiveSeasonId] = useState<number | null>(null);
   const [isDescOrder, setIsDescOrder] = useState(false);
   const [isListView, setIsListView] = useState(false);
   const [searchEp, setSearchEp] = useState('');
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+  const isBookmarked = useIsInWatchlist(data?.media?.id);
   const [isCopied, setIsCopied] = useState(false);
 
+  // Close trailer modal on Escape key
   useEffect(() => {
-    if (!id) return;
+    if (!isTrailerOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsTrailerOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isTrailerOpen]);
+
+  useEffect(() => {
+    if (!rawParam) return;
     async function loadDetail() {
       try {
         setLoading(true);
-        const res = await fetchAnimeDetail(id!);
+        setError(null);
+
+        const locationState = location.state as { anilistId?: number } | null;
+        let targetId: number | string = rawParam;
+
+        if (locationState?.anilistId) {
+          targetId = locationState.anilistId;
+        } else if (getCachedSlugId(rawParam)) {
+          targetId = getCachedSlugId(rawParam)!;
+        } else if (/^\d+$/.test(rawParam)) {
+          targetId = Number(rawParam);
+        }
+
+        const res = await fetchAnimeDetail(targetId, {
+          format: isMovieRoute ? 'MOVIE' : undefined,
+          seasonYear: year ? Number(year) : undefined
+        });
+
         setData(res);
         setActiveSeasonId(res.media.id);
 
-        // Check bookmark status
-        const stored = localStorage.getItem('animora_watchlist') || localStorage.getItem('crunchyroll_watchlist');
-        if (stored) {
-          const list = JSON.parse(stored);
-          setIsBookmarked(list.some((item: any) => item.id === res.media.id));
+        const mTitle = getAnimeTitle(res.media);
+        cacheSlugId(slugify(mTitle), res.media.id);
+
+        // Auto-upgrade legacy numeric URL (e.g. /series/186541 or /movie/21519) to semantic slug
+        if (/^\d+$/.test(rawParam)) {
+          const canonicalUrl = getAnimeUrl(res.media, 1);
+          navigate(canonicalUrl, { replace: true, state: { anilistId: res.media.id } });
         }
       } catch (err: any) {
         console.error('Failed to load anime detail:', err);
@@ -61,7 +96,7 @@ export const SeriesDetailPage: React.FC = () => {
       }
     }
     loadDetail();
-  }, [id]);
+  }, [rawParam, year, isMovieRoute, location.state, navigate]);
 
   if (loading) {
     return <SeriesDetailPageSkeleton />;
@@ -69,11 +104,12 @@ export const SeriesDetailPage: React.FC = () => {
 
   if (error || !data) {
     return (
-      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-4 text-white">
-        <p className="text-red-400">{error || 'Anime not found'}</p>
-        <Link to="/" className="bg-[#F47521] text-black font-bold px-4 py-2 rounded">
-          Back to Home
-        </Link>
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <StatusMessage
+          title="Anime Not Found"
+          description={error || 'Unable to find or load the requested anime series.'}
+          link={{ to: '/browse', label: 'Browse Catalog' }}
+        />
       </div>
     );
   }
@@ -101,9 +137,9 @@ export const SeriesDetailPage: React.FC = () => {
     ? `https://mirrorboxapi.web.app/download/movie/${externalId}`
     : `https://mirrorboxapi.web.app/download/tv/${externalId}/${activeSeasonNumber}/1`);
 
-  const handleBookmarkToggle = async () => {
-    const added = await toggleWatchlist(media);
-    setIsBookmarked(added);
+
+  const handleBookmarkToggle = () => {
+    toggleWatchlist(media);
   };
 
   const handleShare = () => {
@@ -131,6 +167,9 @@ export const SeriesDetailPage: React.FC = () => {
     ? media.description.replace(/<[^>]*>?/gm, '').trim()
     : 'No description available.';
 
+  const siteUrl = 'https://animora.web.app';
+  const detailCanonical = `${siteUrl}${getAnimeUrl(media, activeSeasonNumber)}`;
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': isMovie ? 'Movie' : 'TVSeries',
@@ -138,7 +177,8 @@ export const SeriesDetailPage: React.FC = () => {
     alternateName: media.title.native || media.title.romaji,
     description: cleanDescription,
     image: media.coverImage?.extraLarge || media.bannerImage,
-    genre: media.genres,
+    url: detailCanonical,
+    genre: media.genres || [],
     datePublished: media.seasonYear ? String(media.seasonYear) : undefined,
     numberOfEpisodes: media.episodes || undefined,
     aggregateRating: media.averageScore
@@ -160,13 +200,14 @@ export const SeriesDetailPage: React.FC = () => {
         image={media.bannerImage || media.coverImage?.extraLarge}
         type={isMovie ? 'video.movie' : 'video.tv_show'}
         schema={schema}
+        canonical={detailCanonical}
       />
       {/* 1. Atmospheric Backdrop Header */}
       <div className="relative w-full min-h-[420px] lg:min-h-[480px] bg-black overflow-hidden flex items-end">
         {/* Background Image with blur & vignette */}
         <div className="absolute inset-0">
           <img
-            src={media.bannerImage || media.coverImage?.extraLarge}
+            src={media.bannerImage || getHighResPoster(media)}
             alt={title}
             className="w-full h-full object-cover opacity-35 filter blur-xs brightness-75 scale-105"
           />
@@ -179,7 +220,7 @@ export const SeriesDetailPage: React.FC = () => {
           {/* 2:3 Crisp Poster */}
           <div className="w-36 sm:w-52 md:w-60 flex-shrink-0 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 bg-[#181A22]">
             <img
-              src={media.coverImage?.extraLarge || media.coverImage?.large}
+              src={getHighResPoster(media)}
               alt={title}
               className="w-full h-full object-cover"
             />
@@ -213,14 +254,14 @@ export const SeriesDetailPage: React.FC = () => {
 
             {media.title.native && (
               <p className="text-xs sm:text-sm text-[#8E93A0] font-normal">
-                {media.title.native} • {media.title.romaji}
+                {media.title.native} â€¢ {media.title.romaji}
               </p>
             )}
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-1 sm:pt-2">
               <button
-                onClick={() => navigate(startWatchingUrl)}
+                onClick={() => navigate(startWatchingUrl, { state: { anilistId: media.id } })}
                 className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#F47521]/20 active:scale-95 transition-all"
               >
                 <Play className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current" />
@@ -324,20 +365,26 @@ export const SeriesDetailPage: React.FC = () => {
                       onChange={(e) => {
                         const selId = Number(e.target.value);
                         if (selId !== media.id) {
-                          navigate(media.format === 'MOVIE' ? `/movie/${selId}` : `/series/${selId}`);
+                          const selSeason = franchiseSeasons.find((s) => s.anilistId === selId);
+                          const sMatch = selSeason?.seasonNumberLabel?.match(/Season\s+(\d+)/i);
+                          const sNum = sMatch ? parseInt(sMatch[1], 10) : 1;
+                          navigate(
+                            getAnimeUrl({ id: selId, title: selSeason?.title || title, format: media.format }, sNum),
+                            { state: { anilistId: selId } }
+                          );
                         }
                       }}
                       className="bg-[#181A22] border border-[#F47521]/80 text-white text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer hover:border-[#F47521] shadow-sm transition-colors"
                     >
                       {franchiseSeasons.map((s) => (
                         <option key={s.anilistId} value={s.anilistId}>
-                          {s.seasonNumberLabel} • {s.title} ({s.episodesCount} {s.episodesCount === 1 ? 'ep' : 'eps'})
+                          {s.seasonNumberLabel} â€¢ {s.title} ({s.episodesCount} {s.episodesCount === 1 ? 'ep' : 'eps'})
                         </option>
                       ))}
                     </select>
                   ) : (
                     <span className="text-xs bg-[#181A22] border border-white/10 text-[#8E93A0] font-medium px-3 py-1.5 rounded-xl">
-                      {currentSeasonNode?.seasonNumberLabel || `Season ${activeSeasonNumber}`} • {episodes.length} Episodes
+                      {currentSeasonNode?.seasonNumberLabel || `Season ${activeSeasonNumber}`} â€¢ {episodes.length} Episodes
                     </span>
                   )}
                 </div>
@@ -364,7 +411,7 @@ export const SeriesDetailPage: React.FC = () => {
                         ? 'border-[#F47521] text-[#F47521] bg-[#F47521]/10'
                         : 'border-white/10 text-[#8E93A0] hover:text-white bg-[#181A22]'
                     }`}
-                    title={isDescOrder ? 'Descending (Newest first)' : 'Ascending (1 → N)'}
+                    title={isDescOrder ? 'Descending (Newest first)' : 'Ascending (1 â†’ N)'}
                   >
                     <ArrowUpDown className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{isDescOrder ? 'Desc' : 'Asc'}</span>
@@ -395,7 +442,8 @@ export const SeriesDetailPage: React.FC = () => {
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <Link
-                          to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
+                          to={getWatchUrl(media, activeSeasonNumber, ep.episodeNumber)}
+                          state={{ anilistId: media.id }}
                           className="w-8 h-8 rounded-full bg-[#121318] flex items-center justify-center text-[#F47521] hover:bg-[#F47521] hover:text-black transition-all flex-shrink-0"
                         >
                           <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
@@ -403,7 +451,8 @@ export const SeriesDetailPage: React.FC = () => {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <Link
-                              to={`/watch/${media.id}/ep/${ep.episodeNumber}`}
+                              to={getWatchUrl(media, activeSeasonNumber, ep.episodeNumber)}
+                              state={{ anilistId: media.id }}
                               className="text-xs sm:text-sm font-semibold text-white/90 hover:text-[#F47521] transition line-clamp-1"
                             >
                               {ep.displayTitle || (ep.title?.toLowerCase().startsWith('episode') ? ep.title : `Episode ${ep.episodeNumber}: ${ep.title}`)}
@@ -419,24 +468,17 @@ export const SeriesDetailPage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <a
-                        href={ep.mirrorBoxStream?.downloadUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-2.5 py-1 rounded-lg bg-[#2ABDBB]/10 text-[#2ABDBB] text-xs font-medium hover:bg-[#2ABDBB] hover:text-black transition-all flex items-center gap-1 flex-shrink-0"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download</span>
-                      </a>
+
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3.5">
                   {filteredEpisodes.map((ep) => (
                     <EpisodeCard
                       key={ep.episodeNumber}
                       anilistId={media.id}
+                      animeTitle={title}
                       episode={ep}
                       seasonNumber={ep.seasonNumber || activeSeasonNumber}
                       isActive={lastWatchedItem?.anilistId === media.id && lastWatchedItem?.episodeNumber === ep.episodeNumber}
@@ -465,7 +507,7 @@ export const SeriesDetailPage: React.FC = () => {
                       className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#181A20] border border-white/[0.08]"
                     >
                       <img
-                        src={edge.node.image?.medium}
+                        src={edge.node.image?.large || edge.node.image?.medium}
                         alt={charName}
                         className="w-10 h-12 object-cover rounded-lg shadow-sm border border-white/5"
                       />
@@ -538,7 +580,7 @@ export const SeriesDetailPage: React.FC = () => {
               <div className="flex justify-between py-1">
                 <span className="text-[#8E93A0]">AniList Score:</span>
                 <span className="text-[#FAB818] font-bold">
-                  ★ {media.averageScore ? `${(media.averageScore / 10).toFixed(1)} / 10` : 'N/A'}
+                  â˜… {media.averageScore ? `${(media.averageScore / 10).toFixed(1)} / 10` : 'N/A'}
                 </span>
               </div>
             </div>
@@ -557,11 +599,12 @@ export const SeriesDetailPage: React.FC = () => {
                   return (
                     <Link
                       key={idx}
-                      to={m.format === 'MOVIE' ? `/movie/${m.id}` : `/series/${m.id}`}
+                      to={getAnimeUrl(m)}
+                      state={{ anilistId: m.id }}
                       className="flex items-center gap-3 p-2.5 rounded-xl bg-[#181A20] hover:bg-[#20222B] border border-white/[0.08] transition-all group"
                     >
                       <img
-                        src={m.coverImage?.large || m.coverImage?.extraLarge}
+                        src={getHighResPoster(m)}
                         alt={m.title.english || m.title.romaji}
                         className="w-12 h-16 object-cover rounded-lg shadow-sm border border-white/5"
                       />
@@ -570,11 +613,11 @@ export const SeriesDetailPage: React.FC = () => {
                           {m.title.english || m.title.romaji}
                         </h5>
                         <p className="text-[11px] text-[#8E93A0] mt-0.5">
-                          {m.format} • {m.episodes ? `${m.episodes} Eps` : 'Movie'}
+                          {m.format} â€¢ {m.episodes ? `${m.episodes} Eps` : 'Movie'}
                         </p>
                         {m.averageScore && (
                           <span className="text-[10px] text-[#FAB818] font-semibold">
-                            ★ {(m.averageScore / 10).toFixed(1)}
+                            â˜… {(m.averageScore / 10).toFixed(1)}
                           </span>
                         )}
                       </div>
@@ -590,24 +633,27 @@ export const SeriesDetailPage: React.FC = () => {
       {/* 3. YouTube Trailer Modal */}
       {isTrailerOpen && media.trailer && media.trailer.id && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 md:p-8 animate-page"
           onClick={() => setIsTrailerOpen(false)}
         >
           <div
-            className="relative w-full max-w-4xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/20"
+            className="relative w-full max-w-3xl lg:max-w-4xl max-h-[85vh] aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/15"
             onClick={(e) => e.stopPropagation()}
           >
             <button
+              type="button"
               onClick={() => setIsTrailerOpen(false)}
-              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/70 hover:bg-[#F47521] text-white hover:text-black flex items-center justify-center transition"
+              aria-label="Close trailer"
+              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-[#F47521] text-white hover:text-black flex items-center justify-center transition cursor-pointer backdrop-blur-sm border border-white/10"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
             <iframe
-              src={`https://www.youtube.com/embed/${media.trailer.id}?autoplay=1`}
-              title="Anime Trailer"
+              src={`https://www.youtube-nocookie.com/embed/${media.trailer.id}?autoplay=1&rel=0`}
+              title={`${title} Trailer`}
               className="w-full h-full border-none"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+              {...{ autoPictureInPicture: "true" }}
               allowFullScreen
             />
           </div>

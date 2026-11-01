@@ -6,12 +6,10 @@ import {
   ChevronRight,
   Moon,
   Sun,
-  Maximize2,
   Minimize2,
   Server,
   Volume2,
   Captions,
-  RotateCw,
   Maximize
 } from 'lucide-react';
 import { EpisodeItemDTO } from '../../types/anime';
@@ -41,7 +39,6 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
   onSelectNext,
 }) => {
   const [lightsOff, setLightsOff] = useState(false);
-  const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [activeServer, setActiveServer] = useState<VideoServer>('mirrorbox');
   const [liveStream, setLiveStream] = useState(activeEpisode.mirrorBoxStream);
@@ -141,7 +138,7 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
         if (window.screen?.orientation && 'lock' in window.screen.orientation) {
           await (window.screen.orientation as any).lock('landscape').catch(() => {});
         }
-      } catch (err) {
+      } catch {
         // Fallback to manual CSS 90-degree landscape rotation if native fullscreen/orientation lock is denied
         setIsRotatedLandscape((prev) => !prev);
       }
@@ -161,7 +158,7 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
   };
 
   return (
-    <section className="relative w-full bg-black py-4">
+    <section className="relative w-full">
       {/* Lights-Off Backdrop Overlay */}
       {lightsOff && (
         <div
@@ -172,9 +169,7 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
       )}
 
       <div
-        className={`relative z-40 mx-auto w-full transition-all duration-300 ${
-          isTheaterMode ? 'max-w-full px-2 sm:px-4' : 'max-w-[1280px] px-4'
-        }`}
+        className="relative z-40 mx-auto w-full"
       >
         {/* 16:9 Responsive Iframe Container with Full Rotation Support */}
         <div
@@ -182,9 +177,7 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
           className={`relative aspect-video w-full overflow-hidden bg-[#141519] shadow-2xl ring-1 ring-white/10 ${
             isRotatedLandscape
               ? 'fixed top-0 left-[100vw] w-[100vh] h-[100vw] rotate-90 origin-top-left z-[99999] rounded-none !aspect-auto'
-              : isTheaterMode
-                ? 'rounded-none'
-                : 'rounded-xl'
+              : 'rounded-xl'
           }`}
         >
           {/* Exit Full Screen Floating Badge */}
@@ -231,6 +224,7 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
             frameBorder="0"
             allowFullScreen
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; screen-wake-lock; orientation-lock; web-share"
+            {...{ autoPictureInPicture: "true" }}
             referrerPolicy="origin"
             onLoad={() => setIframeLoaded(true)}
             style={{
@@ -244,29 +238,24 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
           />
         </div>
 
-        {/* Crunchyroll-Style Player Action Bar */}
-        <div className="mt-3 sm:mt-3.5 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 rounded-2xl bg-[#181A20] px-3 sm:px-4 py-2.5 text-xs sm:text-sm text-white border border-white/[0.08] shadow-sm">
-          {/* Left Controls: Lights, Theater Mode & Rotation */}
-          <div className="flex items-center gap-1 sm:gap-1.5">
+        {/* Sleek, Perfectly Aligned Player Action Bar */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2.5 rounded-2xl bg-[#16181F] px-3 sm:px-4 py-2 border border-white/[0.08] shadow-sm">
+          {/* Left Controls: Lights & Fullscreen */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
+              type="button"
               onClick={() => setLightsOff((prev) => !prev)}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-medium text-[#8E93A0] transition-colors hover:bg-white/10 hover:text-white text-xs"
+              className="inline-flex items-center gap-1.5 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#8E93A0] hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-all cursor-pointer"
+              title={lightsOff ? 'Turn lights on' : 'Dim lights around player'}
             >
               {lightsOff ? <Sun className="w-3.5 h-3.5 text-[#FAB818]" /> : <Moon className="w-3.5 h-3.5" />}
               <span>{lightsOff ? 'Lights On' : 'Lights Off'}</span>
             </button>
 
             <button
-              onClick={() => setIsTheaterMode((prev) => !prev)}
-              className="hidden sm:flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-medium text-[#8E93A0] transition-colors hover:bg-white/10 hover:text-white text-xs"
-            >
-              {isTheaterMode ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-              <span>{isTheaterMode ? 'Standard' : 'Theater Mode'}</span>
-            </button>
-
-            <button
+              type="button"
               onClick={handleToggleRotate}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-medium text-[#8E93A0] transition-colors hover:bg-white/10 hover:text-white text-xs"
+              className="inline-flex items-center gap-1.5 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-[#8E93A0] hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-all cursor-pointer"
               title={isFullscreen || isRotatedLandscape ? 'Exit Full Screen' : 'Full Screen'}
             >
               {isFullscreen || isRotatedLandscape ? (
@@ -274,38 +263,41 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
               ) : (
                 <Maximize className="w-3.5 h-3.5 text-[#2ABDBB]" />
               )}
-              <span>{isFullscreen || isRotatedLandscape ? 'Exit Full Screen' : 'Full Screen'}</span>
+              <span>{isFullscreen || isRotatedLandscape ? 'Exit Fullscreen' : 'Fullscreen'}</span>
             </button>
           </div>
 
-          {/* Center: Server Selector (Mirror-Box, SUB, DUB) */}
-          <div className="flex items-center gap-1 bg-[#121318] p-1 rounded-xl border border-white/10">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-[#8E93A0] uppercase px-2 flex items-center gap-1">
+          {/* Center: Server Selector (HD-1, SUB, DUB) */}
+          <div className="flex items-center gap-1 bg-[#101116] p-1 rounded-xl border border-white/10 flex-shrink-0">
+            <span className="text-[10px] sm:text-[11px] font-bold text-[#8E93A0] uppercase px-1.5 flex items-center gap-1">
               <Server className="w-3 h-3 text-[#F47521]" />
-              <span className="hidden xs:inline">Server:</span>
+              <span className="hidden sm:inline">Server:</span>
             </span>
 
             {/* Server 1: Mirror-Box Multi-Server */}
             <button
+              type="button"
               onClick={() => setActiveServer('mirrorbox')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 ${activeServer === 'mirrorbox'
-                  ? 'bg-[#F47521] text-black shadow-sm font-bold'
+              className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                activeServer === 'mirrorbox'
+                  ? 'bg-[#F47521] text-black shadow-sm'
                   : 'text-[#8E93A0] hover:text-white hover:bg-white/5'
-                }`}
-              title="Primary HD Multi-Server (Abyss, FileMoon, Vidmoly, Streamwish)"
+              }`}
+              title="Primary HD Multi-Server"
             >
               <span>HD-1</span>
-              <span className="hidden sm:inline text-[10px] opacity-75">(Multi)</span>
             </button>
 
             {/* Server 2: Megaplay SUB */}
             <button
+              type="button"
               onClick={() => setActiveServer('sub')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeServer === 'sub'
-                  ? 'bg-[#2ABDBB] text-black shadow-sm font-bold'
+              className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                activeServer === 'sub'
+                  ? 'bg-[#2ABDBB] text-black shadow-sm'
                   : 'text-[#8E93A0] hover:text-white hover:bg-white/5'
-                }`}
-              title="Secondary Server SUB (Megaplay Softsub/Hardsub)"
+              }`}
+              title="Secondary Server SUB (Softsub/Hardsub)"
             >
               <Captions className="w-3.5 h-3.5" />
               <span>SUB</span>
@@ -313,12 +305,14 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
 
             {/* Server 3: Megaplay DUB */}
             <button
+              type="button"
               onClick={() => setActiveServer('dub')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${activeServer === 'dub'
-                  ? 'bg-[#FAB818] text-black shadow-sm font-bold'
+              className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                activeServer === 'dub'
+                  ? 'bg-[#FAB818] text-black shadow-sm'
                   : 'text-[#8E93A0] hover:text-white hover:bg-white/5'
-                }`}
-              title="Secondary Server DUB (Megaplay English Dubbed)"
+              }`}
+              title="Secondary Server DUB (English Dubbed)"
             >
               <Volume2 className="w-3.5 h-3.5" />
               <span>DUB</span>
@@ -326,37 +320,42 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
           </div>
 
           {/* Right Controls: Prev/Next & Download */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {!isMovie && (
-              <>
+              <div className="inline-flex items-center rounded-xl bg-[#101116] p-0.5 border border-white/10">
                 <button
+                  type="button"
                   disabled={!hasPrevEpisode}
                   onClick={onSelectPrev}
-                  className="flex items-center gap-1 rounded-xl bg-[#121318] px-3 py-1.5 font-medium text-white/90 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30 text-xs border border-white/5"
+                  className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-white/90 hover:bg-white/10 hover:text-white transition disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                  title="Previous Episode"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   <span>Prev</span>
                 </button>
+                <div className="w-px h-3.5 bg-white/10" />
                 <button
+                  type="button"
                   disabled={!hasNextEpisode}
                   onClick={onSelectNext}
-                  className="flex items-center gap-1 rounded-xl bg-[#F47521] px-3.5 py-1.5 font-bold text-black transition hover:bg-[#FF8533] disabled:cursor-not-allowed disabled:opacity-30 text-xs shadow-sm"
+                  className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold text-black bg-[#F47521] hover:bg-[#FF8533] transition disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer shadow-sm"
+                  title="Next Episode"
                 >
                   <span>Next</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
-              </>
+              </div>
             )}
 
             <a
               href={downloadUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-[#2ABDBB]/40 bg-[#2ABDBB]/15 px-3 py-1.5 font-semibold text-[#2ABDBB] transition hover:bg-[#2ABDBB] hover:text-black text-xs shadow-sm"
-              title="Download direct video file via Mirror-Box CDN"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#2ABDBB]/30 bg-[#2ABDBB]/15 px-3 py-1.5 font-bold text-[#2ABDBB] hover:bg-[#2ABDBB] hover:text-black text-xs transition-all shadow-sm cursor-pointer"
+              title="Download direct video file"
             >
               <Download className="w-3.5 h-3.5" />
-              <span><span className="hidden xs:inline">Direct </span>Download</span>
+              <span>Download</span>
             </a>
           </div>
         </div>

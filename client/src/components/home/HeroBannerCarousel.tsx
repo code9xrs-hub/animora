@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Play, Bookmark, Check, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { AnimeMedia } from '../../types/anime';
 import { toggleWatchlist, getContinuePlayUrl } from '../../api/animeApi';
+import { getAnimeUrl } from '../../lib/slug';
+import { getHighResPoster, getHighResBanner } from '../../lib/imageUtils';
+import { useWatchlist } from '../../lib/userStore';
 
 interface HeroBannerCarouselProps {
   items: AnimeMedia[];
@@ -13,7 +16,8 @@ const INTERVAL_MS = 5000;
 export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items }) => {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [watchlistSet, setWatchlistSet] = useState<Set<number>>(new Set());
+  const watchlist = useWatchlist();
+  const watchlistSet = React.useMemo(() => new Set(watchlist.map((i) => i.id)), [watchlist]);
 
   // Real-time mobile touch-scroll tracking state
   const [dragOffset, setDragOffset] = useState(0);
@@ -21,17 +25,6 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
   const startXRef = useRef(0);
   const startYRef = useRef(0);
   const isHorizontalSwipeRef = useRef<boolean | null>(null);
-
-  // Sync Watchlist state
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('animora_watchlist') || localStorage.getItem('crunchyroll_watchlist');
-      if (stored) {
-        const list = JSON.parse(stored);
-        setWatchlistSet(new Set(list.map((i: any) => i.id)));
-      }
-    } catch {}
-  }, [items]);
 
   // Clean auto-advance timer (Pauses during active touch drag)
   useEffect(() => {
@@ -103,13 +96,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
 
   const handleBookmarkToggle = async (e: React.MouseEvent, item: AnimeMedia) => {
     e.stopPropagation();
-    const added = await toggleWatchlist(item);
-    setWatchlistSet((prev) => {
-      const next = new Set(prev);
-      if (added) next.add(item.id);
-      else next.delete(item.id);
-      return next;
-    });
+    await toggleWatchlist(item);
   };
 
   if (!items || items.length === 0) return null;
@@ -128,15 +115,15 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
           transform: `translateX(calc(-${currentIndex * 100}% + ${dragOffset}px))`
         }}
       >
-        {items.map((item, index) => {
-          const itemBanner = item.bannerImage || item.coverImage?.extraLarge || item.coverImage?.large;
+        {items.map((item) => {
+          const itemBanner = item.bannerImage || getHighResPoster(item);
           const itemTitle = item.title.english || item.title.romaji || 'Featured Anime';
           const isMovie = item.format === 'MOVIE';
           const continueInfo = getContinuePlayUrl(item);
           const seasonNum = item.seasonNumber || continueInfo.seasonNumber || 1;
           const playUrl = continueInfo.url;
           const playLabel = continueInfo.label;
-          const detailUrl = isMovie ? `/movie/${item.id}` : `/series/${item.id}`;
+          const detailUrl = getAnimeUrl(item);
           const isBookmarked = watchlistSet.has(item.id);
 
           const cleanDescription = item.description
@@ -148,16 +135,12 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
               key={item.id}
               className="relative min-w-full w-full h-full flex-shrink-0 overflow-hidden bg-[#0A0B0E]"
             >
-              {/* Ambient Blurred Backdrop for full bleed tone */}
-              <div
-                className="absolute inset-0 bg-cover bg-center filter blur-xl opacity-40 scale-110 pointer-events-none"
-                style={{ backgroundImage: `url(${itemBanner})` }}
-              />
-
               {/* Crisp Main Artwork Image Centered Perfectly */}
               <img
                 src={itemBanner}
                 alt={itemTitle}
+                loading={currentIndex === 0 ? "eager" : "lazy"}
+                {...{ fetchPriority: currentIndex === 0 ? "high" : "low" }}
                 decoding="async"
                 className="relative w-full h-full object-cover object-center filter brightness-105"
               />
@@ -218,7 +201,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
                   {/* CTA Action Buttons */}
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-0.5 sm:pt-1">
                     <button
-                      onClick={() => navigate(playUrl)}
+                      onClick={() => navigate(playUrl, { state: { anilistId: item.id } })}
                       className="bg-[#F47521] hover:bg-[#FF8533] text-black font-bold px-3.5 sm:px-6 py-1.5 sm:py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-[#F47521]/20 active:scale-95 transition-all"
                     >
                       <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
@@ -238,7 +221,7 @@ export const HeroBannerCarousel: React.FC<HeroBannerCarouselProps> = ({ items })
                     </button>
 
                     <button
-                      onClick={() => navigate(detailUrl)}
+                      onClick={() => navigate(detailUrl, { state: { anilistId: item.id } })}
                       className="px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium text-white/90 bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1.5 transition-colors"
                     >
                       <Info className="w-3.5 h-3.5" />

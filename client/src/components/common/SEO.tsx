@@ -9,8 +9,8 @@ export interface SEOProps {
   canonical?: string;
   type?: 'website' | 'video.tv_show' | 'video.movie' | 'video.episode' | string;
   ogType?: string;
-  schema?: Record<string, any>;
-  jsonLd?: Record<string, any>;
+  schema?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown>;
   robots?: string;
 }
 
@@ -18,6 +18,7 @@ const DEFAULT_TITLE = 'Animora — Stream Popular Anime & Movies Free';
 const DEFAULT_DESCRIPTION = 'Stream thousands of trending anime series, simulcasts, and movies in HD with zero-wait direct downloads and multi-server playback powered by AniList & Mirror-Box.';
 const DEFAULT_IMAGE = 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/113415-jQBSkxWAAk83.jpg';
 const DEFAULT_KEYWORDS = 'anime, stream anime, watch anime online, animora, simulcasts, anime movies, free anime hd, english sub, english dub, anilist, mirrorbox';
+const SITE_DOMAIN = 'https://animora.web.app';
 
 export const SEO: React.FC<SEOProps> = ({
   title,
@@ -34,26 +35,41 @@ export const SEO: React.FC<SEOProps> = ({
 }) => {
   const fullTitle = title ? (title.includes('Animora') ? title : `${title} — Animora`) : DEFAULT_TITLE;
 
-  const getOrigin = () => {
-    if (typeof window !== 'undefined' && window.location) {
-      return window.location.origin || `${window.location.protocol}//${window.location.host}`;
-    }
-    return '';
-  };
-
   const resolveFullUrl = (target?: string) => {
-    if (!target) return typeof window !== 'undefined' ? window.location.href : '';
+    if (!target) {
+      if (typeof window !== 'undefined' && window.location) {
+        return window.location.href;
+      }
+      return SITE_DOMAIN;
+    }
     if (target.startsWith('http://') || target.startsWith('https://')) return target;
-    const origin = getOrigin();
-    return `${origin}${target.startsWith('/') ? '' : '/'}${target}`;
+    return `${SITE_DOMAIN}${target.startsWith('/') ? '' : '/'}${target}`;
   };
 
   const currentUrl = resolveFullUrl(canonical || url);
   const activeType = ogType || type || 'website';
-  const activeSchema = jsonLd || schema;
+  
+  // Default Website / WebPage schema when no specific custom schema is supplied
+  const defaultWebSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Animora',
+    url: SITE_DOMAIN,
+    description: DEFAULT_DESCRIPTION,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${SITE_DOMAIN}/browse?search={search_term_string}`
+      },
+      'query-input': 'required name=search_term_string'
+    }
+  };
+
+  const activeSchema = jsonLd || schema || defaultWebSchema;
 
   useEffect(() => {
-    // 1. Title
+    // 1. Document Title
     document.title = fullTitle;
 
     // Helper to update or create meta tag
@@ -86,17 +102,18 @@ export const SEO: React.FC<SEOProps> = ({
     setMeta('name', 'twitter:title', fullTitle);
     setMeta('name', 'twitter:description', description);
     setMeta('name', 'twitter:image', image);
+    setMeta('name', 'twitter:url', currentUrl);
 
     // 5. Canonical Link
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
+    let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonicalEl) {
+      canonicalEl = document.createElement('link');
+      canonicalEl.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalEl);
     }
-    canonical.setAttribute('href', currentUrl);
+    canonicalEl.setAttribute('href', currentUrl);
 
-    // 6. JSON-LD Structured Data Schema
+    // 6. JSON-LD Structured Data Schema.org
     let scriptEl = document.getElementById('animora-jsonld') as HTMLScriptElement | null;
     if (activeSchema) {
       if (!scriptEl) {

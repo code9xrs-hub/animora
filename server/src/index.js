@@ -13,8 +13,10 @@ const USER_DATA_FILE = path.join(__dirname, '..', 'data', 'user-store.json');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const MAX_HISTORY_ITEMS = 100;
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '200kb' }));
 
 // User storage helper for Watchlist & Watch History
 function loadUserData() {
@@ -32,7 +34,10 @@ function saveUserData(data) {
   try {
     const dir = path.dirname(USER_DATA_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(USER_DATA_FILE, JSON.stringify(data, null, 2));
+    // Write to a temp file then rename, so a crash mid-write cannot corrupt the store.
+    const tmpFile = `${USER_DATA_FILE}.tmp`;
+    fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2));
+    fs.renameSync(tmpFile, USER_DATA_FILE);
   } catch (e) {
     console.error('Error writing user-store.json:', e);
   }
@@ -256,7 +261,11 @@ async function buildEpisodeList(media, franchiseSeasons = []) {
       ? cleanTitle
       : `Episode ${i}: ${cleanTitle}`;
 
-    const thumbnail = streamMeta?.thumbnail || media.bannerImage || media.coverImage?.extraLarge || media.coverImage?.large;
+    let rawThumb = streamMeta?.thumbnail;
+    if (rawThumb && typeof rawThumb === 'string' && rawThumb.includes('crunchyroll.com')) {
+      rawThumb = rawThumb.replace(/_(?:thumb|small|medium|wide|widestar)\.jpg(\?.*)?$/i, '_full.jpg$1');
+    }
+    const thumbnail = rawThumb || media.bannerImage || media.coverImage?.extraLarge || media.coverImage?.large;
 
     let isAired = true;
     let airingAtUnix = null;
@@ -310,7 +319,7 @@ async function buildFranchiseSeasons(media) {
       episodesCount: n.episodes || 1,
       seasonYear: n.seasonYear,
       startDate: n.startDate || { year: n.seasonYear || 9999, month: 1, day: 1 },
-      coverImage: n.coverImage?.large || n.coverImage?.extraLarge,
+      coverImage: n.coverImage?.extraLarge || n.coverImage?.large,
       relationType: relType,
       isCurrent: n.id === media.id
     });
@@ -396,7 +405,10 @@ async function buildFranchiseSeasons(media) {
 app.get('/api/v1/anime/:id', async (req, res) => {
   try {
     const id = req.params.id;
-    const media = await anilistService.getMediaDetail(id);
+    const media = await anilistService.getMediaDetail(id, {
+      format: req.query.format,
+      seasonYear: req.query.year
+    });
 
     if (!media) {
       return res.status(404).json({ error: 'Anime not found' });
@@ -424,8 +436,13 @@ app.get('/api/v1/stream/resolve/:anilistId', async (req, res) => {
   const malId = req.query.malId ? parseInt(req.query.malId, 10) : null;
   const title = req.query.title || null;
 
-  const result = await fribbService.resolve(anilistId, episode, format, malId, title);
-  res.json(result);
+  try {
+    const result = await fribbService.resolve(anilistId, episode, format, malId, title);
+    res.json(result);
+  } catch (err) {
+    console.error('Error resolving stream:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // 6. User Watchlist Endpoints
@@ -440,12 +457,17 @@ app.post('/api/v1/user/watchlist', (req, res) => {
     return res.status(400).json({ error: 'Media payload required' });
   }
 
+  // Optional explicit action ('add' | 'remove'); omitting it keeps the legacy toggle behaviour.
+  const { action } = req.body;
   const data = loadUserData();
   const index = data.watchlist.findIndex(item => item.id === media.id);
+  const shouldRemove = action === 'remove' || (action !== 'add' && index >= 0);
 
   let added = false;
-  if (index >= 0) {
-    data.watchlist.splice(index, 1);
+  if (shouldRemove) {
+    if (index >= 0) data.watchlist.splice(index, 1);
+  } else if (index >= 0) {
+    added = true;
   } else {
     data.watchlist.unshift({
       id: media.id,
@@ -472,28 +494,28 @@ app.get('/api/v1/user/history', (req, res) => {
 });
 
 app.post('/api/v1/user/history', (req, res) => {
-  const { anilistId, episodeNumber, progressSeconds, totalSeconds, media } = req.body;
-  if (!anilistId || !episodeNumber) {
+  const { anilistId, episodeNumber, seasonNumber, progressSeconds, totalSeconds, media } = req.body;
+  const id = Number(anilistId);
+  const ep = Number(episodeNumber);
+  if (!Number.isFinite(id) || id <= 0 || !Number.isFinite(ep) || ep <= 0) {
     return res.status(400).json({ error: 'anilistId and episodeNumber required' });
   }
 
   const data = loadUserData();
-  const existingIndex = data.history.findIndex(h => h.anilistId === anilistId);
+  const existing = data.history.find(h => Number(h.anilistId) === id);
 
   const historyItem = {
-    anilistId: Number(anilistId),
-    episodeNumber: Number(episodeNumber),
+    anilistId: id,
+    episodeNumber: ep,
+    seasonNumber: Number(seasonNumber) || existing?.seasonNumber || 1,
     progressSeconds: progressSeconds || 0,
     totalSeconds: totalSeconds || 1440,
     watchedAt: new Date().toISOString(),
-    media: media || (existingIndex >= 0 ? data.history[existingIndex].media : null)
+    media: media || existing?.media || null
   };
 
-  if (existingIndex >= 0) {
-    data.history[existingIndex] = historyItem;
-  } else {
-    data.history.unshift(historyItem);
-  }
+  // Most recent first, bounded so the store file cannot grow without limit.
+  data.history = [historyItem, ...data.history.filter(h => Number(h.anilistId) !== id)].slice(0, MAX_HISTORY_ITEMS);
 
   saveUserData(data);
   res.json({ success: true, history: data.history });
@@ -514,6 +536,18 @@ app.delete('/api/v1/user/history/:anilistId', (req, res) => {
   data.history = data.history.filter(h => h.anilistId !== anilistId);
   saveUserData(data);
   res.json({ success: true, history: data.history });
+});
+
+// Unknown API routes return JSON instead of Express's default HTML page
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Malformed JSON bodies and other unhandled errors
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({ error: status === 500 ? 'Internal server error' : err.message });
 });
 
 // Start Server & Ingest Crosswalk Mapping

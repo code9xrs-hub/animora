@@ -1,35 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { fetchHomeCatalog, getWatchHistory, WatchHistoryItem } from '../api/animeApi';
+import { fetchHomeCatalog } from '../api/animeApi';
+import { useWatchHistory } from '../lib/userStore';
 import { HomeCatalogResponse } from '../types/anime';
 import { HeroBannerCarousel } from '../components/home/HeroBannerCarousel';
 import { MediaSwimlane } from '../components/home/MediaSwimlane';
-import { AnimePosterCard } from '../components/cards/AnimePosterCard';
 import { SEO } from '../components/common/SEO';
 import { HomePageSkeleton } from '../components/common/Shimmer';
+import { StatusMessage } from '../components/common/StatusMessage';
 
 export const HomePage: React.FC = () => {
   const [data, setData] = useState<HomeCatalogResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [history, setHistory] = useState<WatchHistoryItem[]>([]);
+  const history = useWatchHistory();
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const catalogRes = await fetchHomeCatalog();
+      setData(catalogRes);
+    } catch (err: unknown) {
+      console.error('Failed to load home page:', err);
+      setError(err instanceof Error ? err.message : 'Error loading catalog');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const [catalogRes, historyRes] = await Promise.all([
-          fetchHomeCatalog(),
-          getWatchHistory()
-        ]);
-        setData(catalogRes);
-        setHistory(historyRes);
-      } catch (err: any) {
-        console.error('Failed to load home page:', err);
-        setError(err.message || 'Error loading catalog');
-      } finally {
-        setLoading(false);
-      }
-    }
     loadData();
   }, []);
 
@@ -39,14 +38,12 @@ export const HomePage: React.FC = () => {
 
   if (error || !data) {
     return (
-      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-4 text-white px-4">
-        <p className="text-red-400 font-semibold">{error || 'Failed to load catalog'}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-[#F47521] text-black font-bold px-5 py-2 rounded"
-        >
-          Try Again
-        </button>
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <StatusMessage
+          title="Failed to Load Catalog"
+          description={error || 'We could not reach the anime catalog. Please check your connection or try again.'}
+          onRetry={loadData}
+        />
       </div>
     );
   }
@@ -57,7 +54,7 @@ export const HomePage: React.FC = () => {
     .map((h) => h.media!);
 
   return (
-    <div className="w-full pb-2 md:pb-8">
+    <div className="w-full pb-8 md:pb-12">
       <SEO
         title="Watch Trending Anime & Simulcasts Online Free"
         description="Stream thousands of trending anime series, simulcasts, and movies in HD with zero-wait direct downloads and multi-server playback on Animora."

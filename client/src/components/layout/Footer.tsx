@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export const Footer: React.FC = () => {
   return (
     <footer className="mt-auto bg-[#0E0F12] border-t border-[#1F2026] pt-3.5 pb-20 md:py-7 text-[#8E93A0] text-xs">
@@ -40,8 +42,8 @@ export const Footer: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/calendar" className="hover:text-white transition-colors">
-                    Simulcast Season
+                  <Link to="/browse?status=RELEASING&sort=TRENDING_DESC" className="hover:text-white transition-colors">
+                    Airing Now
                   </Link>
                 </li>
                 <li>
@@ -50,7 +52,7 @@ export const Footer: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/browse" className="hover:text-white transition-colors">
+                  <Link to="/calendar" className="hover:text-white transition-colors">
                     Release Calendar
                   </Link>
                 </li>
@@ -111,13 +113,11 @@ export const Footer: React.FC = () => {
 
         {/* Clean Compact Bottom Row */}
         <div className="pt-0 md:pt-4 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 text-[11px] text-[#636875] text-center sm:text-left">
-          <p>© {new Date().getFullYear()} Animora. All rights reserved.</p>
+          <p>© {CURRENT_YEAR} Animora. All rights reserved.</p>
           <div className="flex items-center gap-3 sm:gap-4">
             <span>English (US)</span>
             <span>•</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
-            <span>•</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
+            <span>Data by AniList</span>
           </div>
         </div>
 
