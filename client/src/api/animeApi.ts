@@ -141,6 +141,54 @@ export function fetchCalendar(startUnix?: number, endUnix?: number): Promise<{ s
   );
 }
 
+
+export interface AniKotoScheduleItem {
+  id: string;
+  title: string;
+  title_jp?: string;
+  episode: string;
+  time: string;
+  timestamp: string;
+  airing_status: string;
+  audio_type?: string;
+  poster: string;
+  description?: string;
+  genres?: string[];
+  slug?: string;
+  url?: string;
+}
+
+export interface AniKotoDaySchedule {
+  day: string;
+  label: string;
+  timestamp: string;
+  is_today: boolean;
+  is_past: boolean;
+  total_scheduled: number;
+  items: AniKotoScheduleItem[];
+}
+
+export interface AniKotoScheduleResponse {
+  source: string;
+  timezone_offset: number;
+  scraped_at: string;
+  days: string[];
+  schedule: Record<string, AniKotoDaySchedule>;
+}
+
+export async function fetchAniKotoSchedule(day?: string): Promise<AniKotoScheduleResponse> {
+  const query = day ? `?day=${encodeURIComponent(day.toLowerCase())}` : '';
+  const url = `https://anifetch.code9x-rs.workers.dev/api/anikoto/schedule${query}`;
+
+  return cached(`anikoto_schedule_${day || 'all'}`, async () => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Schedule service returned HTTP ${res.status}`);
+    }
+    return res.json();
+  });
+}
+
 export async function resolveStream(
   anilistId: number,
   episode: number = 1,

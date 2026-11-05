@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { getAnimeUrl, getWatchUrl, cacheSlugId, getCachedSlugId, slugify, getAnimeTitle } from '../lib/slug';
 import { getHighResPoster, getHighResEpisodeThumbnail } from '../lib/imageUtils';
@@ -44,14 +45,29 @@ export const SeriesDetailPage: React.FC = () => {
   const isBookmarked = useIsInWatchlist(data?.media?.id);
   const [isCopied, setIsCopied] = useState(false);
 
-  // Close trailer modal on Escape key
+  // Lock body scroll and close trailer modal on Escape key
   useEffect(() => {
     if (!isTrailerOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.overflow = 'hidden';
+    if (scrollBarWidth > 0) {
+      document.body.style.paddingRight = `${scrollBarWidth}px`;
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsTrailerOpen(false);
     };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isTrailerOpen]);
 
   useEffect(() => {
@@ -376,15 +392,19 @@ export const SeriesDetailPage: React.FC = () => {
                       }}
                       className="bg-[#181A22] border border-[#F47521]/80 text-white text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer hover:border-[#F47521] shadow-sm transition-colors"
                     >
-                      {franchiseSeasons.map((s) => (
-                        <option key={s.anilistId} value={s.anilistId}>
-                          {s.seasonNumberLabel} â€¢ {s.title} ({s.episodesCount} {s.episodesCount === 1 ? 'ep' : 'eps'})
-                        </option>
-                      ))}
+                      {franchiseSeasons.map((s) => {
+                        const seasonLabel = s.seasonNumberLabel || 'Season 1';
+                        const epSuffix = s.episodesCount ? ` (EP${s.episodesCount})` : '';
+                        return (
+                          <option key={s.anilistId} value={s.anilistId}>
+                            {seasonLabel}{epSuffix}
+                          </option>
+                        );
+                      })}
                     </select>
                   ) : (
                     <span className="text-xs bg-[#181A22] border border-white/10 text-[#8E93A0] font-medium px-3 py-1.5 rounded-xl">
-                      {currentSeasonNode?.seasonNumberLabel || `Season ${activeSeasonNumber}`} â€¢ {episodes.length} Episodes
+                      {currentSeasonNode?.seasonNumberLabel || `Season ${activeSeasonNumber}`} {episodes.length > 0 ? `(EP${episodes.length})` : ''}
                     </span>
                   )}
                 </div>
@@ -630,34 +650,54 @@ export const SeriesDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. YouTube Trailer Modal */}
-      {isTrailerOpen && media.trailer && media.trailer.id && (
+      {/* 3. YouTube Trailer Modal (Rendered at Root Portal to avoid ancestor transform/overflow clipping) */}
+      {isTrailerOpen && media.trailer && media.trailer.id && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 md:p-8 animate-page"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${title} Trailer`}
+          className="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 md:p-8 overflow-hidden overscroll-none select-none w-screen h-[100dvh]"
           onClick={() => setIsTrailerOpen(false)}
         >
           <div
-            className="relative w-full max-w-3xl lg:max-w-4xl max-h-[85vh] aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/15"
+            className="relative w-full mx-auto flex flex-col gap-2 sm:gap-2.5 pointer-events-auto"
+            style={{
+              maxWidth: 'min(94vw, calc((90dvh - 3.5rem) * 16 / 9), 56rem)'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              onClick={() => setIsTrailerOpen(false)}
-              aria-label="Close trailer"
-              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-[#F47521] text-white hover:text-black flex items-center justify-center transition cursor-pointer backdrop-blur-sm border border-white/10"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${media.trailer.id}?autoplay=1&rel=0`}
-              title={`${title} Trailer`}
-              className="w-full h-full border-none"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
-              {...{ autoPictureInPicture: "true" }}
-              allowFullScreen
-            />
+            {/* Top Bar with Title & Close Button */}
+            <div className="flex items-center justify-between w-full px-1">
+              <div className="flex items-center gap-2 truncate pr-3">
+                <Film className="w-4 h-4 text-[#FAB818] flex-shrink-0" />
+                <span className="text-xs sm:text-sm font-semibold truncate text-white/90">
+                  {title} — Official Trailer
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTrailerOpen(false)}
+                aria-label="Close trailer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-[#F47521] text-white hover:text-black flex items-center justify-center transition-all cursor-pointer backdrop-blur-md border border-white/20 active:scale-95 flex-shrink-0 shadow-xl"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* 16:9 Video Box */}
+            <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/15 ring-1 ring-white/10">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${media.trailer.id}?autoplay=1&rel=0`}
+                title={`${title} Trailer`}
+                className="w-full h-full border-none block"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+                {...{ autoPictureInPicture: "true" }}
+                allowFullScreen
+              />
+            </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -28,7 +28,7 @@ const MOBILE_LINKS = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/browse', label: 'Browse All Anime', icon: Compass },
   { to: '/movies', label: 'Anime Movies', icon: Film },
-  { to: '/calendar', label: 'Simulcast Calendar', icon: Calendar }
+  { to: '/schedule', label: 'Schedule', icon: Calendar }
 ];
 
 export const Navbar: React.FC = () => {
@@ -344,10 +344,10 @@ export const Navbar: React.FC = () => {
               Movies
             </Link>
             <Link
-              to="/calendar"
+              to="/schedule"
               className="text-white hover:text-[#F47521] transition-colors"
             >
-              Simulcast Calendar
+              Schedule
             </Link>
           </nav>
         </div>

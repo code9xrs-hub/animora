@@ -31,10 +31,10 @@ export const MobileBottomNav: React.FC = () => {
       isCenter: true
     },
     {
-      name: 'Calendar',
-      to: '/calendar',
+      name: 'Schedule',
+      to: '/schedule',
       icon: Calendar,
-      isActive: currentPath.startsWith('/calendar'),
+      isActive: currentPath.startsWith('/schedule') || currentPath.startsWith('/calendar'),
       isCenter: false
     },
     {

@@ -48,7 +48,8 @@ It combines the vast catalog of **AniList GraphQL v2** with high-speed multi-ser
 - 🚀 **Extreme Bundle Optimization:** Route-level code splitting dropping initial JS load to just **~69 KB** (84% reduction!) and sub-second builds (~1s).
 - 🎬 **Multi-Server Cinema Theater:** 3 dedicated servers (HD-1 Multi-Mirror, SUB, DUB) with landscape rotation lock and feature-policy iframe controls.
 - 🔄 **Real-Time Dynamic Crosswalk & Zero-Reload Switcher:** Translates AniList IDs to TMDb/IMDb on the fly via `api.ani.zip` and `arm.haglund.dev`, with in-place episode switches that eliminate full page reloads.
-- 📅 **7-Day Simulcast Airing Calendar:** Multi-page pagination populating up to 200 broadcast schedules across all 7 weekdays with live countdown timers.
+- 📅 **7-Day AniKoto Airing Schedule:** Real-time weekly lineup powered by the AniKoto schedule API, complete with live countdowns, broadcast status badges (AIRED vs upcoming), and local timezone conversion.
+- 🎬 **Isolated Trailer Modal:** React Portal-driven cinema trailer player (`createPortal`) providing true viewport centering and zero scroll leakage across mobile and desktop.
 
 ---
 
@@ -104,7 +105,7 @@ It combines the vast catalog of **AniList GraphQL v2** with high-speed multi-ser
 - **Non-Truncated Titles:** Multi-line responsive font scaling ensures long anime titles are fully legible.
 
 ### 6. 🧭 Mobile-First UI & Centerpiece Navigation Bar
-- **Ergonomic Centerpiece Bottom Navigation:** Positioned the primary **Home** action in the middle (`Browse` | `Movies` | **`Home`** | `Calendar` | `Watchlist`) with an elevated circular highlight and active glow.
+- **Ergonomic Centerpiece Bottom Navigation:** Positioned the primary **Home** action in the middle (`Browse` | `Movies` | **`Home`** | `Schedule` | `Watchlist`) with an elevated circular highlight and active glow.
 - **Single-Line Mobile Card Metadata:** Dynamic season badge (`S1` on mobile, `Season 1` on desktop), `Sub | Dub`, and release year fit strictly on a single line with zero awkward wrapping or truncation.
 - **Touch-Optimized Swimlanes:** Wider card rails (`w-[138px] xs:w-40`) showing ~2.2 cards across screen width with native momentum scrolling (`-webkit-overflow-scrolling: touch; overscroll-behavior-x: contain`).
 
@@ -123,10 +124,10 @@ It combines the vast catalog of **AniList GraphQL v2** with high-speed multi-ser
 - **Instant Dual-Tier Translation:** Resolves metadata via [`api.ani.zip`](https://api.ani.zip) and [`arm.haglund.dev`](https://arm.haglund.dev/) on demand.
 - **Sub-Millisecond In-Memory Caching:** Subsequent lookups complete in `<0.01ms` from runtime session memory.
 
-### 10. 📅 Live Simulcast Airing Calendar
-- **Full 7-Day Multi-Page Schedule:** Multi-page query fetching up to 200 broadcast schedules to ensure all 7 days of the week populate accurately.
-- **Real-Time Countdown:** Live ticking countdown showing hours, minutes, and seconds until the next episode broadcasts in Japan.
-- **Timezone Synchronization:** Automatically converts broadcast schedules to the viewer's local browser timezone.
+### 10. 📅 Live Airing Schedule (AniKoto API)
+- **Real-Time Weekly Lineup:** Fetches daily schedules from the AniKoto schedule API (`https://anifetch.code9x-rs.workers.dev/api/anikoto/schedule`) spanning all 7 weekdays (`Mon` - `Sun`).
+- **Live Countdown & Broadcast Status:** Shows hours, minutes, and seconds until the next episode airs, plus distinct `AIRED` vs upcoming badges.
+- **Audio & Stream Metadata:** Displays `SUB` and `DUB` badge indicators, airing episode numbers, and direct watch links.
 
 ---
 
@@ -142,7 +143,7 @@ Animora adopts a clean, readable URL structure optimized for search engine index
 | **Movie Playback** | `/watch/:title/:year` | `/watch/your-name/2016` | `/watch/21519` &rarr; Auto-upgrades |
 | **Catalog Browse** | `/browse?genre=...&format=...` | `/browse?genre=Action&format=TV` | Supported |
 | **Movies Hub** | `/movies` | `/movies` | Supported |
-| **Simulcast Calendar**| `/calendar` | `/calendar` | Supported |
+| **Anime Schedule**| `/schedule` | `/schedule` (also `/calendar`) | Supported |
 
 ---
 

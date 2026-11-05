@@ -52,8 +52,8 @@ export const Footer: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/calendar" className="hover:text-white transition-colors">
-                    Release Calendar
+                  <Link to="/schedule" className="hover:text-white transition-colors">
+                    Schedule
                   </Link>
                 </li>
               </ul>

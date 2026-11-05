@@ -128,6 +128,7 @@ function AppRoutes() {
             <Route path="/" element={<HomePage />} />
             <Route path="/browse" element={<BrowsePage />} />
             <Route path="/movies" element={<MoviesPage />} />
+            <Route path="/schedule" element={<CalendarPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             {/* Semantic Slug Routes */}
             <Route path="/series/:slug" element={<SeriesDetailPage />} />
