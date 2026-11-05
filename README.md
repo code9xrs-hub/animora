@@ -125,7 +125,7 @@ It combines the vast catalog of **AniList GraphQL v2** with high-speed multi-ser
 - **Sub-Millisecond In-Memory Caching:** Subsequent lookups complete in `<0.01ms` from runtime session memory.
 
 ### 10. 📅 Live Airing Schedule (AniKoto API)
-- **Real-Time Weekly Lineup:** Fetches daily schedules from the AniKoto schedule API (`https://anifetch.code9x-rs.workers.dev/api/anikoto/schedule`) spanning all 7 weekdays (`Mon` - `Sun`).
+- **Real-Time Weekly Lineup:** Fetches daily schedules from the AniKoto schedule API (`https://animora.web.app/schedule`) spanning all 7 weekdays (`Mon` - `Sun`).
 - **Live Countdown & Broadcast Status:** Shows hours, minutes, and seconds until the next episode airs, plus distinct `AIRED` vs upcoming badges.
 - **Audio & Stream Metadata:** Displays `SUB` and `DUB` badge indicators, airing episode numbers, and direct watch links.
 
