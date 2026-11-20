@@ -135,6 +135,7 @@ function AppRoutes() {
             <Route path="/movie/:slug/:year" element={<SeriesDetailPage />} />
             <Route path="/movie/:slug" element={<SeriesDetailPage />} />
             <Route path="/watch/:slug/:year" element={<WatchPage />} />
+            <Route path="/watch/:slug/ep/:episodeNumber" element={<WatchPage />} />
             <Route path="/watch/:slug" element={<WatchPage />} />
             {/* Legacy Numeric ID Routes */}
             <Route path="/series/:id" element={<SeriesDetailPage />} />

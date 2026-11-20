@@ -214,14 +214,19 @@ export async function clientFetchAnimeDetail(
 
   if (isNaN(numericId) || numericId <= 0) {
     let cleanSearch = String(id);
+    let seasonNumber = 1;
+
     const match1x1 = cleanSearch.match(/^(.+?)-(\d+)x(\d+)$/i);
     if (match1x1) {
       cleanSearch = match1x1[1];
+      seasonNumber = parseInt(match1x1[2], 10) || 1;
     }
     const matchSeason = cleanSearch.match(/^(.+?)-season-(\d+)$/i);
     if (matchSeason) {
       cleanSearch = matchSeason[1];
+      seasonNumber = parseInt(matchSeason[2], 10) || 1;
     }
+    cleanSearch = cleanSearch.replace(/-season-\d+$/i, '').replace(/-\d+x\d+$/i, '');
     cleanSearch = cleanSearch.replace(/-/g, ' ').trim();
 
     const resolveQuery = `
@@ -231,11 +236,28 @@ export async function clientFetchAnimeDetail(
         }
       }
     `;
-    const searchData = await fetchGraphQL(resolveQuery, {
-      search: cleanSearch,
-      format: options?.format || undefined,
-      seasonYear: options?.seasonYear ? Number(options?.seasonYear) : undefined
-    });
+
+    // If season > 1, first attempt searching specifically for "Title Season X"
+    let searchData = null;
+    if (seasonNumber > 1) {
+      try {
+        searchData = await fetchGraphQL(resolveQuery, {
+          search: `${cleanSearch} Season ${seasonNumber}`,
+          format: options?.format || undefined,
+          seasonYear: options?.seasonYear ? Number(options?.seasonYear) : undefined
+        });
+      } catch {}
+    }
+
+    // Fallback to base title search
+    if (!searchData?.Media?.id) {
+      searchData = await fetchGraphQL(resolveQuery, {
+        search: cleanSearch,
+        format: options?.format || undefined,
+        seasonYear: options?.seasonYear ? Number(options?.seasonYear) : undefined
+      });
+    }
+
     if (searchData?.Media?.id) {
       numericId = searchData.Media.id;
     } else {

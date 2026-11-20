@@ -31,14 +31,15 @@ export function getAnimeTitle(media: {
 export function buildSeriesDetailSlug(title: string, season: number = 1): string {
   let cleanSlug = slugify(title);
   const s = Math.max(1, Math.floor(season || 1));
-  cleanSlug = cleanSlug.replace(/-season-\d+$/i, '');
+  cleanSlug = cleanSlug.replace(/-season-\d+$/i, '').replace(/-\d+x\d+$/i, '');
   return `${cleanSlug}-season-${s}`;
 }
 
 export function buildSeriesSlug(title: string, season: number = 1, episode: number = 1): string {
-  const cleanSlug = slugify(title);
+  let cleanSlug = slugify(title);
   const s = Math.max(1, Math.floor(season || 1));
   const ep = Math.max(1, Math.floor(episode || 1));
+  cleanSlug = cleanSlug.replace(/-season-\d+$/i, '').replace(/-\d+x\d+$/i, '');
   return `${cleanSlug}-${s}x${ep}`;
 }
 
@@ -132,31 +133,31 @@ export function parseSeriesSlug(slug: string): ParsedSlug {
     };
   }
 
+  // Check for -(\d+)x(\d+)$ (Watch URL: /watch/title-1x1)
+  const match1x1 = slug.match(/^(.+?)-(\d+)x(\d+)$/i);
+  if (match1x1) {
+    const titleSlug = match1x1[1].replace(/-season-\d+$/i, '');
+    const season = Math.max(1, parseInt(match1x1[2], 10) || 1);
+    const episode = Math.max(1, parseInt(match1x1[3], 10) || 1);
+    return {
+      isNumeric: false,
+      titleSlug,
+      season,
+      episode,
+      searchKeywords: titleSlug.replace(/-/g, ' ').trim()
+    };
+  }
+
   // Check for -season-(\d+)$ (Series detail URL: /series/title-season-1)
   const matchSeason = slug.match(/^(.+?)-season-(\d+)$/i);
   if (matchSeason) {
-    const titleSlug = matchSeason[1];
+    const titleSlug = matchSeason[1].replace(/-\d+x\d+$/i, '');
     const season = Math.max(1, parseInt(matchSeason[2], 10) || 1);
     return {
       isNumeric: false,
       titleSlug,
       season,
       episode: 1,
-      searchKeywords: titleSlug.replace(/-/g, ' ').trim()
-    };
-  }
-
-  // Check for -(\d+)x(\d+)$ (Watch URL: /watch/title-1x1)
-  const match = slug.match(/^(.+?)-(\d+)x(\d+)$/i);
-  if (match) {
-    const titleSlug = match[1];
-    const season = Math.max(1, parseInt(match[2], 10) || 1);
-    const episode = Math.max(1, parseInt(match[3], 10) || 1);
-    return {
-      isNumeric: false,
-      titleSlug,
-      season,
-      episode,
       searchKeywords: titleSlug.replace(/-/g, ' ').trim()
     };
   }

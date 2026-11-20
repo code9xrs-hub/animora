@@ -1,11 +1,11 @@
 import React, { memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Play, Bookmark, Check } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { AnimeMedia } from '../../types/anime';
-import { toggleWatchlist, getContinuePlayUrl } from '../../api/animeApi';
+import { getContinuePlayUrl } from '../../api/animeApi';
 import { getAnimeUrl } from '../../lib/slug';
 import { getHighResPoster } from '../../lib/imageUtils';
-import { useIsInWatchlist, useWatchHistory } from '../../lib/userStore';
+import { useWatchHistory } from '../../lib/userStore';
 
 interface AnimePosterCardProps {
   anime: AnimeMedia;
@@ -15,7 +15,6 @@ const stripHtml = (html?: string) => (html ? html.replace(/<[^>]*>?/gm, '').trim
 
 const AnimePosterCardBase: React.FC<AnimePosterCardProps> = ({ anime }) => {
   const navigate = useNavigate();
-  const isBookmarked = useIsInWatchlist(anime.id);
   // Subscribing keeps the resume label in sync after the user watches something.
   useWatchHistory();
 
@@ -36,12 +35,6 @@ const AnimePosterCardBase: React.FC<AnimePosterCardProps> = ({ anime }) => {
         : `Resume E${last.episodeNumber}`
       : `S${seasonNum} E1`;
 
-  const handleBookmarkClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWatchlist(anime);
-  };
-
   const handlePlayClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -61,32 +54,12 @@ const AnimePosterCardBase: React.FC<AnimePosterCardProps> = ({ anime }) => {
           />
         </Link>
 
-        {/* Format & Score Badges */}
+        {/* Format Badge */}
         <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10 pointer-events-none">
           <span className="bg-black/75 backdrop-blur-md text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md text-white/90 uppercase tracking-wide border border-white/10">
             {anime.format || 'TV'}
           </span>
-          {score && (
-            <span className="bg-[#FAB818] text-black text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
-              ★ {score}
-            </span>
-          )}
         </div>
-
-        {/* Bookmark is always reachable on touch devices (no hover there) */}
-        <button
-          type="button"
-          onClick={handleBookmarkClick}
-          aria-label={isBookmarked ? `Remove ${title} from watchlist` : `Add ${title} to watchlist`}
-          aria-pressed={isBookmarked}
-          className={`sm:hidden absolute top-2 right-2 z-10 p-1.5 rounded-lg backdrop-blur-md border transition-colors ${
-            isBookmarked
-              ? 'bg-[#F47521] text-black border-[#F47521]'
-              : 'bg-black/60 text-white border-white/15'
-          }`}
-        >
-          {isBookmarked ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
-        </button>
 
         {/* Hover drawer (desktop) — pure CSS, no per-card state */}
         <div className="hidden sm:flex absolute inset-0 z-20 flex-col justify-between bg-[#14151B]/95 backdrop-blur-md p-3.5 sm:p-4 opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto">
@@ -115,29 +88,14 @@ const AnimePosterCardBase: React.FC<AnimePosterCardProps> = ({ anime }) => {
             )}
           </Link>
 
-          <div className="flex items-center gap-2 pt-2.5 border-t border-white/10">
+          <div className="pt-2.5 border-t border-white/10">
             <button
               type="button"
               onClick={handlePlayClick}
-              className="flex-1 min-w-0 bg-[#F47521] hover:bg-[#FF8533] text-black font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm active:scale-95"
+              className="w-full bg-[#F47521] hover:bg-[#FF8533] text-black font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm active:scale-95"
             >
               <Play className="w-3.5 h-3.5 fill-current flex-shrink-0" />
               <span className="truncate">{playLabel}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleBookmarkClick}
-              aria-label={isBookmarked ? `Remove ${title} from watchlist` : `Add ${title} to watchlist`}
-              aria-pressed={isBookmarked}
-              title={isBookmarked ? 'In Watchlist' : 'Add to Watchlist'}
-              className={`p-2 rounded-lg border transition-colors ${
-                isBookmarked
-                  ? 'border-[#F47521] bg-[#F47521]/15 text-[#F47521]'
-                  : 'border-white/15 bg-white/5 text-[#9AA0A6] hover:text-white hover:border-white/30'
-              }`}
-            >
-              {isBookmarked ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -152,22 +110,18 @@ const AnimePosterCardBase: React.FC<AnimePosterCardProps> = ({ anime }) => {
         >
           {title}
         </Link>
-        <div className="flex items-center justify-between gap-1 w-full overflow-hidden whitespace-nowrap text-[10px] sm:text-[11px] text-[#8E93A0] leading-none pt-0.5 select-none">
-          <div className="flex items-center gap-1.5 min-w-0 flex-shrink-0">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#F47521] bg-[#F47521]/15 border border-[#F47521]/30 px-1.5 py-0.5 rounded leading-none flex-shrink-0">
-              {isMovie ? (
-                'Movie'
-              ) : (
-                <>
-                  <span className="sm:hidden">S{seasonNum}</span>
-                  <span className="hidden sm:inline">Season {seasonNum}</span>
-                </>
-              )}
-            </span>
-            <span className="text-[9.5px] sm:text-[11px] text-[#2ABDBB] font-semibold tracking-tight flex-shrink-0">
-              Sub | Dub
-            </span>
-          </div>
+        <div className="flex items-center justify-between gap-1.5 w-full overflow-hidden whitespace-nowrap text-[10px] sm:text-[11px] text-[#8E93A0] leading-none pt-0.5 select-none">
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#F47521] bg-[#F47521]/15 border border-[#F47521]/30 px-1.5 py-0.5 rounded leading-none flex-shrink-0">
+            {isMovie ? (
+              'Movie'
+            ) : (
+              <>
+                <span className="sm:hidden">S{seasonNum}</span>
+                <span className="hidden sm:inline">Season {seasonNum}</span>
+              </>
+            )}
+          </span>
+
           {anime.seasonYear ? (
             <span className="text-[9.5px] sm:text-[11px] font-mono text-[#8E93A0] font-medium flex-shrink-0 ml-auto">
               {anime.seasonYear}

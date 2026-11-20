@@ -99,9 +99,14 @@ export const SeriesDetailPage: React.FC = () => {
         const mTitle = getAnimeTitle(res.media);
         cacheSlugId(slugify(mTitle), res.media.id);
 
-        // Auto-upgrade legacy numeric URL (e.g. /series/186541 or /movie/21519) to semantic slug
-        if (/^\d+$/.test(rawParam)) {
-          const canonicalUrl = getAnimeUrl(res.media, 1);
+        // Auto-normalize and upgrade URL to ensure exact canonical schema:
+        // Series: /series/:title-season-:num
+        // Movie: /movie/:title/:year
+        const seasonMatch = rawParam.match(/-season-(\d+)$/i);
+        const reqSeasonNum = seasonMatch ? parseInt(seasonMatch[1], 10) : 1;
+        const canonicalUrl = getAnimeUrl(res.media, reqSeasonNum);
+
+        if (location.pathname !== canonicalUrl) {
           navigate(canonicalUrl, { replace: true, state: { anilistId: res.media.id } });
         }
       } catch (err: any) {
@@ -113,6 +118,19 @@ export const SeriesDetailPage: React.FC = () => {
     }
     loadDetail();
   }, [rawParam, year, isMovieRoute, location.state, navigate]);
+
+  // Re-initialize ShareThis whenever the anime/route changes (placed before early returns to preserve hook order)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const st = (window as any).__sharethis__;
+      if (st && typeof st.initialize === 'function') {
+        try {
+          st.initialize();
+        } catch {}
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [data?.media?.id, location.pathname]);
 
   if (loading) {
     return <SeriesDetailPageSkeleton />;
@@ -162,7 +180,12 @@ export const SeriesDetailPage: React.FC = () => {
     navigator.clipboard.writeText(window.location.href);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
+    const shareSec = document.getElementById('sharethis-section');
+    if (shareSec) {
+      shareSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   };
+
 
   // Filter and sort episodes
   let filteredEpisodes = [...episodes];
@@ -361,6 +384,48 @@ export const SeriesDetailPage: React.FC = () => {
                 </Link>
               ))}
             </div>
+          </div>
+
+          {/* Share Section (ShareThis) */}
+          <div
+            id="sharethis-section"
+            className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-4 sm:p-5 space-y-3 shadow-sm"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2.5 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <Share2 className="w-4 h-4 text-[#F47521]" />
+                <h3 className="font-semibold text-xs uppercase tracking-wider text-white">
+                  Share Anime
+                </h3>
+              </div>
+              <p className="text-[11px] text-[#8E93A0]">
+                Enjoying <span className="text-white font-medium">{title}</span>? Share it with friends on social media!
+              </p>
+            </div>
+
+            {/* ShareThis BEGINS */}
+            <div className="pt-1 overflow-x-auto min-h-[44px]">
+              <div
+                className="sharethis-share-buttons"
+                data-type="inline-share-buttons"
+                data-labels="counts"
+                data-show_total="true"
+                data-size="small"
+                data-url={typeof window !== 'undefined' ? window.location.href : undefined}
+                data-title={title}
+              >
+                <span data-network="facebook"></span>
+                <span data-network="twitter"></span>
+                <span data-network="sharethis"></span>
+                <span data-network="linkedin"></span>
+                <span data-network="reddit"></span>
+                <span data-network="telegram"></span>
+                <span data-network="vk"></span>
+                <span data-network="messenger"></span>
+                <span data-network="line"></span>
+              </div>
+            </div>
+            {/* ShareThis ENDS */}
           </div>
 
           {/* Franchise Season Selector & Episode Browser (Only for Series, NOT for Movies) */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Play,
   Download,
@@ -70,6 +70,73 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
     };
   }, []);
 
+  // Toggle rotation / fullscreen handler
+  const handleToggleRotate = useCallback(async () => {
+    const container = playerContainerRef.current;
+    if (!container) return;
+
+    if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
+      try {
+        if (container.requestFullscreen) {
+          await container.requestFullscreen();
+        } else if ((container as any).webkitRequestFullscreen) {
+          await (container as any).webkitRequestFullscreen();
+        }
+
+        // Request landscape orientation lock if supported
+        if (window.screen?.orientation && 'lock' in window.screen.orientation) {
+          await (window.screen.orientation as any).lock('landscape').catch(() => {});
+        }
+      } catch {
+        // Fallback to manual CSS 90-degree landscape rotation if native fullscreen/orientation lock is denied
+        setIsRotatedLandscape((prev) => !prev);
+      }
+    } else {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        await (document as any).webkitExitFullscreen();
+      }
+      if (window.screen?.orientation?.unlock) {
+        try {
+          window.screen.orientation.unlock();
+        } catch {}
+      }
+      setIsRotatedLandscape(false);
+    }
+  }, []);
+
+  // Keyboard navigation shortcuts (f: fullscreen, l: lights off, p: prev, n: next)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeTag = (document.activeElement?.tagName || '').toLowerCase();
+      if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
+        return;
+      }
+
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        handleToggleRotate();
+      } else if (e.key === 'l' || e.key === 'L') {
+        e.preventDefault();
+        setLightsOff((prev) => !prev);
+      } else if (e.key === 'n' || e.key === 'N') {
+        if (hasNextEpisode) {
+          e.preventDefault();
+          onSelectNext();
+        }
+      } else if (e.key === 'p' || e.key === 'P') {
+        if (hasPrevEpisode) {
+          e.preventDefault();
+          onSelectPrev();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [hasNextEpisode, hasPrevEpisode, onSelectNext, onSelectPrev]);
+
   // Real-time conversion safeguard: if active stream is unmapped, resolve on the fly
   useEffect(() => {
     let isMounted = true;
@@ -121,42 +188,6 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
     setIframeLoaded(false);
   }, [activeServer, activeEpisode.episodeNumber, embedUrl]);
 
-  // Toggle rotation / fullscreen handler
-  const handleToggleRotate = async () => {
-    const container = playerContainerRef.current;
-    if (!container) return;
-
-    if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
-      try {
-        if (container.requestFullscreen) {
-          await container.requestFullscreen();
-        } else if ((container as any).webkitRequestFullscreen) {
-          await (container as any).webkitRequestFullscreen();
-        }
-
-        // Request landscape orientation lock if supported
-        if (window.screen?.orientation && 'lock' in window.screen.orientation) {
-          await (window.screen.orientation as any).lock('landscape').catch(() => {});
-        }
-      } catch {
-        // Fallback to manual CSS 90-degree landscape rotation if native fullscreen/orientation lock is denied
-        setIsRotatedLandscape((prev) => !prev);
-      }
-    } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        await (document as any).webkitExitFullscreen();
-      }
-      if (window.screen?.orientation?.unlock) {
-        try {
-          window.screen.orientation.unlock();
-        } catch {}
-      }
-      setIsRotatedLandscape(false);
-    }
-  };
-
   return (
     <section className="relative w-full">
       {/* Lights-Off Backdrop Overlay */}
@@ -177,18 +208,21 @@ export const MirrorBoxPlayer: React.FC<MirrorBoxPlayerProps> = ({
           className={`relative aspect-video w-full overflow-hidden bg-[#141519] shadow-2xl ring-1 ring-white/10 ${
             isRotatedLandscape
               ? 'fixed top-0 left-[100vw] w-[100vh] h-[100vw] rotate-90 origin-top-left z-[99999] rounded-none !aspect-auto'
-              : 'rounded-xl'
+              : isFullscreen
+                ? 'w-full h-full rounded-none !aspect-auto'
+                : 'rounded-xl'
           }`}
         >
           {/* Exit Full Screen Floating Badge */}
-          {isRotatedLandscape && (
+          {(isRotatedLandscape || isFullscreen) && (
             <button
-              onClick={() => setIsRotatedLandscape(false)}
-              className="absolute top-4 right-4 z-50 bg-black/80 hover:bg-[#F47521] text-white hover:text-black px-3 py-1.5 rounded-full shadow-lg transition-all flex items-center gap-1.5 text-xs font-bold border border-white/20"
-              title="Exit Full Screen"
+              type="button"
+              onClick={handleToggleRotate}
+              className="absolute top-4 right-4 z-50 bg-black/85 hover:bg-[#F47521] text-white hover:text-black px-3.5 py-1.5 rounded-full shadow-2xl transition-all flex items-center gap-1.5 text-xs font-bold border border-white/20 backdrop-blur-md cursor-pointer active:scale-95"
+              title="Exit Fullscreen"
             >
               <Minimize2 className="w-3.5 h-3.5" />
-              <span>Exit Full Screen</span>
+              <span>Exit Fullscreen</span>
             </button>
           )}
 

@@ -5,6 +5,7 @@ import { HeroBannerCarousel } from '../components/home/HeroBannerCarousel';
 import { MediaSwimlane } from '../components/home/MediaSwimlane';
 import { SEO } from '../components/common/SEO';
 import { HomePageSkeleton } from '../components/common/Shimmer';
+import { StatusMessage } from '../components/common/StatusMessage';
 
 export const MoviesPage: React.FC = () => {
   const [popularMovies, setPopularMovies] = useState<AnimeMedia[]>([]);
@@ -14,33 +15,35 @@ export const MoviesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadAllMovies() {
-      try {
-        setLoading(true);
-        const [popularRes, topRatedRes, newestRes] = await Promise.all([
-          fetchBrowse({ format: 'MOVIE', sort: 'POPULARITY_DESC', perPage: 24 }),
-          fetchBrowse({ format: 'MOVIE', sort: 'SCORE_DESC', perPage: 24 }),
-          fetchBrowse({ format: 'MOVIE', sort: 'START_DATE_DESC', perPage: 24 })
-        ]);
+  const loadAllMovies = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [popularRes, topRatedRes, newestRes] = await Promise.all([
+        fetchBrowse({ format: 'MOVIE', sort: 'POPULARITY_DESC', perPage: 24 }),
+        fetchBrowse({ format: 'MOVIE', sort: 'SCORE_DESC', perPage: 24 }),
+        fetchBrowse({ format: 'MOVIE', sort: 'START_DATE_DESC', perPage: 24 })
+      ]);
 
-        const pop = popularRes.media || [];
-        const top = topRatedRes.media || [];
-        const recent = newestRes.media || [];
+      const pop = popularRes.media || [];
+      const top = topRatedRes.media || [];
+      const recent = newestRes.media || [];
 
-        setPopularMovies(pop);
-        setTopRatedMovies(top);
-        setNewestMovies(recent);
+      setPopularMovies(pop);
+      setTopRatedMovies(top);
+      setNewestMovies(recent);
 
-        // Top 8 movies for the hero banner carousel
-        setSpotlightMovies(pop.slice(0, 8));
-      } catch (err: any) {
-        console.error('Failed to load anime movies:', err);
-        setError(err.message || 'Error loading movies');
-      } finally {
-        setLoading(false);
-      }
+      // Top 8 movies for the hero banner carousel
+      setSpotlightMovies(pop.slice(0, 8));
+    } catch (err: any) {
+      console.error('Failed to load anime movies:', err);
+      setError(err.message || 'Error loading movies');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadAllMovies();
   }, []);
 
@@ -50,14 +53,13 @@ export const MoviesPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center gap-4 text-white px-4">
-        <p className="text-red-400 font-semibold">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-[#F47521] text-black font-bold px-5 py-2 rounded-xl text-xs hover:bg-[#FF8533] transition-colors"
-        >
-          Try Again
-        </button>
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <StatusMessage
+          title="Failed to Load Movies"
+          description={error}
+          onRetry={loadAllMovies}
+          link={{ to: '/browse?format=MOVIE', label: 'Browse Movie Catalog' }}
+        />
       </div>
     );
   }

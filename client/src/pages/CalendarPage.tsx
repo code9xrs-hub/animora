@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar as CalendarIcon, Clock, Play, Timer, Sparkles } from 'lucide-react';
 import { fetchAniKotoSchedule, AniKotoDaySchedule, AniKotoScheduleItem } from '../api/animeApi';
-import { slugify } from '../lib/slug';
+import { slugify, buildSeriesDetailSlug, buildSeriesSlug } from '../lib/slug';
 import { SEO } from '../components/common/SEO';
 import { StatusMessage } from '../components/common/StatusMessage';
 
@@ -150,13 +150,20 @@ export const CalendarPage: React.FC = () => {
           {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
-              className="flex gap-3.5 p-3.5 rounded-xl bg-[#1A1C24] border border-[#2B2E38]/50 animate-shimmer h-28"
+              className="flex items-center gap-3.5 sm:gap-4 p-3 sm:p-3.5 rounded-xl bg-[#181A20] border border-white/[0.08] animate-shimmer"
             >
-              <div className="w-16 h-full rounded-lg animate-shimmer flex-shrink-0" />
-              <div className="flex-1 space-y-2.5 py-1">
-                <div className="w-3/4 h-4 rounded animate-shimmer" />
-                <div className="w-1/2 h-3 rounded animate-shimmer opacity-60" />
-                <div className="w-1/3 h-3 rounded animate-shimmer opacity-40" />
+              <div className="w-16 h-24 flex-shrink-0 rounded-lg animate-shimmer border border-white/5" />
+              <div className="flex-1 space-y-2 py-1 min-w-0">
+                <div className="flex justify-between items-center gap-2">
+                  <div className="w-20 h-4 rounded animate-shimmer bg-[#F47521]/15" />
+                  <div className="w-12 h-4 rounded animate-shimmer bg-[#2ABDBB]/15" />
+                </div>
+                <div className="w-4/5 h-4 rounded animate-shimmer" />
+                <div className="w-1/2 h-3 rounded animate-shimmer opacity-50" />
+                <div className="flex justify-between items-center pt-2 border-t border-white/[0.06]">
+                  <div className="w-24 h-6 rounded-lg animate-shimmer bg-[#F47521]/20" />
+                  <div className="w-14 h-4 rounded animate-shimmer opacity-40" />
+                </div>
               </div>
             </div>
           ))}
@@ -179,9 +186,8 @@ export const CalendarPage: React.FC = () => {
           {items.map((item) => {
             const epMatch = item.episode?.match(/\d+/);
             const epNum = epMatch ? parseInt(epMatch[0], 10) : 1;
-            const titleSlug = slugify(item.title);
-            const watchUrl = `/watch/${titleSlug}-1x${epNum}`;
-            const detailUrl = `/series/${titleSlug}-season-1`;
+            const watchUrl = `/watch/${buildSeriesSlug(item.title, 1, epNum)}`;
+            const detailUrl = `/series/${buildSeriesDetailSlug(item.title, 1)}`;
 
             const itemTimeUnix = parseInt(item.timestamp, 10) || 0;
             const diffSeconds = itemTimeUnix - nowUnix;
@@ -206,6 +212,10 @@ export const CalendarPage: React.FC = () => {
                     alt={item.title}
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300&q=80';
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
                   {item.audio_type && (

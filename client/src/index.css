@@ -116,9 +116,9 @@ button, a {
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    #1A1C23 0%,
-    #2B2E38 50%,
-    #1A1C23 100%
+    #14151B 0%,
+    #232632 50%,
+    #14151B 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite ease-in-out;

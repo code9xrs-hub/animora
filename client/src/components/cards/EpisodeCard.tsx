@@ -44,6 +44,10 @@ export const EpisodeCardBase: React.FC<EpisodeCardProps> = ({
           alt={episode.title}
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&q=80';
+          }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
 

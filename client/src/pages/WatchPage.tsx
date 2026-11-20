@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { getAnimeUrl, getWatchUrl, parseSeriesSlug, getCachedSlugId } from '../lib/slug';
 import { getHighResPoster, getHighResEpisodeThumbnail } from '../lib/imageUtils';
@@ -47,6 +47,7 @@ export const WatchPage: React.FC = () => {
   }, [episodeNumber, slug]);
 
   const [selectedEpNum, setSelectedEpNum] = useState<number>(parsedUrlInfo.episode);
+  const activeEpisodeRef = useRef<HTMLButtonElement | null>(null);
 
   // Sync selected episode with URL parameter when browser back/forward is used
   useEffect(() => {
@@ -54,6 +55,13 @@ export const WatchPage: React.FC = () => {
       setSelectedEpNum(parsedUrlInfo.episode);
     }
   }, [parsedUrlInfo.episode, selectedEpNum]);
+
+  // Auto-scroll the episode list to the active episode
+  useEffect(() => {
+    if (activeEpisodeRef.current) {
+      activeEpisodeRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [selectedEpNum, loading]);
 
   // Reactive watchlist subscription
   const isBookmarked = useIsInWatchlist(data?.media?.id);
@@ -97,9 +105,14 @@ export const WatchPage: React.FC = () => {
         }
       }
 
-      // If legacy numeric ID was accessed (/watch/186541/ep/1), upgrade URL to semantic slug
-      if (/^\d+$/.test(rawParam)) {
-        const canonicalUrl = getWatchUrl(res.media, parsedUrlInfo.season || 1, parsedUrlInfo.episode);
+      // Auto-normalize and upgrade URL to ensure exact canonical schema:
+      // Series: /watch/:title-:seasonx:episode
+      // Movie: /watch/:title/:year
+      const targetSeason = parsedUrlInfo.season || 1;
+      const targetEp = parsedUrlInfo.episode || 1;
+      const canonicalUrl = getWatchUrl(res.media, targetSeason, targetEp);
+
+      if (location.pathname !== canonicalUrl) {
         navigate(canonicalUrl, { replace: true, state: { anilistId: res.media.id } });
       }
 
@@ -143,7 +156,7 @@ export const WatchPage: React.FC = () => {
     );
   }
 
-  const { media, episodes } = data;
+  const { media, episodes, franchiseSeasons } = data;
   const isMovie = media.format === 'MOVIE';
   const title = media.title.english || media.title.romaji || 'Untitled';
 
@@ -181,6 +194,12 @@ export const WatchPage: React.FC = () => {
   const hasPrevEpisode = activeEpisodeIndex > 0;
   const hasNextEpisode = activeEpisodeIndex >= 0 && activeEpisodeIndex < episodes.length - 1;
   const nextEpisode = hasNextEpisode ? episodes[activeEpisodeIndex + 1] : null;
+
+  // Determine next season if at end of current season
+  const currentFranchiseIndex = franchiseSeasons?.findIndex((s) => s.anilistId === media.id) ?? -1;
+  const nextSeasonNode = currentFranchiseIndex >= 0 && franchiseSeasons && currentFranchiseIndex < franchiseSeasons.length - 1
+    ? franchiseSeasons[currentFranchiseIndex + 1]
+    : null;
 
   // Seamless in-place episode switching (Zero page reload / Zero skeleton flash)
   const handleEpisodeChange = (newEpNum: number) => {
@@ -456,15 +475,43 @@ export const WatchPage: React.FC = () => {
             ) : (
               <div className="bg-[#181A20] border border-white/[0.08] rounded-2xl p-4 shadow-sm flex flex-col h-full lg:max-h-[640px] xl:max-h-[690px]">
                 <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 mb-3">
-                  <div className="flex items-center gap-2">
-                    <Tv className="w-4 h-4 text-[#F47521]" />
-                    <h3 className="font-semibold text-xs text-white/90 uppercase tracking-wider">
-                      Season {activeEpisode.seasonNumber || 1} Queue ({episodes.length} Episodes)
-                    </h3>
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <Tv className="w-4 h-4 text-[#F47521] flex-shrink-0" />
+                    {franchiseSeasons && franchiseSeasons.length > 1 ? (
+                      <select
+                        value={media.id}
+                        onChange={(e) => {
+                          const targetId = Number(e.target.value);
+                          if (targetId !== media.id) {
+                            const selSeason = franchiseSeasons.find((s) => s.anilistId === targetId);
+                            const sMatch = selSeason?.seasonNumberLabel?.match(/Season\s+(\d+)/i);
+                            const sNum = sMatch ? parseInt(sMatch[1], 10) : 1;
+                            const targetUrl = getWatchUrl({ id: targetId, title: selSeason?.title || title, format: media.format }, sNum, 1);
+                            navigate(targetUrl, { state: { anilistId: targetId } });
+                          }
+                        }}
+                        className="bg-[#101116] border border-[#F47521]/60 text-white text-xs font-semibold rounded-lg px-2.5 py-1 focus:outline-none cursor-pointer hover:border-[#F47521] transition-colors"
+                        title="Switch Season"
+                      >
+                        {franchiseSeasons.map((s) => {
+                          const seasonLabel = s.seasonNumberLabel || 'Season 1';
+                          const epSuffix = s.episodesCount ? ` (EP${s.episodesCount})` : '';
+                          return (
+                            <option key={s.anilistId} value={s.anilistId}>
+                              {seasonLabel}{epSuffix}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    ) : (
+                      <h3 className="font-semibold text-xs text-white/90 uppercase tracking-wider truncate">
+                        Season {activeEpisode.seasonNumber || 1} Queue ({episodes.length} Episodes)
+                      </h3>
+                    )}
                   </div>
                 </div>
 
-                {/* Next Episode Featured Card (if available) */}
+                {/* Next Episode Featured Card (if available in current season) */}
                 {nextEpisode && (
                   <div className="mb-3 p-2.5 rounded-xl bg-[#14151B] border border-[#F47521]/30 space-y-1.5 flex-shrink-0">
                     <span className="text-[10px] font-bold uppercase text-[#F47521] tracking-wider block">
@@ -497,12 +544,44 @@ export const WatchPage: React.FC = () => {
                   </div>
                 )}
 
+                {/* If at end of season and next season exists */}
+                {!nextEpisode && nextSeasonNode && (
+                  <div className="mb-3 p-2.5 rounded-xl bg-[#14151B] border border-[#2ABDBB]/40 space-y-1.5 flex-shrink-0">
+                    <span className="text-[10px] font-bold uppercase text-[#2ABDBB] tracking-wider block">
+                      UP NEXT (NEXT SEASON)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const sMatch = nextSeasonNode.seasonNumberLabel?.match(/Season\s+(\d+)/i);
+                        const sNum = sMatch ? parseInt(sMatch[1], 10) : 2;
+                        const nextSeasonUrl = getWatchUrl({ id: nextSeasonNode.anilistId, title: nextSeasonNode.title || title, format: media.format }, sNum, 1);
+                        navigate(nextSeasonUrl, { state: { anilistId: nextSeasonNode.anilistId } });
+                      }}
+                      className="flex items-center gap-2.5 group w-full text-left cursor-pointer"
+                    >
+                      <div className="w-12 h-10 rounded-md bg-[#2ABDBB]/15 border border-[#2ABDBB]/30 flex items-center justify-center text-[#2ABDBB] flex-shrink-0">
+                        <Play className="w-4 h-4 fill-current ml-0.5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h5 className="text-xs font-semibold text-white/90 group-hover:text-[#2ABDBB] transition line-clamp-1">
+                          {nextSeasonNode.seasonNumberLabel || 'Next Season'} — Episode 1
+                        </h5>
+                        <span className="text-[10px] text-[#8E93A0]">
+                          Start next season now
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+
                 {/* All Episodes in Current Season Scrollable List */}
                 <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 min-h-[300px]" data-lenis-prevent>
                   {episodes.map((ep) => {
                     const isCurrent = ep.episodeNumber === activeEpisode.episodeNumber;
                     return (
                       <button
+                        ref={isCurrent ? activeEpisodeRef : null}
                         type="button"
                         key={ep.episodeNumber}
                         onClick={() => handleEpisodeChange(ep.episodeNumber)}
